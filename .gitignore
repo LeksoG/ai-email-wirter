@@ -1,0 +1,17 @@
+{
+  "name": "ai-tools-suite",
+  "version": "1.0.0",
+  "description": "AI-powered email and text transformation tools",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["ai", "email", "transformation", "mistral"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}
