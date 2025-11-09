@@ -765,6 +765,39 @@
                 console.log('🗑️ Deleted result:', id);
             };
 
+            const handleRetry = async () => {
+                if (!savedResults.length) return;
+
+                const lastResult = savedResults[0];
+                console.log('🔄 Retrying with prompt:', lastResult.prompt);
+
+                setIsProcessing(true);
+                setResult('');
+
+                try {
+                    const transformedText = await callAIAPI(lastResult.prompt, lastResult.originalText);
+                    setResult(transformedText);
+
+                    // Save new retry result
+                    const newResult = {
+                        id: Date.now(),
+                        content: transformedText,
+                        prompt: lastResult.prompt,
+                        originalText: lastResult.originalText,
+                        timestamp: new Date().toLocaleString(),
+                        tone: lastResult.tone
+                    };
+                    setSavedResults(prev => [newResult, ...prev]);
+
+                    setIsProcessing(false);
+                    setTimeout(() => animateText(transformedText), 100);
+                } catch (error) {
+                    console.error('Retry Error:', error);
+                    setResult(`Error: ${error.message}`);
+                    setIsProcessing(false);
+                }
+            };
+
             const handleToolProcess = async () => {
                 setIsProcessing(true);
                 setResult('');
@@ -882,6 +915,75 @@
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderInbox = () => {
+                return (
+                    <div className="space-y-6">
+                        <div className="glass-effect rounded-3xl p-8 ai-glow">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-6">📥 Inbox</h2>
+                            <div className="space-y-3">
+                                {gmailEmails.length > 0 ? (
+                                    gmailEmails.map(email => (
+                                        <div
+                                            key={email.id}
+                                            onClick={() => {
+                                                setEmailText(email.snippet);
+                                                setCurrentPage('home');
+                                                setActiveView('writer');
+                                            }}
+                                            className="email-item glass-dark px-6 py-4 rounded-2xl cursor-pointer hover:shadow-lg transition-all"
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-sm font-bold text-gray-800">{email.from}</span>
+                                                <span className="text-xs text-gray-500">{email.date}</span>
+                                            </div>
+                                            <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
+                                            <div className="text-sm text-gray-600">{email.snippet}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-12 text-gray-500">
+                                        <div className="text-6xl mb-4">📭</div>
+                                        <p>No emails in inbox</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderSent = () => {
+                return (
+                    <div className="space-y-6">
+                        <div className="glass-effect rounded-3xl p-8 ai-glow">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-6">📤 Sent</h2>
+                            <div className="space-y-3">
+                                {sentEmails.length > 0 ? (
+                                    sentEmails.map(email => (
+                                        <div
+                                            key={email.id}
+                                            className="glass-dark px-6 py-4 rounded-2xl"
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-sm font-bold text-gray-800">To: {email.to}</span>
+                                                <span className="text-xs text-gray-500">{email.date}</span>
+                                            </div>
+                                            <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
+                                            <div className="text-sm text-gray-600">{email.snippet}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-12 text-gray-500">
+                                        <div className="text-6xl mb-4">📭</div>
+                                        <p>No sent emails</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1073,29 +1175,27 @@
                     return (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-6 py-4">
                             {/* Current Result (in Writer position) */}
-                            <div className="suggestions-container">
+                            <div className="suggestions-container relative">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">📝 Current Result</h3>
                                 {result ? (
-                                    <div>
-                                        <div className="glass-dark rounded-2xl p-6 mb-4">
-                                            <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
-                                        </div>
-                                        <div className="flex gap-3">
+                                    <div className="relative">
+                                        {/* Action buttons at top-right */}
+                                        <div className="action-buttons">
                                             <button
                                                 onClick={() => navigator.clipboard.writeText(result)}
-                                                className="flex-1 px-4 py-3 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 text-sm"
+                                                className="action-btn text-gray-700 hover:text-indigo-700"
                                             >
-                                                📋 Copy
+                                                Copy
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    setResult('');
-                                                    setActiveView('writer');
-                                                }}
-                                                className="flex-1 px-4 py-3 glass-effect border-2 border-purple-400 rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button text-sm"
+                                                onClick={handleRetry}
+                                                className="action-btn text-gray-700 hover:text-purple-700"
                                             >
-                                                🔄 New
+                                                Retry
                                             </button>
+                                        </div>
+                                        <div className="glass-dark rounded-2xl p-6">
+                                            <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
                                         </div>
                                     </div>
                                 ) : (
@@ -1145,26 +1245,24 @@
                 // Normal layout when no saved results
                 if (result) {
                     return (
-                        <div className="result-container px-6 py-4">
-                            <div className="glass-dark rounded-2xl p-6 mb-6">
-                                <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
-                            </div>
-                            <div className="flex gap-3">
+                        <div className="result-container px-6 py-4 relative">
+                            {/* Action buttons at top-right */}
+                            <div className="action-buttons">
                                 <button
                                     onClick={() => navigator.clipboard.writeText(result)}
-                                    className="flex-1 px-6 py-4 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 hover:border-indigo-500"
+                                    className="action-btn text-gray-700 hover:text-indigo-700"
                                 >
-                                    📋 Copy to Clipboard
+                                    Copy
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        setResult('');
-                                        setActiveView('writer');
-                                    }}
-                                    className="flex-1 px-6 py-4 glass-effect border-2 border-purple-400 hover:border-purple-500 rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button"
+                                    onClick={handleRetry}
+                                    className="action-btn text-gray-700 hover:text-purple-700"
                                 >
-                                    🔄 Start New
+                                    Retry
                                 </button>
+                            </div>
+                            <div className="glass-dark rounded-2xl p-6">
+                                <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
                             </div>
                         </div>
                     );
@@ -1288,7 +1386,9 @@
 
                     <div className="page-container relative z-10 container mx-auto px-4 py-8 max-w-8xl">
 
-                        {currentPage === 'settings' ? renderSettings() : (
+                        {currentPage === 'settings' ? renderSettings() :
+                         currentPage === 'inbox' ? renderInbox() :
+                         currentPage === 'sent' ? renderSent() : (
                             <>
                                 {/* Main Center Container with Tabs */}
                                 <div className="glass-effect rounded-3xl p-8 ai-glow relative">
