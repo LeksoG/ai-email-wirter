@@ -953,6 +953,175 @@
         .email-content-formatted p {
             margin-bottom: 12px;
         }
+
+        /* Priority Email Stacking */
+        .priority-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .priority-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            position: relative;
+            z-index: 10;
+        }
+
+        .priority-header:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .priority-stack {
+            position: relative;
+            margin-top: -12px;
+        }
+
+        .priority-email-stacked {
+            position: absolute;
+            width: calc(100% - 16px);
+            left: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .priority-email-stacked:nth-child(1) {
+            top: 8px;
+            z-index: 3;
+            transform: scale(0.98);
+        }
+
+        .priority-email-stacked:nth-child(2) {
+            top: 12px;
+            z-index: 2;
+            transform: scale(0.96);
+            opacity: 0.7;
+        }
+
+        .priority-email-stacked:nth-child(3) {
+            top: 16px;
+            z-index: 1;
+            transform: scale(0.94);
+            opacity: 0.5;
+        }
+
+        .priority-email-stacked:nth-child(n+4) {
+            display: none;
+        }
+
+        .priority-stack-expanded {
+            position: relative;
+            margin-top: 0;
+        }
+
+        .priority-stack-expanded .priority-email-stacked {
+            position: relative;
+            width: 100%;
+            left: 0;
+            margin-bottom: 12px;
+            opacity: 1;
+            transform: scale(1);
+            animation: priority-expand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .priority-stack-expanded .priority-email-stacked:nth-child(n+4) {
+            display: block;
+        }
+
+        @keyframes priority-expand {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Auto-Prioritize Setting */
+        .setting-preview-container {
+            margin-top: 12px;
+            padding: 16px;
+            background: rgba(99, 102, 241, 0.05);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            animation: setting-preview-appear 0.3s ease-out;
+        }
+
+        @keyframes setting-preview-appear {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .preview-animation {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .preview-email-item {
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            font-size: 12px;
+            animation: preview-slide 2s ease-in-out infinite;
+        }
+
+        .preview-email-item:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .preview-email-item:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .preview-email-item:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes preview-slide {
+            0%, 100% {
+                transform: translateX(0);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateX(10px);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1001,9 +1170,13 @@
             const [isPrioritizing, setIsPrioritizing] = useState(false);
             const [emailsPrioritized, setEmailsPrioritized] = useState(false);
             const [isRewritingReply, setIsRewritingReply] = useState(false);
+            const [autoPrioritize, setAutoPrioritize] = useState(false);
+            const [priorityEmails, setPriorityEmails] = useState([]);
+            const [isPriorityExpanded, setIsPriorityExpanded] = useState(false);
 
             // Audio references for notifications
             const audioRef = useRef(null);
+            const sendAudioRef = useRef(null);
 
             // Initialize app with console logging
             useEffect(() => {
@@ -1113,10 +1286,19 @@
                 }
             }, [customPrompt, showSuggestionsEnabled]);
 
-            // Initialize audio
+            // Initialize audio with local files
             useEffect(() => {
-                audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+                audioRef.current = new Audio('/notification.mp3');
                 audioRef.current.load();
+
+                sendAudioRef.current = new Audio('/send.mp3');
+                sendAudioRef.current.load();
+
+                // Load auto-prioritize setting
+                const savedAutoPrioritize = localStorage.getItem('autoPrioritize');
+                if (savedAutoPrioritize === 'true') {
+                    setAutoPrioritize(true);
+                }
             }, []);
 
             // Auto-hide undo delete button after 5 seconds
@@ -1130,10 +1312,26 @@
                 }
             }, [showUndoDelete]);
 
+            // Auto-prioritize emails when inbox loads
+            useEffect(() => {
+                if (autoPrioritize && gmailEmails.length > 0 && currentPage === 'inbox' && priorityEmails.length === 0) {
+                    handlePrioritizeEmails();
+                }
+            }, [autoPrioritize, gmailEmails.length, currentPage]);
+
             // Play notification sound
             const playNotificationSound = () => {
                 if (audioRef.current) {
+                    audioRef.current.currentTime = 0;
                     audioRef.current.play().catch(e => console.log('Sound play failed:', e));
+                }
+            };
+
+            // Play send sound
+            const playSendSound = () => {
+                if (sendAudioRef.current) {
+                    sendAudioRef.current.currentTime = 0;
+                    sendAudioRef.current.play().catch(e => console.log('Send sound failed:', e));
                 }
             };
 
@@ -1662,6 +1860,59 @@
                                     </div>
                                 </div>
 
+                                {/* Auto-Prioritize Toggle */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                        ✨ Auto-Prioritize Emails
+                                    </label>
+                                    <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                        <span className="text-sm text-gray-700">Automatically prioritize important emails in inbox</span>
+                                        <button
+                                            onClick={() => {
+                                                const newValue = !autoPrioritize;
+                                                setAutoPrioritize(newValue);
+                                                localStorage.setItem('autoPrioritize', newValue.toString());
+                                                playNotificationSound();
+                                            }}
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                autoPrioritize ? 'bg-indigo-600' : 'bg-gray-300'
+                                            }`}
+                                        >
+                                            <span
+                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                    autoPrioritize ? 'translate-x-6' : 'translate-x-1'
+                                                }`}
+                                            />
+                                        </button>
+                                    </div>
+
+                                    {/* Preview Animation */}
+                                    {autoPrioritize && (
+                                        <div className="setting-preview-container">
+                                            <div className="text-xs font-semibold text-indigo-600 mb-2">
+                                                🤖 How it works:
+                                            </div>
+                                            <div className="text-xs text-gray-600 mb-3">
+                                                AI analyzes your emails for urgency, keywords, and importance, then stacks priority emails at the top of your inbox
+                                            </div>
+                                            <div className="preview-animation">
+                                                <div className="preview-email-item">
+                                                    <div className="font-semibold text-indigo-600">⚡ URGENT: Meeting in 1 hour</div>
+                                                    <div className="text-gray-500 text-xs mt-1">Detected as high priority</div>
+                                                </div>
+                                                <div className="preview-email-item">
+                                                    <div className="font-semibold text-indigo-600">🎯 Action Required: Review Document</div>
+                                                    <div className="text-gray-500 text-xs mt-1">Detected as high priority</div>
+                                                </div>
+                                                <div className="preview-email-item">
+                                                    <div className="font-semibold text-indigo-600">⏰ Deadline Tomorrow</div>
+                                                    <div className="text-gray-500 text-xs mt-1">Detected as high priority</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
                                 {/* Email Connection Section */}
                                 <div className="pt-6 border-t border-gray-300">
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -1846,57 +2097,51 @@
                 setEmailsPrioritized(false);
 
                 try {
-                    // Use AI to determine priority
-                    const emailsToAnalyze = gmailEmails.map(email => ({
-                        id: email.id,
-                        from: email.from,
-                        subject: email.subject,
-                        snippet: email.snippet
-                    }));
+                    // Simple AI-based priority detection using keywords and patterns
+                    const analyzePriority = (email) => {
+                        let score = 0;
+                        const subjectLower = email.subject.toLowerCase();
+                        const snippetLower = email.snippet.toLowerCase();
 
-                    // Call AI API to analyze priority
-                    const response = await fetch('/api/transform', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            prompt: `Analyze these emails and return a JSON array of email IDs sorted by priority (most important first). Consider urgency, sender importance, and content. Return ONLY a JSON array of IDs like: ["id1", "id2", "id3"]. Emails: ${JSON.stringify(emailsToAnalyze)}`,
-                            text: '',
-                            temperature: 0.3
-                        })
-                    });
+                        // Urgent keywords
+                        if (subjectLower.match(/urgent|asap|important|critical|emergency|priority/)) score += 10;
+                        if (snippetLower.match(/urgent|asap|important|critical|emergency|priority/)) score += 5;
 
-                    const data = await response.json();
+                        // Action required
+                        if (subjectLower.match(/action required|respond|reply|feedback|review/)) score += 7;
+                        if (snippetLower.match(/action required|respond|reply|feedback|review/)) score += 3;
 
-                    // Parse AI response to get priority order
-                    let priorityIds = [];
-                    try {
-                        const match = data.result.match(/\[.*\]/);
-                        if (match) {
-                            priorityIds = JSON.parse(match[0]);
-                        }
-                    } catch (e) {
-                        console.log('Could not parse AI priority, using default');
-                    }
+                        // Time-sensitive
+                        if (subjectLower.match(/today|tomorrow|deadline|due|meeting/)) score += 8;
+                        if (snippetLower.match(/today|tomorrow|deadline|due|meeting/)) score += 4;
+
+                        // Question marks (usually need response)
+                        if (subjectLower.includes('?')) score += 5;
+
+                        // Sender patterns (you can enhance this)
+                        if (email.from.match(/boss|ceo|manager|director/i)) score += 6;
+
+                        return score;
+                    };
 
                     // Wait for wave animation
                     setTimeout(() => {
-                        if (priorityIds.length > 0) {
-                            // Reorder emails based on AI priority
-                            const prioritizedEmails = [];
-                            priorityIds.forEach(id => {
-                                const email = gmailEmails.find(e => e.id === id);
-                                if (email) prioritizedEmails.push(email);
-                            });
+                        // Analyze and score all emails
+                        const scoredEmails = gmailEmails.map(email => ({
+                            ...email,
+                            priorityScore: analyzePriority(email)
+                        }));
 
-                            // Add any emails that weren't in the AI response
-                            gmailEmails.forEach(email => {
-                                if (!prioritizedEmails.find(e => e.id === email.id)) {
-                                    prioritizedEmails.push(email);
-                                }
-                            });
+                        // Sort by priority score
+                        scoredEmails.sort((a, b) => b.priorityScore - a.priorityScore);
 
-                            setGmailEmails(prioritizedEmails);
-                        }
+                        // Top 3-5 emails with score > 5 are priority
+                        const priorityThreshold = 5;
+                        const priority = scoredEmails.filter(e => e.priorityScore >= priorityThreshold).slice(0, 5);
+                        const regular = scoredEmails.filter(e => !priority.find(p => p.id === e.id));
+
+                        setPriorityEmails(priority);
+                        setGmailEmails([...priority, ...regular]);
 
                         setIsPrioritizing(false);
                         setEmailsPrioritized(true);
@@ -1962,19 +2207,21 @@
                                 <div className="flex gap-3">
                                     {gmailEmails.length > 0 && (
                                         <>
-                                            <button
-                                                onClick={() => handlePrioritizeEmails()}
-                                                disabled={isPrioritizing}
-                                                className="oval-button px-4 py-2 text-sm font-semibold text-white"
-                                                style={{
-                                                    background: isPrioritizing
-                                                        ? 'rgba(99, 102, 241, 0.5)'
-                                                        : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                                    cursor: isPrioritizing ? 'not-allowed' : 'pointer'
-                                                }}
-                                            >
-                                                {isPrioritizing ? '🤖 Prioritizing...' : '✨ Prioritize Emails'}
-                                            </button>
+                                            {!autoPrioritize && (
+                                                <button
+                                                    onClick={() => handlePrioritizeEmails()}
+                                                    disabled={isPrioritizing}
+                                                    className="oval-button px-4 py-2 text-sm font-semibold text-white"
+                                                    style={{
+                                                        background: isPrioritizing
+                                                            ? 'rgba(99, 102, 241, 0.5)'
+                                                            : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                        cursor: isPrioritizing ? 'not-allowed' : 'pointer'
+                                                    }}
+                                                >
+                                                    {isPrioritizing ? '🤖 Prioritizing...' : '✨ Prioritize Emails'}
+                                                </button>
+                                            )}
                                             {selectedEmails.length > 0 && (
                                                 <button
                                                     onClick={() => handleDeleteSelected('inbox')}
@@ -2001,9 +2248,72 @@
                                 </div>
                             )}
 
+                            {/* Priority Emails Stacked */}
+                            {priorityEmails.length > 0 && !isPrioritizing && (
+                                <div className="priority-container">
+                                    <div
+                                        className="priority-header"
+                                        onClick={() => setIsPriorityExpanded(!isPriorityExpanded)}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span>⚡ Priority Emails</span>
+                                            <div className="priority-badge">
+                                                {priorityEmails.length} {priorityEmails.length === 1 ? 'email' : 'emails'}
+                                            </div>
+                                        </div>
+                                        <span className="text-2xl" style={{transition: 'transform 0.3s', transform: isPriorityExpanded ? 'rotate(180deg)' : 'rotate(0)'}}>
+                                            ↓
+                                        </span>
+                                    </div>
+
+                                    <div className={isPriorityExpanded ? 'priority-stack-expanded' : 'priority-stack'}>
+                                        {priorityEmails.map((email, index) => (
+                                            <div
+                                                key={email.id}
+                                                onClick={() => setViewingEmail(email)}
+                                                className="priority-email-stacked cursor-pointer"
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-1">
+                                                        <div className="text-sm font-bold text-gray-800 mb-1">{email.from}</div>
+                                                        <div className="text-base font-semibold text-gray-700 mb-1">{email.subject}</div>
+                                                        {isPriorityExpanded && (
+                                                            <div className="text-sm text-gray-600 mt-2">{email.snippet.substring(0, 100)}...</div>
+                                                        )}
+                                                    </div>
+                                                    {isPriorityExpanded && (
+                                                        <div className="flex gap-2 ml-4">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleSummarizeEmail(email);
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-semibold text-white rounded-full"
+                                                                style={{background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'}}
+                                                            >
+                                                                Summarize
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteEmail(email.id, 'inbox');
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded-full"
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="space-y-3">
                                 {gmailEmails.length > 0 ? (
-                                    gmailEmails.map((email, index) => (
+                                    gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map((email, index) => (
                                         <div
                                             key={email.id}
                                             data-email-id={email.id}
@@ -2550,7 +2860,7 @@
                                                 <button
                                                     onClick={() => {
                                                         if (emailReply) {
-                                                            playNotificationSound();
+                                                            playSendSound();
                                                             console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
                                                             alert('Reply sent successfully! ✉️');
                                                             setEmailReply('');
