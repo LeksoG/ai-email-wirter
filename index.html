@@ -668,7 +668,7 @@
                     console.log('🔐 Initiating Gmail OAuth...');
 
                     // Call your auth endpoint to get the OAuth URL
-                    const response = await fetch('/api/auth/gmail');
+                    const response = await fetch('/api/gmail-auth');
 
                     if (!response.ok) {
                         throw new Error('Failed to initiate OAuth');
@@ -681,7 +681,7 @@
                     window.location.href = data.authUrl;
                 } catch (error) {
                     console.error('❌ Gmail OAuth error:', error);
-                    alert('Failed to connect to Gmail. Please check:\n\n1. GOOGLE_CLIENT_ID is set in Vercel\n2. GOOGLE_CLIENT_SECRET is set in Vercel\n3. OAuth redirect URI is configured correctly\n4. Gmail API is enabled in Google Cloud Console');
+                    console.error('Please check: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set in Vercel');
                 }
             };
 
@@ -689,7 +689,7 @@
                 try {
                     console.log('📬 Fetching Gmail inbox...');
 
-                    const response = await fetch('/api/gmail/inbox', {
+                    const response = await fetch('/api/gmail-inbox', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -730,7 +730,7 @@
                 try {
                     console.log('📤 Fetching sent emails...');
 
-                    const response = await fetch('/api/gmail/sent', {
+                    const response = await fetch('/api/gmail-sent', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
