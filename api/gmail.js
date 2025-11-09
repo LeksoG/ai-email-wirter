@@ -13,33 +13,47 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        console.log('🔐 Generating OAuth URL...');
+        const { accessToken } = req.body;
 
-        const oauth2Client = new google.auth.OAuth2(
-            process.env.GOOGLE_CLIENT_ID,
-            process.env.GOOGLE_CLIENT_SECRET,
-            `${req.headers.origin || 'http://localhost:3000'}/api/auth/callback`
-        );
+        if (!accessToken) {
+            return res.status(400).json({ error: 'Access token is required' });
+        }
 
-        const scopes = [
-            'https://www.googleapis.com/auth/gmail.readonly',
-            'https://www.googleapis.com/auth/gmail.send',
-            'https://www.googleapis.com/auth/userinfo.email'
-        ];
+        console.log('📤 Fetching sent emails...');
 
-        const authUrl = oauth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: scopes,
-            prompt: 'consent' // Force to show consent screen to get refresh token
+        const oauth2Client = new google.auth.OAuth2();
+        oauth2Client.setCredentials({ access_token: accessToken });
+
+        const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+        // List messages from sent folder
+        const listResponse = await gmail.users.messages.list({
+            userId: 'me',
+            maxResults: 10,
+            labelIds: ['SENT']
         });
 
-        console.log('✅ OAuth URL generated');
+        const messages = listResponse.data.messages || [];
 
-        res.status(200).json({ authUrl });
+        // Fetch full message details
+        const emails = await Promise.all(
+            messages.map(async (msg) => {
+                const fullMsg = await gmail.users.messages.get({
+                    userId: 'me',
+                    id: msg.id,
+                    format: 'full'
+                });
+                return fullMsg.data;
+            })
+        );
+
+        console.log(`✅ Fetched ${emails.length} sent emails`);
+
+        res.status(200).json({ emails });
     } catch (error) {
-        console.error('❌ OAuth URL generation error:', error);
+        console.error('❌ Error fetching sent emails:', error);
         res.status(500).json({
-            error: 'Failed to generate OAuth URL',
+            error: 'Failed to fetch sent emails',
             message: error.message
         });
     }
