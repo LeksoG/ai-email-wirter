@@ -752,22 +752,206 @@
         }
 
         @keyframes float-particle {
-            0%, 100% { 
+            0%, 100% {
                 transform: translate(0, 0) scale(1);
                 opacity: 0.3;
             }
-            25% { 
+            25% {
                 transform: translate(30px, -40px) scale(1.5);
                 opacity: 0.6;
             }
-            50% { 
+            50% {
                 transform: translate(-20px, -80px) scale(1);
                 opacity: 0.4;
             }
-            75% { 
+            75% {
                 transform: translate(-50px, -40px) scale(1.2);
                 opacity: 0.5;
             }
+        }
+
+        /* Delete Animation */
+        .email-delete-fade {
+            animation: delete-fade-out 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        @keyframes delete-fade-out {
+            0% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateX(-20px) scale(0.98);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-60px) scale(0.95);
+                height: 0;
+                padding: 0;
+                margin: 0;
+            }
+        }
+
+        /* Undo Delete Button */
+        .undo-delete-button {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: rgba(20, 20, 20, 0.95);
+            color: white;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: undo-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .undo-delete-button:hover {
+            background: rgba(40, 40, 40, 0.95);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes undo-slide-up {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Prioritize Email Animation */
+        .prioritize-wave {
+            height: 60px;
+            background: linear-gradient(90deg,
+                rgba(99, 102, 241, 0.1) 0%,
+                rgba(139, 92, 246, 0.3) 25%,
+                rgba(167, 139, 250, 0.4) 50%,
+                rgba(139, 92, 246, 0.3) 75%,
+                rgba(99, 102, 241, 0.1) 100%
+            );
+            background-size: 200% 100%;
+            animation: prioritize-wave-motion 3s ease-in-out infinite;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #6366f1;
+        }
+
+        @keyframes prioritize-wave-motion {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .email-slide-up {
+            animation: email-priority-slide 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes email-priority-slide {
+            0% {
+                opacity: 0.5;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Gmail Icon Styles */
+        .gmail-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        .gmail-connecting {
+            animation: gmail-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes gmail-pulse {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .gmail-connected {
+            position: relative;
+        }
+
+        .gmail-connected::after {
+            content: '✓';
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            color: white;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* Email Selection Checkbox */
+        .email-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(99, 102, 241, 0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .email-checkbox.checked {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: #6366f1;
+        }
+
+        .email-checkbox:hover {
+            border-color: #6366f1;
+            transform: scale(1.1);
+        }
+
+        /* Improved Email Content Display */
+        .email-content-formatted {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .email-content-formatted p {
+            margin-bottom: 12px;
         }
     </style>
 </head>
@@ -809,6 +993,17 @@
                 { id: 2, from: 'sarah@company.com', subject: 'Project Update', preview: 'The latest updates on the project...', date: '5 hours ago' },
                 { id: 3, from: 'mike@startup.io', subject: 'Quick Question', preview: 'Do you have a moment to discuss...', date: '1 day ago' },
             ]);
+
+            // New state variables for enhanced features
+            const [selectedEmails, setSelectedEmails] = useState([]);
+            const [deletedEmail, setDeletedEmail] = useState(null);
+            const [showUndoDelete, setShowUndoDelete] = useState(false);
+            const [isPrioritizing, setIsPrioritizing] = useState(false);
+            const [emailsPrioritized, setEmailsPrioritized] = useState(false);
+            const [isRewritingReply, setIsRewritingReply] = useState(false);
+
+            // Audio references for notifications
+            const audioRef = useRef(null);
 
             // Initialize app with console logging
             useEffect(() => {
@@ -917,6 +1112,30 @@
                     setShowSuggestions(false);
                 }
             }, [customPrompt, showSuggestionsEnabled]);
+
+            // Initialize audio
+            useEffect(() => {
+                audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+                audioRef.current.load();
+            }, []);
+
+            // Auto-hide undo delete button after 5 seconds
+            useEffect(() => {
+                if (showUndoDelete) {
+                    const timer = setTimeout(() => {
+                        setShowUndoDelete(false);
+                        setDeletedEmail(null);
+                    }, 5000);
+                    return () => clearTimeout(timer);
+                }
+            }, [showUndoDelete]);
+
+            // Play notification sound
+            const playNotificationSound = () => {
+                if (audioRef.current) {
+                    audioRef.current.play().catch(e => console.log('Sound play failed:', e));
+                }
+            };
 
             const emailStyles = [
                 { id: 'professional', label: '💼 Professional' },
@@ -1455,15 +1674,23 @@
                                     {!emailConnected ? (
                                         <button
                                             onClick={handleGmailConnect}
-                                            className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:from-indigo-600 hover:to-purple-700 transition-all oval-button"
+                                            className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:from-indigo-600 hover:to-purple-700 transition-all oval-button flex items-center justify-center gap-3"
                                         >
+                                            <svg className="gmail-icon gmail-connecting" viewBox="0 0 24 24" fill="white">
+                                                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                                            </svg>
                                             Connect Gmail
                                         </button>
                                     ) : (
                                         <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-medium text-gray-700">✅ Connected to Gmail</span>
-                                                {userEmail && <span className="text-xs text-gray-600 mt-1">{userEmail}</span>}
+                                            <div className="flex items-center gap-3">
+                                                <svg className="gmail-icon gmail-connected" viewBox="0 0 24 24" fill="#10b981">
+                                                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                                                </svg>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-medium text-gray-700">Connected to Gmail</span>
+                                                    {userEmail && <span className="text-xs text-gray-600 mt-1">{userEmail}</span>}
+                                                </div>
                                             </div>
                                             <button
                                                 onClick={() => {
@@ -1529,27 +1756,276 @@
             };
 
             const handleDeleteEmail = (emailId, type = 'inbox') => {
-                if (type === 'inbox') {
-                    setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+                playNotificationSound();
+
+                // Find the email being deleted
+                const emailToDelete = type === 'inbox'
+                    ? gmailEmails.find(e => e.id === emailId)
+                    : sentEmails.find(e => e.id === emailId);
+
+                // Store deleted email for undo
+                setDeletedEmail({ email: emailToDelete, type });
+                setShowUndoDelete(true);
+
+                // Delete with animation
+                const emailElement = document.querySelector(`[data-email-id="${emailId}"]`);
+                if (emailElement) {
+                    emailElement.classList.add('email-delete-fade');
+                    setTimeout(() => {
+                        if (type === 'inbox') {
+                            setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+                        } else {
+                            setSentEmails(prev => prev.filter(e => e.id !== emailId));
+                        }
+                        console.log(`🗑️ Deleted ${type} email:`, emailId);
+                    }, 400);
                 } else {
-                    setSentEmails(prev => prev.filter(e => e.id !== emailId));
+                    if (type === 'inbox') {
+                        setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+                    } else {
+                        setSentEmails(prev => prev.filter(e => e.id !== emailId));
+                    }
                 }
-                console.log(`🗑️ Deleted ${type} email:`, emailId);
+            };
+
+            const handleUndoDelete = () => {
+                if (deletedEmail) {
+                    playNotificationSound();
+                    if (deletedEmail.type === 'inbox') {
+                        setGmailEmails(prev => [deletedEmail.email, ...prev]);
+                    } else {
+                        setSentEmails(prev => [deletedEmail.email, ...prev]);
+                    }
+                    setShowUndoDelete(false);
+                    setDeletedEmail(null);
+                    console.log('↩️ Undid delete');
+                }
+            };
+
+            const handleDeleteSelected = (type = 'inbox') => {
+                if (selectedEmails.length === 0) return;
+                playNotificationSound();
+
+                if (type === 'inbox') {
+                    setGmailEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
+                } else {
+                    setSentEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
+                }
+                setSelectedEmails([]);
+                console.log(`🗑️ Deleted ${selectedEmails.length} emails`);
+            };
+
+            const handleDeleteAll = (type = 'inbox') => {
+                playNotificationSound();
+                const confirmDelete = confirm(`Are you sure you want to delete all ${type} emails?`);
+                if (confirmDelete) {
+                    if (type === 'inbox') {
+                        setGmailEmails([]);
+                    } else {
+                        setSentEmails([]);
+                    }
+                    console.log(`🗑️ Deleted all ${type} emails`);
+                }
+            };
+
+            const toggleEmailSelection = (emailId) => {
+                setSelectedEmails(prev => {
+                    if (prev.includes(emailId)) {
+                        return prev.filter(id => id !== emailId);
+                    } else {
+                        return [...prev, emailId];
+                    }
+                });
+            };
+
+            const handlePrioritizeEmails = async () => {
+                if (gmailEmails.length === 0) return;
+
+                playNotificationSound();
+                setIsPrioritizing(true);
+                setEmailsPrioritized(false);
+
+                try {
+                    // Use AI to determine priority
+                    const emailsToAnalyze = gmailEmails.map(email => ({
+                        id: email.id,
+                        from: email.from,
+                        subject: email.subject,
+                        snippet: email.snippet
+                    }));
+
+                    // Call AI API to analyze priority
+                    const response = await fetch('/api/transform', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: `Analyze these emails and return a JSON array of email IDs sorted by priority (most important first). Consider urgency, sender importance, and content. Return ONLY a JSON array of IDs like: ["id1", "id2", "id3"]. Emails: ${JSON.stringify(emailsToAnalyze)}`,
+                            text: '',
+                            temperature: 0.3
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    // Parse AI response to get priority order
+                    let priorityIds = [];
+                    try {
+                        const match = data.result.match(/\[.*\]/);
+                        if (match) {
+                            priorityIds = JSON.parse(match[0]);
+                        }
+                    } catch (e) {
+                        console.log('Could not parse AI priority, using default');
+                    }
+
+                    // Wait for wave animation
+                    setTimeout(() => {
+                        if (priorityIds.length > 0) {
+                            // Reorder emails based on AI priority
+                            const prioritizedEmails = [];
+                            priorityIds.forEach(id => {
+                                const email = gmailEmails.find(e => e.id === id);
+                                if (email) prioritizedEmails.push(email);
+                            });
+
+                            // Add any emails that weren't in the AI response
+                            gmailEmails.forEach(email => {
+                                if (!prioritizedEmails.find(e => e.id === email.id)) {
+                                    prioritizedEmails.push(email);
+                                }
+                            });
+
+                            setGmailEmails(prioritizedEmails);
+                        }
+
+                        setIsPrioritizing(false);
+                        setEmailsPrioritized(true);
+
+                        // Reset prioritized flag after animation
+                        setTimeout(() => setEmailsPrioritized(false), 2000);
+                    }, 3000);
+
+                } catch (error) {
+                    console.error('Error prioritizing emails:', error);
+                    setIsPrioritizing(false);
+                }
+            };
+
+            const handleRewriteReply = async () => {
+                if (!emailReply || !replyPrompt) return;
+
+                setIsRewritingReply(true);
+                playNotificationSound();
+
+                try {
+                    // Check if user wants email structure
+                    const needsStructure = replyPrompt.toLowerCase().includes('structure') ||
+                                         replyPrompt.toLowerCase().includes('format') ||
+                                         emailReply.match(/^(Hi|Hello|Hey|Dear)/i) === null;
+
+                    let finalPrompt = replyPrompt;
+                    if (needsStructure) {
+                        finalPrompt += ' Make sure to format it as a proper email with greeting, body, and closing.';
+                    }
+
+                    const response = await fetch('/api/transform', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: finalPrompt,
+                            text: emailReply,
+                            temperature: 0.7
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.result) {
+                        setEmailReply(data.result);
+                        setReplyPrompt('');
+                    }
+
+                    setIsRewritingReply(false);
+                } catch (error) {
+                    console.error('Error rewriting reply:', error);
+                    setIsRewritingReply(false);
+                }
             };
 
             const renderInbox = () => {
                 return (
                     <div className="space-y-6">
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
-                            <h2 className="text-3xl font-bold text-gray-800 mb-6">📥 Inbox</h2>
+                            {/* Header with Actions */}
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-3xl font-bold text-gray-800">📥 Inbox</h2>
+                                <div className="flex gap-3">
+                                    {gmailEmails.length > 0 && (
+                                        <>
+                                            <button
+                                                onClick={() => handlePrioritizeEmails()}
+                                                disabled={isPrioritizing}
+                                                className="oval-button px-4 py-2 text-sm font-semibold text-white"
+                                                style={{
+                                                    background: isPrioritizing
+                                                        ? 'rgba(99, 102, 241, 0.5)'
+                                                        : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                    cursor: isPrioritizing ? 'not-allowed' : 'pointer'
+                                                }}
+                                            >
+                                                {isPrioritizing ? '🤖 Prioritizing...' : '✨ Prioritize Emails'}
+                                            </button>
+                                            {selectedEmails.length > 0 && (
+                                                <button
+                                                    onClick={() => handleDeleteSelected('inbox')}
+                                                    className="oval-button px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600"
+                                                >
+                                                    🗑️ Delete Selected ({selectedEmails.length})
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleDeleteAll('inbox')}
+                                                className="oval-button px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600"
+                                            >
+                                                🗑️ Delete All
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Prioritizing Wave Animation */}
+                            {isPrioritizing && (
+                                <div className="prioritize-wave mb-6">
+                                    <span>🤖 AI is analyzing and prioritizing your emails...</span>
+                                </div>
+                            )}
+
                             <div className="space-y-3">
                                 {gmailEmails.length > 0 ? (
-                                    gmailEmails.map(email => (
+                                    gmailEmails.map((email, index) => (
                                         <div
                                             key={email.id}
+                                            data-email-id={email.id}
                                             onClick={() => setViewingEmail(email)}
-                                            className="email-item glass-dark px-6 py-4 rounded-2xl cursor-pointer hover:shadow-lg transition-all relative"
+                                            className={`email-item glass-dark px-6 py-4 rounded-2xl cursor-pointer hover:shadow-lg transition-all relative ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''}`}
                                         >
+                                            {/* Checkbox for Selection */}
+                                            <div
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleEmailSelection(email.id);
+                                                }}
+                                                className={`email-checkbox ${selectedEmails.includes(email.id) ? 'checked' : ''}`}
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: '16px',
+                                                    top: '16px'
+                                                }}
+                                            >
+                                                {selectedEmails.includes(email.id) && <span style={{color: 'white', fontSize: '12px'}}>✓</span>}
+                                            </div>
+
                                             <div className="email-hover-buttons">
                                                 <button
                                                     onClick={(e) => {
@@ -1592,12 +2068,15 @@
                                                     Delete
                                                 </button>
                                             </div>
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-sm font-bold text-gray-800">{email.from}</span>
-                                                <span className="text-xs text-gray-500">{email.date}</span>
+
+                                            <div style={{marginLeft: '40px'}}>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="text-sm font-bold text-gray-800">{email.from}</span>
+                                                    <span className="text-xs text-gray-500">{email.date}</span>
+                                                </div>
+                                                <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
+                                                <div className="text-sm text-gray-600 email-content-formatted">{email.snippet}</div>
                                             </div>
-                                            <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
-                                            <div className="text-sm text-gray-600">{email.snippet}</div>
 
                                             {/* Summarize Popup */}
                                             {summarizingEmail === email.id && (
@@ -1657,20 +2136,81 @@
                 return (
                     <div className="space-y-6">
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
-                            <h2 className="text-3xl font-bold text-gray-800 mb-6">📤 Sent</h2>
+                            {/* Header with Actions */}
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-3xl font-bold text-gray-800">📤 Sent</h2>
+                                <div className="flex gap-3">
+                                    {sentEmails.length > 0 && (
+                                        <>
+                                            {selectedEmails.length > 0 && (
+                                                <button
+                                                    onClick={() => handleDeleteSelected('sent')}
+                                                    className="oval-button px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600"
+                                                >
+                                                    🗑️ Delete Selected ({selectedEmails.length})
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleDeleteAll('sent')}
+                                                className="oval-button px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600"
+                                            >
+                                                🗑️ Delete All
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
                             <div className="space-y-3">
                                 {sentEmails.length > 0 ? (
                                     sentEmails.map(email => (
                                         <div
                                             key={email.id}
-                                            className="glass-dark px-6 py-4 rounded-2xl"
+                                            data-email-id={email.id}
+                                            className="email-item glass-dark px-6 py-4 rounded-2xl relative hover:shadow-lg transition-all"
                                         >
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="text-sm font-bold text-gray-800">To: {email.to}</span>
-                                                <span className="text-xs text-gray-500">{email.date}</span>
+                                            {/* Checkbox for Selection */}
+                                            <div
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleEmailSelection(email.id);
+                                                }}
+                                                className={`email-checkbox ${selectedEmails.includes(email.id) ? 'checked' : ''}`}
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: '16px',
+                                                    top: '16px'
+                                                }}
+                                            >
+                                                {selectedEmails.includes(email.id) && <span style={{color: 'white', fontSize: '12px'}}>✓</span>}
                                             </div>
-                                            <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
-                                            <div className="text-sm text-gray-600">{email.snippet}</div>
+
+                                            {/* Delete Button on Hover */}
+                                            <div className="email-hover-buttons">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteEmail(email.id, 'sent');
+                                                    }}
+                                                    className="email-hover-btn"
+                                                    style={{
+                                                        background: 'rgba(239, 68, 68, 0.9)',
+                                                        color: 'white',
+                                                        border: 'none'
+                                                    }}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+
+                                            <div style={{marginLeft: '40px'}}>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="text-sm font-bold text-gray-800">To: {email.to}</span>
+                                                    <span className="text-xs text-gray-500">{email.date}</span>
+                                                </div>
+                                                <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
+                                                <div className="text-sm text-gray-600 email-content-formatted">{email.snippet}</div>
+                                            </div>
                                         </div>
                                     ))
                                 ) : (
@@ -1948,7 +2488,7 @@
                                         </div>
                                     </div>
                                     <div className="prose max-w-none">
-                                        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{viewingEmail.snippet}</p>
+                                        <p className="text-gray-700 leading-relaxed email-content-formatted">{viewingEmail.snippet}</p>
                                     </div>
 
                                     {/* Summarize Popup in Viewer */}
@@ -2010,15 +2550,7 @@
                                                 <button
                                                     onClick={() => {
                                                         if (emailReply) {
-                                                            // Try to play send sound with better audio source
-                                                            try {
-                                                                const audio = new Audio();
-                                                                audio.src = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3';
-                                                                audio.play().catch(e => console.log('Sound play failed:', e));
-                                                            } catch (e) {
-                                                                console.log('Audio not available:', e);
-                                                            }
-
+                                                            playNotificationSound();
                                                             console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
                                                             alert('Reply sent successfully! ✉️');
                                                             setEmailReply('');
@@ -2040,29 +2572,19 @@
                                                 value={replyPrompt}
                                                 onChange={(e) => setReplyPrompt(e.target.value)}
                                                 className="ai-transform-input"
-                                                placeholder="✨ Transform with AI (e.g., 'Make it more professional')"
+                                                placeholder="✨ Rewrite with AI (e.g., 'Make it more professional', 'Add email structure')"
                                                 onKeyPress={(e) => {
                                                     if (e.key === 'Enter' && replyPrompt && emailReply) {
-                                                        callAIAPI(replyPrompt, emailReply).then(transformed => {
-                                                            setEmailReply(transformed);
-                                                            setReplyPrompt('');
-                                                        });
+                                                        handleRewriteReply();
                                                     }
                                                 }}
                                             />
                                             <button
-                                                onClick={() => {
-                                                    if (replyPrompt && emailReply) {
-                                                        callAIAPI(replyPrompt, emailReply).then(transformed => {
-                                                            setEmailReply(transformed);
-                                                            setReplyPrompt('');
-                                                        });
-                                                    }
-                                                }}
-                                                disabled={!replyPrompt || !emailReply}
+                                                onClick={handleRewriteReply}
+                                                disabled={!replyPrompt || !emailReply || isRewritingReply}
                                                 className="ai-transform-button"
                                             >
-                                                Transform
+                                                {isRewritingReply ? '✨ Rewriting...' : 'Rewrite'}
                                             </button>
                                         </div>
                                     </div>
@@ -2266,6 +2788,17 @@
                             </>
                         )}
                     </div>
+
+                    {/* Undo Delete Button */}
+                    {showUndoDelete && (
+                        <button
+                            onClick={handleUndoDelete}
+                            className="undo-delete-button"
+                        >
+                            <span>↩️</span>
+                            <span>Undo Delete</span>
+                        </button>
+                    )}
                 </div>
             );
         };
