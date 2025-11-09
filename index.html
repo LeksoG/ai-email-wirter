@@ -306,6 +306,56 @@
             transform: translateX(5px);
         }
 
+        /* Filter Dropdown */
+        .filter-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            min-width: 200px;
+            max-width: 300px;
+            z-index: 50;
+            animation: dropdown-appear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes dropdown-appear {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Suggestions blur animation */
+        .suggestions-container {
+            animation: blur-slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes blur-slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+                filter: blur(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+                filter: blur(0);
+            }
+        }
+
+        /* Tab container styling */
+        .tab-button-container {
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+        }
+
         /* Floating AI particles */
         .ai-particle {
             position: fixed;
@@ -353,11 +403,19 @@
             const [isProcessing, setIsProcessing] = useState(false);
             const [showSuggestions, setShowSuggestions] = useState(false);
             const [emailConnected, setEmailConnected] = useState(false);
+            const [showFilterDropdown, setShowFilterDropdown] = useState(false);
             const [userEmails, setUserEmails] = useState([
                 { id: 1, from: 'john@example.com', subject: 'Meeting Tomorrow', preview: 'Hey, just wanted to confirm...', date: '2 hours ago' },
                 { id: 2, from: 'sarah@company.com', subject: 'Project Update', preview: 'The latest updates on the project...', date: '5 hours ago' },
                 { id: 3, from: 'mike@startup.io', subject: 'Quick Question', preview: 'Do you have a moment to discuss...', date: '1 day ago' },
             ]);
+
+            // Initialize app with console logging
+            useEffect(() => {
+                console.log('🚀 AI Email Writer initialized');
+                console.log('📊 Initial state:', { activeTab, activeView, currentPage });
+                console.log('🔌 API endpoint:', '/api/transform');
+            }, []);
 
             const emailStyles = [
                 { id: 'professional', label: '💼 Professional' },
@@ -386,8 +444,11 @@
             }, [emailText]);
 
             const callAIAPI = async (prompt, text) => {
+                console.log('🤖 Calling AI API...');
+                console.log('📝 Prompt:', prompt);
+                console.log('📄 Text length:', text.length, 'characters');
+
                 try {
-                    // Call the Vercel serverless function
                     const response = await fetch('/api/transform', {
                         method: 'POST',
                         headers: {
@@ -399,15 +460,29 @@
                         })
                     });
 
+                    console.log('📡 API Response status:', response.status);
+
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || 'API request failed');
+                        const contentType = response.headers.get('content-type');
+                        let errorMessage = 'API request failed';
+
+                        if (contentType && contentType.includes('application/json')) {
+                            const errorData = await response.json();
+                            errorMessage = errorData.error || errorMessage;
+                        } else {
+                            const errorText = await response.text();
+                            console.error('❌ Non-JSON response:', errorText.substring(0, 200));
+                            errorMessage = 'Server error: API endpoint not available. Make sure you\'ve deployed to Vercel.';
+                        }
+
+                        throw new Error(errorMessage);
                     }
 
                     const data = await response.json();
+                    console.log('✅ AI Response received, length:', data.result?.length || 0);
                     return data.result;
                 } catch (error) {
-                    console.error('API Error:', error);
+                    console.error('❌ API Error:', error.message);
                     throw error;
                 }
             };
@@ -622,11 +697,26 @@
                     case 'email':
                         return (
                             <div className="space-y-6 fade-in">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
-                                        <span className="text-lg mr-2">✍️</span>
-                                        Paste your email content
-                                    </label>
+                                <div className="relative">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center">
+                                            <span className="text-lg mr-2">✍️</span>
+                                            Paste your email content
+                                        </label>
+                                        {showSuggestions && (
+                                            <div className="suggestions-container flex flex-wrap gap-2 max-w-xl">
+                                                {emailStyles.map((style) => (
+                                                    <button
+                                                        key={style.id}
+                                                        onClick={() => handleStyleClick(style.id)}
+                                                        className="suggestion-pill glass-effect text-gray-800 font-medium hover:bg-white/90 oval-button border border-indigo-300 px-4 py-1.5 rounded-full text-xs"
+                                                    >
+                                                        {style.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                     <textarea
                                         value={emailText}
                                         onChange={(e) => setEmailText(e.target.value)}
@@ -634,26 +724,6 @@
                                         placeholder="Type or paste your email content here and watch the magic happen..."
                                     />
                                 </div>
-
-                                {showSuggestions && (
-                                    <div className="slide-in space-y-4">
-                                        <p className="text-sm text-gray-700 font-medium flex items-center">
-                                            <span className="mr-2">✨</span>
-                                            Quick Style Transformations:
-                                        </p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {emailStyles.map((style) => (
-                                                <button
-                                                    key={style.id}
-                                                    onClick={() => handleStyleClick(style.id)}
-                                                    className="suggestion-pill glass-effect text-gray-800 font-medium hover:bg-white/90 oval-button border border-indigo-300 px-5 py-2 rounded-full text-sm"
-                                                >
-                                                    {style.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
 
                                 <div className="pt-4 border-t border-gray-300">
                                     <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
@@ -683,11 +753,13 @@
                     default:
                         return (
                             <div className="space-y-6 fade-in">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
-                                        <span className="text-lg mr-2">📄</span>
-                                        Enter your text
-                                    </label>
+                                <div className="relative">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center">
+                                            <span className="text-lg mr-2">📄</span>
+                                            Enter your text
+                                        </label>
+                                    </div>
                                     <textarea
                                         value={emailText}
                                         onChange={(e) => setEmailText(e.target.value)}
@@ -811,38 +883,54 @@
 
                         {currentPage === 'settings' ? renderSettings() : (
                             <>
-                                {/* Tool Navigation */}
-                                <div className="glass-effect rounded-2xl p-6 mb-8 ai-glow">
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                                        {tools.map((tool) => (
-                                            <button
-                                                key={tool.id}
-                                                onClick={() => {
-                                                    setActiveTab(tool.id);
-                                                    setResult('');
-                                                    setEmailText('');
-                                                    setCustomPrompt('');
-                                                    setActiveView('writer');
-                                                }}
-                                                className={`tool-card p-4 rounded-xl transition-all ${
-                                                    activeTab === tool.id
-                                                        ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg'
-                                                        : 'glass-dark text-gray-800 hover:bg-white/80'
-                                                }`}
-                                            >
-                                                <div className="text-3xl mb-2">{tool.icon}</div>
-                                                <div className="text-sm font-semibold mb-1">{tool.name}</div>
-                                                <div className="text-xs opacity-80">{tool.desc}</div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
                                 {/* Main Center Container with Tabs */}
-                                <div className="glass-effect rounded-3xl p-8 ai-glow">
-                                    {/* Oval Tabs */}
+                                <div className="glass-effect rounded-3xl p-8 ai-glow relative">
+                                    {/* Filter Dropdown Button */}
+                                    <div className="absolute top-6 right-6">
+                                        <button
+                                            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                                            className="px-4 py-2 glass-effect rounded-full text-gray-700 font-medium hover:bg-white/90 transition-all oval-button border border-indigo-300 flex items-center gap-2"
+                                        >
+                                            <span>🔧</span>
+                                            <span className="text-sm">Tools</span>
+                                            <span className={`text-xs transform transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`}>▼</span>
+                                        </button>
+                                        {showFilterDropdown && (
+                                            <div className="filter-dropdown glass-effect rounded-2xl p-3 shadow-xl">
+                                                {tools.map((tool) => (
+                                                    <button
+                                                        key={tool.id}
+                                                        onClick={() => {
+                                                            setActiveTab(tool.id);
+                                                            setResult('');
+                                                            setEmailText('');
+                                                            setCustomPrompt('');
+                                                            setActiveView('writer');
+                                                            setShowFilterDropdown(false);
+                                                            console.log('🔧 Switched to tool:', tool.name);
+                                                        }}
+                                                        className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
+                                                            activeTab === tool.id
+                                                                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
+                                                                : 'hover:bg-white/80 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-2xl">{tool.icon}</span>
+                                                            <div>
+                                                                <div className="text-sm font-semibold">{tool.name}</div>
+                                                                <div className="text-xs opacity-80">{tool.desc}</div>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Tab Switches */}
                                     <div className="flex justify-center mb-8">
-                                        <div className="tab-container">
+                                        <div className="tab-container tab-button-container">
                                             <div 
                                                 className="tab-slider"
                                                 style={{
@@ -874,27 +962,6 @@
                                     {/* Content Area */}
                                     <div className="min-h-[500px]">
                                         {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
-                                    </div>
-                                </div>
-
-                                {/* Features Footer */}
-                                <div className="mt-12 glass-effect rounded-2xl p-6 ai-glow">
-                                    <div className="grid md:grid-cols-3 gap-6 text-center">
-                                        <div className="fade-in">
-                                            <div className="text-4xl mb-2">⚡</div>
-                                            <h3 className="text-gray-800 font-semibold mb-2">Lightning Fast</h3>
-                                            <p className="text-gray-600 text-sm">Get instant results with our AI-powered engine</p>
-                                        </div>
-                                        <div className="fade-in" style={{animationDelay: '0.1s'}}>
-                                            <div className="text-4xl mb-2">🔒</div>
-                                            <h3 className="text-gray-800 font-semibold mb-2">Secure & Private</h3>
-                                            <p className="text-gray-600 text-sm">Your data is processed securely and never stored</p>
-                                        </div>
-                                        <div className="fade-in" style={{animationDelay: '0.2s'}}>
-                                            <div className="text-4xl mb-2">🎯</div>
-                                            <h3 className="text-gray-800 font-semibold mb-2">Smart & Accurate</h3>
-                                            <p className="text-gray-600 text-sm">Advanced AI ensures high-quality transformations</p>
-                                        </div>
                                     </div>
                                 </div>
                             </>
