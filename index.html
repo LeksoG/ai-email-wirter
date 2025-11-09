@@ -1759,7 +1759,7 @@
                                                 onClick={() => {
                                                     if (emailReply) {
                                                         // Play send sound
-                                                        const sendSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBCx+zPLTgC8FJHjI8N+QPwsVYrjr7aVXGAtKp+Pw');
+                                                        const sendSound = new Audio('/whoosh-motion-405445.mp3'); // or /send.wav
                                                         sendSound.play().catch(e => console.log('Sound play failed:', e));
 
                                                         console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
