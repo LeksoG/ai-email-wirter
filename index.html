@@ -1122,6 +1122,178 @@
                 opacity: 1;
             }
         }
+
+        /* Dark mode support for preview */
+        body.dark-mode .setting-preview-container {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        body.dark-mode .preview-email-item {
+            background: rgba(40, 40, 40, 0.9);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #e5e5e5;
+        }
+
+        /* Send Button States */
+        .send-button-sending {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .send-button-sending:hover {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Envelope Flying Animation */
+        .envelope-animation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 48px;
+            z-index: 10000;
+            animation: envelope-fly 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes envelope-fly {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            30% {
+                transform: scale(0.8) rotate(-10deg);
+            }
+            60% {
+                transform: scale(1.2) rotate(5deg) translateY(-20px);
+            }
+            100% {
+                transform: scale(0.5) rotate(45deg) translate(300px, -300px);
+                opacity: 0;
+            }
+        }
+
+        /* Priority Fade Glow */
+        .priority-fade-glow {
+            animation: priority-glow-fade 2s ease-out forwards;
+        }
+
+        @keyframes priority-glow-fade {
+            0% {
+                box-shadow: 0 0 0 rgba(99, 102, 241, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(99, 102, 241, 0.8), 0 0 80px rgba(139, 92, 246, 0.6);
+            }
+            100% {
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            }
+        }
+
+        /* Improved Email Container Design */
+        .modern-email-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+            border: 2px solid rgba(99, 102, 241, 0.15);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-email-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .modern-email-item:hover::before {
+            left: 100%;
+        }
+
+        .modern-email-item:hover {
+            transform: translateY(-5px) translateX(5px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        body.dark-mode .modern-email-item {
+            background: linear-gradient(135deg, rgba(40, 40, 40, 0.95) 0%, rgba(30, 30, 30, 0.85) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Priority Preview Containers */
+        .priority-preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .priority-preview-card {
+            padding: 16px;
+            border-radius: 16px;
+            border: 2px solid;
+            transition: all 0.3s;
+        }
+
+        .priority-preview-off {
+            background: rgba(200, 200, 200, 0.1);
+            border-color: rgba(150, 150, 150, 0.3);
+        }
+
+        .priority-preview-on {
+            background: rgba(99, 102, 241, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        body.dark-mode .priority-preview-off {
+            background: rgba(60, 60, 60, 0.3);
+            border-color: rgba(120, 120, 120, 0.4);
+        }
+
+        body.dark-mode .priority-preview-on {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .preview-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .preview-label-off {
+            background: rgba(150, 150, 150, 0.2);
+            color: #666;
+        }
+
+        .preview-label-on {
+            background: rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+        }
+
+        body.dark-mode .preview-label-off {
+            background: rgba(120, 120, 120, 0.3);
+            color: #aaa;
+        }
+
+        body.dark-mode .preview-label-on {
+            background: rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+        }
     </style>
 </head>
 <body>
@@ -1173,6 +1345,9 @@
             const [autoPrioritize, setAutoPrioritize] = useState(false);
             const [priorityEmails, setPriorityEmails] = useState([]);
             const [isPriorityExpanded, setIsPriorityExpanded] = useState(false);
+            const [isSending, setIsSending] = useState(false);
+            const [showEnvelope, setShowEnvelope] = useState(false);
+            const [showPriorityGlow, setShowPriorityGlow] = useState(false);
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -1291,7 +1466,7 @@
                 audioRef.current = new Audio('/notification.mp3');
                 audioRef.current.load();
 
-                sendAudioRef.current = new Audio('/whoosh-motion-405445.mp3');
+                sendAudioRef.current = new Audio('/send.mp3');
                 sendAudioRef.current.load();
 
                 // Load auto-prioritize setting
@@ -1333,6 +1508,33 @@
                     sendAudioRef.current.currentTime = 0;
                     sendAudioRef.current.play().catch(e => console.log('Send sound failed:', e));
                 }
+            };
+
+            // Handle send email with animation
+            const handleSendEmail = async () => {
+                if (!emailReply) return;
+
+                setIsSending(true);
+
+                // Wait 1.5 seconds before sending
+                setTimeout(() => {
+                    // Show envelope animation
+                    setShowEnvelope(true);
+                    playSendSound();
+
+                    console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
+                    alert('Reply sent successfully! ✉️');
+
+                    // Clear fields
+                    setEmailReply('');
+                    setReplyPrompt('');
+                    setIsSending(false);
+
+                    // Remove envelope after animation completes
+                    setTimeout(() => {
+                        setShowEnvelope(false);
+                    }, 1500);
+                }, 1500);
             };
 
             const emailStyles = [
@@ -1886,31 +2088,46 @@
                                         </button>
                                     </div>
 
-                                    {/* Preview Animation */}
-                                    {autoPrioritize && (
-                                        <div className="setting-preview-container">
-                                            <div className="text-xs font-semibold text-indigo-600 mb-2">
-                                                🤖 How it works:
+                                    {/* Side-by-Side Preview */}
+                                    <div className="priority-preview-grid">
+                                        {/* OFF Preview */}
+                                        <div className="priority-preview-card priority-preview-off">
+                                            <div className="preview-label preview-label-off">OFF - Manual Priority</div>
+                                            <div className="text-xs text-gray-600 mb-3" style={{color: darkMode ? '#aaa' : '#666'}}>
+                                                Emails show in chronological order. Click "Prioritize" button to analyze.
                                             </div>
-                                            <div className="text-xs text-gray-600 mb-3">
-                                                AI analyzes your emails for urgency, keywords, and importance, then stacks priority emails at the top of your inbox
-                                            </div>
-                                            <div className="preview-animation">
-                                                <div className="preview-email-item">
-                                                    <div className="font-semibold text-indigo-600">⚡ URGENT: Meeting in 1 hour</div>
-                                                    <div className="text-gray-500 text-xs mt-1">Detected as high priority</div>
+                                            <div className="space-y-2">
+                                                <div style={{padding: '8px', background: darkMode ? 'rgba(60,60,60,0.5)' : 'rgba(200,200,200,0.3)', borderRadius: '8px', fontSize: '11px'}}>
+                                                    📧 Newsletter: Weekly Update
                                                 </div>
-                                                <div className="preview-email-item">
-                                                    <div className="font-semibold text-indigo-600">🎯 Action Required: Review Document</div>
-                                                    <div className="text-gray-500 text-xs mt-1">Detected as high priority</div>
+                                                <div style={{padding: '8px', background: darkMode ? 'rgba(60,60,60,0.5)' : 'rgba(200,200,200,0.3)', borderRadius: '8px', fontSize: '11px'}}>
+                                                    📧 Friend: Let's catch up
                                                 </div>
-                                                <div className="preview-email-item">
-                                                    <div className="font-semibold text-indigo-600">⏰ Deadline Tomorrow</div>
-                                                    <div className="text-gray-500 text-xs mt-1">Detected as high priority</div>
+                                                <div style={{padding: '8px', background: darkMode ? 'rgba(60,60,60,0.5)' : 'rgba(200,200,200,0.3)', borderRadius: '8px', fontSize: '11px'}}>
+                                                    📧 URGENT: Meeting in 1 hour
                                                 </div>
                                             </div>
                                         </div>
-                                    )}
+
+                                        {/* ON Preview */}
+                                        <div className="priority-preview-card priority-preview-on">
+                                            <div className="preview-label preview-label-on">ON - Auto Priority</div>
+                                            <div className="text-xs text-gray-600 mb-3" style={{color: darkMode ? '#a5b4fc' : '#6366f1'}}>
+                                                AI automatically stacks urgent emails at the top of your inbox.
+                                            </div>
+                                            <div className="space-y-2">
+                                                <div style={{padding: '8px', background: 'linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))', border: '2px solid rgba(99,102,241,0.4)', borderRadius: '8px', fontSize: '11px', fontWeight: 600}}>
+                                                    ⚡ URGENT: Meeting in 1 hour
+                                                </div>
+                                                <div style={{padding: '8px', background: darkMode ? 'rgba(60,60,60,0.5)' : 'rgba(200,200,200,0.3)', borderRadius: '8px', fontSize: '11px'}}>
+                                                    📧 Friend: Let's catch up
+                                                </div>
+                                                <div style={{padding: '8px', background: darkMode ? 'rgba(60,60,60,0.5)' : 'rgba(200,200,200,0.3)', borderRadius: '8px', fontSize: '11px'}}>
+                                                    📧 Newsletter: Weekly Update
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Email Connection Section */}
@@ -2146,6 +2363,12 @@
                         setIsPrioritizing(false);
                         setEmailsPrioritized(true);
 
+                        // Trigger priority glow effect (once)
+                        if (priority.length > 0) {
+                            setShowPriorityGlow(true);
+                            setTimeout(() => setShowPriorityGlow(false), 2000);
+                        }
+
                         // Reset prioritized flag after animation
                         setTimeout(() => setEmailsPrioritized(false), 2000);
                     }, 3000);
@@ -2249,8 +2472,8 @@
                             )}
 
                             {/* Priority Emails Stacked */}
-                            {priorityEmails.length > 0 && !isPrioritizing && (
-                                <div className="priority-container">
+                            {priorityEmails.length > 0 && !isPrioritizing && autoPrioritize && (
+                                <div className={`priority-container ${showPriorityGlow ? 'priority-fade-glow' : ''}`}>
                                     <div
                                         className="priority-header"
                                         onClick={() => setIsPriorityExpanded(!isPriorityExpanded)}
@@ -2313,12 +2536,12 @@
 
                             <div className="space-y-3">
                                 {gmailEmails.length > 0 ? (
-                                    gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map((email, index) => (
+                                    gmailEmails.filter(email => autoPrioritize ? !priorityEmails.find(p => p.id === email.id) : true).map((email, index) => (
                                         <div
                                             key={email.id}
                                             data-email-id={email.id}
                                             onClick={() => setViewingEmail(email)}
-                                            className={`email-item glass-dark px-6 py-4 rounded-2xl cursor-pointer hover:shadow-lg transition-all relative ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''}`}
+                                            className={`modern-email-item ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''}`}
                                         >
                                             {/* Checkbox for Selection */}
                                             <div
@@ -2858,19 +3081,21 @@
                                             {/* Floating Send Button */}
                                             {emailReply && emailReply.trim().length > 0 && (
                                                 <button
-                                                    onClick={() => {
-                                                        if (emailReply) {
-                                                            playSendSound();
-                                                            console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
-                                                            alert('Reply sent successfully! ✉️');
-                                                            setEmailReply('');
-                                                            setReplyPrompt('');
-                                                        }
-                                                    }}
-                                                    className="send-button-float"
+                                                    onClick={handleSendEmail}
+                                                    disabled={isSending}
+                                                    className={isSending ? 'send-button-float send-button-sending' : 'send-button-float'}
                                                 >
-                                                    <span>→</span>
-                                                    <span>Send</span>
+                                                    {isSending ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                                            <span>Sending...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span>→</span>
+                                                            <span>Send</span>
+                                                        </>
+                                                    )}
                                                 </button>
                                             )}
                                         </div>
@@ -3108,6 +3333,13 @@
                             <span>↩️</span>
                             <span>Undo Delete</span>
                         </button>
+                    )}
+
+                    {/* Envelope Flying Animation */}
+                    {showEnvelope && (
+                        <div className="envelope-animation">
+                            📧
+                        </div>
                     )}
                 </div>
             );
