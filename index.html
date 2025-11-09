@@ -30,12 +30,42 @@
 
         body.dark-mode {
             background: linear-gradient(135deg,
-                #1e1b4b 0%,
-                #312e81 25%,
-                #4c1d95 50%,
-                #1e1b4b 75%,
-                #0c4a6e 100%
+                #000000 0%,
+                #0a0a0a 25%,
+                #1a1a1a 50%,
+                #0a0a0a 75%,
+                #000000 100%
             );
+        }
+
+        body.dark-mode .glass-effect {
+            background: rgba(20, 20, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .glass-dark {
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .text-gray-800,
+        body.dark-mode .text-gray-700 {
+            color: #e5e5e5 !important;
+        }
+
+        body.dark-mode .text-gray-600,
+        body.dark-mode .text-gray-500 {
+            color: #a0a0a0 !important;
+        }
+
+        body.dark-mode .custom-textarea {
+            background: rgba(30, 30, 30, 0.8);
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .sticky-header {
+            background: rgba(10, 10, 10, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         @keyframes subtle-shift {
@@ -428,10 +458,10 @@
             left: 0;
             right: 0;
             z-index: 50;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.05);
             animation: header-slide-down 0.3s ease-out;
         }
 
@@ -451,8 +481,9 @@
             display: flex;
             gap: 8px;
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
         }
 
         .action-btn {
@@ -684,6 +715,13 @@
 
             const handleGenerate = async () => {
                 if (!selectedTone && !customPrompt) return;
+
+                // Ensure we have text to process
+                const textToProcess = uploadedFile?.content || emailText;
+                if (!textToProcess || textToProcess.trim().length === 0) {
+                    alert('Please enter some text or upload a file before generating!');
+                    return;
+                }
 
                 setIsProcessing(true);
                 setResult('');
@@ -1107,7 +1145,7 @@
                                         />
                                         <button
                                             onClick={handleGenerate}
-                                            disabled={!emailText && !uploadedFile && !selectedTone}
+                                            disabled={(!emailText && !uploadedFile) || (!selectedTone && !customPrompt)}
                                             className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             ✨ Generate
@@ -1173,7 +1211,16 @@
                 if (shouldSwapLayout) {
                     // Swapped layout: Current result on left (Writer position), Saved results on right
                     return (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-6 py-4">
+                        <div className="px-6 py-4">
+                            {/* Back to Writer Button */}
+                            <button
+                                onClick={() => setActiveView('writer')}
+                                className="mb-4 px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all border border-indigo-300 flex items-center gap-2"
+                            >
+                                <span>←</span>
+                                <span>Back to Writer</span>
+                            </button>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Current Result (in Writer position) */}
                             <div className="suggestions-container relative">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">📝 Current Result</h3>
@@ -1238,6 +1285,7 @@
                                     ))}
                                 </div>
                             </div>
+                            </div>
                         </div>
                     );
                 }
@@ -1246,23 +1294,33 @@
                 if (result) {
                     return (
                         <div className="result-container px-6 py-4 relative">
-                            {/* Action buttons at top-right */}
-                            <div className="action-buttons">
-                                <button
-                                    onClick={() => navigator.clipboard.writeText(result)}
-                                    className="action-btn text-gray-700 hover:text-indigo-700"
-                                >
-                                    Copy
-                                </button>
-                                <button
-                                    onClick={handleRetry}
-                                    className="action-btn text-gray-700 hover:text-purple-700"
-                                >
-                                    Retry
-                                </button>
-                            </div>
-                            <div className="glass-dark rounded-2xl p-6">
-                                <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
+                            {/* Back to Writer Button */}
+                            <button
+                                onClick={() => setActiveView('writer')}
+                                className="mb-4 px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all border border-indigo-300 flex items-center gap-2"
+                            >
+                                <span>←</span>
+                                <span>Back to Writer</span>
+                            </button>
+                            <div className="relative">
+                                {/* Action buttons at top-right */}
+                                <div className="action-buttons">
+                                    <button
+                                        onClick={() => navigator.clipboard.writeText(result)}
+                                        className="action-btn text-gray-700 hover:text-indigo-700"
+                                    >
+                                        Copy
+                                    </button>
+                                    <button
+                                        onClick={handleRetry}
+                                        className="action-btn text-gray-700 hover:text-purple-700"
+                                    >
+                                        Retry
+                                    </button>
+                                </div>
+                                <div className="glass-dark rounded-2xl p-6">
+                                    <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
+                                </div>
                             </div>
                         </div>
                     );
@@ -1391,7 +1449,7 @@
                          currentPage === 'sent' ? renderSent() : (
                             <>
                                 {/* Main Center Container with Tabs */}
-                                <div className="glass-effect rounded-3xl p-8 ai-glow relative">
+                                <div className="rounded-3xl p-8 relative">
                                     {/* Filter Dropdown Button */}
                                     <div className="absolute top-6 right-6">
                                         <button
