@@ -400,7 +400,7 @@
             border-radius: 16px;
             padding: 16px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            z-index: 20;
+            z-index: 50;
             animation: popup-slide-down 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -417,6 +417,121 @@
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Send Button - Floating */
+        .send-button-float {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            animation: float-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .send-button-float:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        @keyframes float-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* AI Transform Container */
+        .ai-transform-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ai-transform-input {
+            width: 100%;
+            padding: 12px 140px 12px 20px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
+        }
+
+        .ai-transform-input:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        body.dark-mode .ai-transform-input {
+            background: rgba(30, 30, 30, 0.8);
+            color: #e5e5e5;
+        }
+
+        .ai-transform-button {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ai-transform-button:hover {
+            opacity: 0.9;
+        }
+
+        .ai-transform-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Wave Animation - Apple Intelligence Style */
+        .wave-char {
+            display: inline-block;
+            opacity: 0;
+            animation: wave-splash 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes wave-splash {
+            0% {
+                opacity: 0;
+                transform: translate(-4px, -4px) scale(0.9);
+                filter: blur(3px);
+            }
+            50% {
+                opacity: 1;
+                filter: blur(0);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+                filter: blur(0);
             }
         }
 
@@ -688,6 +803,7 @@
             const [summarizingEmail, setSummarizingEmail] = useState(null);
             const [summaryText, setSummaryText] = useState('');
             const [isSummarizing, setIsSummarizing] = useState(false);
+            const [summaryHidden, setSummaryHidden] = useState(false);
             const [userEmails, setUserEmails] = useState([
                 { id: 1, from: 'john@example.com', subject: 'Meeting Tomorrow', preview: 'Hey, just wanted to confirm...', date: '2 hours ago' },
                 { id: 2, from: 'sarah@company.com', subject: 'Project Update', preview: 'The latest updates on the project...', date: '5 hours ago' },
@@ -976,16 +1092,32 @@
                 if (!resultElement) return;
 
                 resultElement.innerHTML = '';
-                const chars = text.split('');
+                const lines = text.split('\n');
 
-                // Display all characters at once with staggered wave animation
-                chars.forEach((char, index) => {
-                    const span = document.createElement('span');
-                    span.className = 'wave-char';
-                    span.textContent = char;
-                    // Faster stagger - all appear together in a wave
-                    span.style.animationDelay = `${index * 0.003}s`;
-                    resultElement.appendChild(span);
+                // Calculate position-based delay for splash effect (top-left to bottom-right)
+                lines.forEach((line, lineIndex) => {
+                    const words = line.split(' ');
+                    words.forEach((word, wordIndex) => {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'wave-char';
+                        wordSpan.textContent = word;
+                        // Diagonal splash: lineIndex + wordIndex for top-left to bottom-right
+                        const diagonalDelay = (lineIndex + wordIndex * 0.3) * 0.015;
+                        wordSpan.style.animationDelay = `${diagonalDelay}s`;
+                        resultElement.appendChild(wordSpan);
+
+                        // Add space after word (except last word)
+                        if (wordIndex < words.length - 1) {
+                            const space = document.createTextNode(' ');
+                            resultElement.appendChild(space);
+                        }
+                    });
+
+                    // Add line break (except after last line)
+                    if (lineIndex < lines.length - 1) {
+                        const br = document.createElement('br');
+                        resultElement.appendChild(br);
+                    }
                 });
             };
 
@@ -1260,11 +1392,33 @@
                 setSummarizingEmail(email.id);
                 setIsSummarizing(true);
                 setSummaryText('');
+                setSummaryHidden(false);
 
                 try {
                     const summary = await callAIAPI('Summarize this email concisely in 2-3 sentences', email.snippet);
                     setSummaryText(summary);
                     setIsSummarizing(false);
+
+                    // Animate summary text with wave effect
+                    setTimeout(() => {
+                        const summaryElement = document.getElementById(`summary-text-${email.id}`);
+                        if (summaryElement) {
+                            summaryElement.innerHTML = '';
+                            const words = summary.split(' ');
+                            words.forEach((word, index) => {
+                                const wordSpan = document.createElement('span');
+                                wordSpan.className = 'wave-char';
+                                wordSpan.textContent = word;
+                                wordSpan.style.animationDelay = `${index * 0.02}s`;
+                                summaryElement.appendChild(wordSpan);
+
+                                if (index < words.length - 1) {
+                                    const space = document.createTextNode(' ');
+                                    summaryElement.appendChild(space);
+                                }
+                            });
+                        }
+                    }, 50);
                 } catch (error) {
                     console.error('Error summarizing:', error);
                     setSummaryText('Failed to summarize email');
@@ -1347,22 +1501,38 @@
                                             {summarizingEmail === email.id && (
                                                 <div className="summary-popup" onClick={(e) => e.stopPropagation()}>
                                                     {isSummarizing ? (
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
-                                                            <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center gap-3 mb-3">
+                                                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
+                                                                <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
+                                                            </div>
+                                                            {/* Wave loading animation */}
+                                                            <div className="space-y-2">
+                                                                <div className="loading-line" style={{height: '8px'}}></div>
+                                                                <div className="loading-line" style={{height: '8px'}}></div>
+                                                                <div className="loading-line" style={{height: '8px'}}></div>
+                                                            </div>
                                                         </div>
                                                     ) : (
                                                         <div>
                                                             <div className="flex justify-between items-center mb-2">
                                                                 <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
                                                                 <button
-                                                                    onClick={() => setSummarizingEmail(null)}
-                                                                    className="text-gray-500 hover:text-gray-700 text-xs"
+                                                                    onClick={() => {
+                                                                        if (summaryHidden) {
+                                                                            setSummaryHidden(false);
+                                                                        } else {
+                                                                            setSummaryHidden(true);
+                                                                        }
+                                                                    }}
+                                                                    className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
                                                                 >
-                                                                    ✕
+                                                                    {summaryHidden ? 'Show' : 'Hide'}
                                                                 </button>
                                                             </div>
-                                                            <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                            {!summaryHidden && (
+                                                                <p id={`summary-text-${email.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
@@ -1683,22 +1853,38 @@
                                     {summarizingEmail === viewingEmail.id && (
                                         <div className="summary-popup mt-4" style={{position: 'relative', top: 0, marginTop: '16px'}}>
                                             {isSummarizing ? (
-                                                <div className="flex items-center gap-3">
-                                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
-                                                    <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center gap-3 mb-3">
+                                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
+                                                        <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
+                                                    </div>
+                                                    {/* Wave loading animation */}
+                                                    <div className="space-y-2">
+                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <div>
                                                     <div className="flex justify-between items-center mb-2">
                                                         <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
                                                         <button
-                                                            onClick={() => setSummarizingEmail(null)}
-                                                            className="text-gray-500 hover:text-gray-700 text-xs"
+                                                            onClick={() => {
+                                                                if (summaryHidden) {
+                                                                    setSummaryHidden(false);
+                                                                } else {
+                                                                    setSummaryHidden(true);
+                                                                }
+                                                            }}
+                                                            className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
                                                         >
-                                                            ✕
+                                                            {summaryHidden ? 'Show' : 'Hide'}
                                                         </button>
                                                     </div>
-                                                    <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                    {!summaryHidden && (
+                                                        <p id={`summary-text-${viewingEmail.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -1707,21 +1893,52 @@
                                     {/* Reply Section */}
                                     <div id="reply-section" className="mt-8 pt-6 border-t border-gray-300">
                                         <h3 className="text-lg font-bold text-gray-800 mb-4">✍️ Write Reply</h3>
-                                        <textarea
-                                            value={emailReply}
-                                            onChange={(e) => setEmailReply(e.target.value)}
-                                            className="w-full h-48 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none mb-4"
-                                            placeholder="Type your reply here..."
-                                        />
 
-                                        {/* AI Transformation for Reply */}
-                                        <div className="flex gap-3 items-center">
+                                        {/* Textarea Container with Floating Send Button */}
+                                        <div className="relative mb-4">
+                                            <textarea
+                                                value={emailReply}
+                                                onChange={(e) => setEmailReply(e.target.value)}
+                                                className="w-full h-48 px-6 py-4 pr-24 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
+                                                placeholder="Type your reply here..."
+                                            />
+
+                                            {/* Floating Send Button */}
+                                            {emailReply && emailReply.trim().length > 0 && (
+                                                <button
+                                                    onClick={() => {
+                                                        if (emailReply) {
+                                                            // Try to play send sound with better audio source
+                                                            try {
+                                                                const audio = new Audio();
+                                                                audio.src = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3';
+                                                                audio.play().catch(e => console.log('Sound play failed:', e));
+                                                            } catch (e) {
+                                                                console.log('Audio not available:', e);
+                                                            }
+
+                                                            console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
+                                                            alert('Reply sent successfully! ✉️');
+                                                            setEmailReply('');
+                                                            setReplyPrompt('');
+                                                        }
+                                                    }}
+                                                    className="send-button-float"
+                                                >
+                                                    <span>→</span>
+                                                    <span>Send</span>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* AI Transformation Container */}
+                                        <div className="ai-transform-container">
                                             <input
                                                 type="text"
                                                 value={replyPrompt}
                                                 onChange={(e) => setReplyPrompt(e.target.value)}
-                                                className="flex-1 px-5 py-3 glass-effect border border-indigo-300 rounded-full text-gray-800 placeholder-gray-500 text-sm"
-                                                placeholder="Transform reply with AI (e.g., 'Make it more professional')"
+                                                className="ai-transform-input"
+                                                placeholder="✨ Transform with AI (e.g., 'Make it more professional')"
                                                 onKeyPress={(e) => {
                                                     if (e.key === 'Enter' && replyPrompt && emailReply) {
                                                         callAIAPI(replyPrompt, emailReply).then(transformed => {
@@ -1741,40 +1958,9 @@
                                                     }
                                                 }}
                                                 disabled={!replyPrompt || !emailReply}
-                                                className="px-6 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all border-2 border-indigo-400 disabled:opacity-50 text-sm"
+                                                className="ai-transform-button"
                                             >
-                                                ✨ Transform
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(emailReply);
-                                                    alert('Reply copied to clipboard!');
-                                                }}
-                                                disabled={!emailReply}
-                                                className="px-6 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all border-2 border-purple-400 disabled:opacity-50 text-sm"
-                                            >
-                                                📋 Copy
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    if (emailReply) {
-                                                        // Play send sound
-                                                        const sendSound = new Audio('/whoosh-motion-405445.mp3'); // or /send.wav
-                                                        sendSound.play().catch(e => console.log('Sound play failed:', e));
-
-                                                        console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
-                                                        alert('Reply sent successfully! ✉️');
-                                                        setEmailReply('');
-                                                        setReplyPrompt('');
-                                                    }
-                                                }}
-                                                disabled={!emailReply}
-                                                className="px-6 py-3 rounded-full text-white font-medium hover:opacity-90 transition-all disabled:opacity-50 text-sm"
-                                                style={{
-                                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                                                }}
-                                            >
-                                                📨 Send
+                                                Transform
                                             </button>
                                         </div>
                                     </div>
