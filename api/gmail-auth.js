@@ -13,12 +13,17 @@ module.exports = async function handler(req, res) {
     }
 
     try {
+        const redirectUri = `${req.headers.origin || 'https://ai-email-wirter.vercel.app'}/api/gmail-callback`;
+
         console.log('🔐 Generating OAuth URL...');
+        console.log('📍 Redirect URI:', redirectUri);
+        console.log('🔑 Client ID:', process.env.GOOGLE_CLIENT_ID ? 'Set ✓' : 'Missing ✗');
+        console.log('🌐 Origin:', req.headers.origin);
 
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
-            `${req.headers.origin || 'http://localhost:3000'}/api/gmail-callback`
+            redirectUri
         );
 
         const scopes = [

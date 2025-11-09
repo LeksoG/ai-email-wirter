@@ -9,12 +9,15 @@ module.exports = async function handler(req, res) {
             return res.redirect('/?error=no_code');
         }
 
+        const redirectUri = `${req.headers.origin || 'https://ai-email-wirter.vercel.app'}/api/gmail-callback`;
+
         console.log('🔐 Processing OAuth callback...');
+        console.log('📍 Redirect URI:', redirectUri);
 
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
-            `${req.headers.origin || 'http://localhost:3000'}/api/gmail-callback`
+            redirectUri
         );
 
         // Exchange authorization code for access token
