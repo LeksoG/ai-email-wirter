@@ -13,11 +13,11 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, 
-                #e0e7ff 0%, 
-                #f3e8ff 25%, 
-                #ddd6fe 50%, 
-                #e0e7ff 75%, 
+            background: linear-gradient(135deg,
+                #e0e7ff 0%,
+                #f3e8ff 25%,
+                #ddd6fe 50%,
+                #e0e7ff 75%,
                 #f0f9ff 100%
             );
             background-size: 400% 400%;
@@ -25,6 +25,17 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            padding-top: 100px; /* Space for sticky header */
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg,
+                #1e1b4b 0%,
+                #312e81 25%,
+                #4c1d95 50%,
+                #1e1b4b 75%,
+                #0c4a6e 100%
+            );
         }
 
         @keyframes subtle-shift {
@@ -410,6 +421,57 @@
             overflow: hidden;
         }
 
+        /* Sticky Header */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+            animation: header-slide-down 0.3s ease-out;
+        }
+
+        @keyframes header-slide-down {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Action Buttons (Copy/Retry) */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .action-btn {
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-1px);
+        }
+
         /* Floating AI particles */
         .ai-particle {
             position: fixed;
@@ -462,6 +524,9 @@
             const [uploadedFile, setUploadedFile] = useState(null);
             const [savedResults, setSavedResults] = useState([]);
             const [viewingFile, setViewingFile] = useState(null);
+            const [darkMode, setDarkMode] = useState(false);
+            const [gmailEmails, setGmailEmails] = useState([]);
+            const [sentEmails, setSentEmails] = useState([]);
             const [userEmails, setUserEmails] = useState([
                 { id: 1, from: 'john@example.com', subject: 'Meeting Tomorrow', preview: 'Hey, just wanted to confirm...', date: '2 hours ago' },
                 { id: 2, from: 'sarah@company.com', subject: 'Project Update', preview: 'The latest updates on the project...', date: '5 hours ago' },
@@ -473,7 +538,40 @@
                 console.log('🚀 AI Email Writer initialized');
                 console.log('📊 Initial state:', { activeTab, activeView, currentPage });
                 console.log('🔌 API endpoint:', '/api/transform');
+
+                // Load email connection from localStorage
+                const savedConnection = localStorage.getItem('emailConnected');
+                if (savedConnection === 'true') {
+                    setEmailConnected(true);
+                }
+
+                // Load dark mode preference
+                const savedDarkMode = localStorage.getItem('darkMode');
+                if (savedDarkMode === 'true') {
+                    setDarkMode(true);
+                    document.body.classList.add('dark-mode');
+                }
             }, []);
+
+            // Update dark mode
+            useEffect(() => {
+                if (darkMode) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'false');
+                }
+            }, [darkMode]);
+
+            // Update suggestions based on text and custom prompt
+            useEffect(() => {
+                if (emailText.length > 10 || customPrompt.length > 0) {
+                    setShowSuggestions(true);
+                } else {
+                    setShowSuggestions(false);
+                }
+            }, [emailText, customPrompt]);
 
             const emailStyles = [
                 { id: 'professional', label: '💼 Professional' },
@@ -493,13 +591,28 @@
                 { id: 'tone', icon: '🎭', name: 'Tone Analyzer', desc: 'Understand message sentiment' }
             ];
 
-            useEffect(() => {
-                if (emailText.length > 10) {
-                    setShowSuggestions(true);
-                } else {
-                    setShowSuggestions(false);
-                }
-            }, [emailText]);
+            const handleGmailConnect = () => {
+                // For Gmail OAuth, the user needs to set up Google Cloud OAuth
+                // This would open a popup or redirect to Google OAuth
+                alert('Gmail OAuth Setup Required!\n\nTo connect Gmail, you need to:\n\n1. Create a Google Cloud Project\n2. Enable Gmail API\n3. Create OAuth 2.0 credentials\n4. Add authorized redirect URI\n5. Implement OAuth flow\n\nFor now, simulating connection...');
+
+                setEmailConnected(true);
+                localStorage.setItem('emailConnected', 'true');
+                console.log('📧 Gmail connected');
+
+                // In production, this would fetch real emails via Gmail API
+                // For now, using mock data
+                setGmailEmails([
+                    { id: 1, from: 'boss@company.com', subject: 'Quarterly Review', snippet: 'Please prepare for our quarterly review...', date: '10:30 AM' },
+                    { id: 2, from: 'client@business.com', subject: 'Project Proposal', snippet: 'I have reviewed your proposal and...', date: 'Yesterday' },
+                    { id: 3, from: 'team@startup.io', subject: 'Team Meeting', snippet: 'Reminder: Team meeting at 3 PM...', date: '2 days ago' }
+                ]);
+
+                setSentEmails([
+                    { id: 1, to: 'john@example.com', subject: 'Re: Meeting Tomorrow', snippet: 'Thanks for confirming. See you then!', date: '9:15 AM' },
+                    { id: 2, to: 'support@service.com', subject: 'Feature Request', snippet: 'I would like to request a new feature...', date: 'Yesterday' }
+                ]);
+            };
 
             const callAIAPI = async (prompt, text) => {
                 console.log('🤖 Calling AI API...');
@@ -652,6 +765,39 @@
                 console.log('🗑️ Deleted result:', id);
             };
 
+            const handleRetry = async () => {
+                if (!savedResults.length) return;
+
+                const lastResult = savedResults[0];
+                console.log('🔄 Retrying with prompt:', lastResult.prompt);
+
+                setIsProcessing(true);
+                setResult('');
+
+                try {
+                    const transformedText = await callAIAPI(lastResult.prompt, lastResult.originalText);
+                    setResult(transformedText);
+
+                    // Save new retry result
+                    const newResult = {
+                        id: Date.now(),
+                        content: transformedText,
+                        prompt: lastResult.prompt,
+                        originalText: lastResult.originalText,
+                        timestamp: new Date().toLocaleString(),
+                        tone: lastResult.tone
+                    };
+                    setSavedResults(prev => [newResult, ...prev]);
+
+                    setIsProcessing(false);
+                    setTimeout(() => animateText(transformedText), 100);
+                } catch (error) {
+                    console.error('Retry Error:', error);
+                    setResult(`Error: ${error.message}`);
+                    setIsProcessing(false);
+                }
+            };
+
             const handleToolProcess = async () => {
                 setIsProcessing(true);
                 setResult('');
@@ -693,24 +839,27 @@
                     <div className="settings-panel space-y-8">
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
                             <h2 className="text-3xl font-bold text-gray-800 mb-6">⚙️ Settings</h2>
-                            
+
                             <div className="space-y-6">
-                                {/* API Key Section */}
+                                {/* Dark Mode Toggle */}
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        🔑 Mistral AI Configuration
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                        🌙 Dark Mode
                                     </label>
-                                    <p className="text-xs text-gray-600 mb-3">
-                                        Your API key should be set in Vercel environment variables (MISTRAL_API_KEY). 
-                                        The key is never exposed to the browser for security.
-                                    </p>
-                                    <div className="glass-dark px-4 py-3 rounded-xl">
-                                        <p className="text-sm text-gray-700">
-                                            ✅ API key is configured server-side
-                                        </p>
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            Set MISTRAL_API_KEY in your Vercel dashboard
-                                        </p>
+                                    <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                        <span className="text-sm text-gray-700">Enable dark theme</span>
+                                        <button
+                                            onClick={() => setDarkMode(!darkMode)}
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                darkMode ? 'bg-indigo-600' : 'bg-gray-300'
+                                            }`}
+                                        >
+                                            <span
+                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                    darkMode ? 'translate-x-6' : 'translate-x-1'
+                                                }`}
+                                            />
+                                        </button>
                                     </div>
                                 </div>
 
@@ -720,24 +869,16 @@
                                         📧 Email Connection
                                     </label>
                                     <p className="text-xs text-gray-600 mb-4">
-                                        Connect your email to access and transform your messages
+                                        Connect your Gmail to access and transform your messages
                                     </p>
-                                    
+
                                     {!emailConnected ? (
-                                        <div className="space-y-3">
-                                            <button
-                                                onClick={() => setEmailConnected(true)}
-                                                className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:from-indigo-600 hover:to-purple-700 transition-all oval-button"
-                                            >
-                                                Connect Gmail
-                                            </button>
-                                            <button
-                                                onClick={() => setEmailConnected(true)}
-                                                className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-full font-medium hover:from-blue-600 hover:to-cyan-700 transition-all oval-button"
-                                            >
-                                                Connect Outlook
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={handleGmailConnect}
+                                            className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:from-indigo-600 hover:to-purple-700 transition-all oval-button"
+                                        >
+                                            Connect Gmail
+                                        </button>
                                     ) : (
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
@@ -774,6 +915,75 @@
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderInbox = () => {
+                return (
+                    <div className="space-y-6">
+                        <div className="glass-effect rounded-3xl p-8 ai-glow">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-6">📥 Inbox</h2>
+                            <div className="space-y-3">
+                                {gmailEmails.length > 0 ? (
+                                    gmailEmails.map(email => (
+                                        <div
+                                            key={email.id}
+                                            onClick={() => {
+                                                setEmailText(email.snippet);
+                                                setCurrentPage('home');
+                                                setActiveView('writer');
+                                            }}
+                                            className="email-item glass-dark px-6 py-4 rounded-2xl cursor-pointer hover:shadow-lg transition-all"
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-sm font-bold text-gray-800">{email.from}</span>
+                                                <span className="text-xs text-gray-500">{email.date}</span>
+                                            </div>
+                                            <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
+                                            <div className="text-sm text-gray-600">{email.snippet}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-12 text-gray-500">
+                                        <div className="text-6xl mb-4">📭</div>
+                                        <p>No emails in inbox</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderSent = () => {
+                return (
+                    <div className="space-y-6">
+                        <div className="glass-effect rounded-3xl p-8 ai-glow">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-6">📤 Sent</h2>
+                            <div className="space-y-3">
+                                {sentEmails.length > 0 ? (
+                                    sentEmails.map(email => (
+                                        <div
+                                            key={email.id}
+                                            className="glass-dark px-6 py-4 rounded-2xl"
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-sm font-bold text-gray-800">To: {email.to}</span>
+                                                <span className="text-xs text-gray-500">{email.date}</span>
+                                            </div>
+                                            <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
+                                            <div className="text-sm text-gray-600">{email.snippet}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-12 text-gray-500">
+                                        <div className="text-6xl mb-4">📭</div>
+                                        <p>No sent emails</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -965,29 +1175,27 @@
                     return (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-6 py-4">
                             {/* Current Result (in Writer position) */}
-                            <div className="suggestions-container">
+                            <div className="suggestions-container relative">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">📝 Current Result</h3>
                                 {result ? (
-                                    <div>
-                                        <div className="glass-dark rounded-2xl p-6 mb-4">
-                                            <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
-                                        </div>
-                                        <div className="flex gap-3">
+                                    <div className="relative">
+                                        {/* Action buttons at top-right */}
+                                        <div className="action-buttons">
                                             <button
                                                 onClick={() => navigator.clipboard.writeText(result)}
-                                                className="flex-1 px-4 py-3 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 text-sm"
+                                                className="action-btn text-gray-700 hover:text-indigo-700"
                                             >
-                                                📋 Copy
+                                                Copy
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    setResult('');
-                                                    setActiveView('writer');
-                                                }}
-                                                className="flex-1 px-4 py-3 glass-effect border-2 border-purple-400 rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button text-sm"
+                                                onClick={handleRetry}
+                                                className="action-btn text-gray-700 hover:text-purple-700"
                                             >
-                                                🔄 New
+                                                Retry
                                             </button>
+                                        </div>
+                                        <div className="glass-dark rounded-2xl p-6">
+                                            <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
                                         </div>
                                     </div>
                                 ) : (
@@ -1037,26 +1245,24 @@
                 // Normal layout when no saved results
                 if (result) {
                     return (
-                        <div className="result-container px-6 py-4">
-                            <div className="glass-dark rounded-2xl p-6 mb-6">
-                                <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
-                            </div>
-                            <div className="flex gap-3">
+                        <div className="result-container px-6 py-4 relative">
+                            {/* Action buttons at top-right */}
+                            <div className="action-buttons">
                                 <button
                                     onClick={() => navigator.clipboard.writeText(result)}
-                                    className="flex-1 px-6 py-4 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 hover:border-indigo-500"
+                                    className="action-btn text-gray-700 hover:text-indigo-700"
                                 >
-                                    📋 Copy to Clipboard
+                                    Copy
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        setResult('');
-                                        setActiveView('writer');
-                                    }}
-                                    className="flex-1 px-6 py-4 glass-effect border-2 border-purple-400 hover:border-purple-500 rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button"
+                                    onClick={handleRetry}
+                                    className="action-btn text-gray-700 hover:text-purple-700"
                                 >
-                                    🔄 Start New
+                                    Retry
                                 </button>
+                            </div>
+                            <div className="glass-dark rounded-2xl p-6">
+                                <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
                             </div>
                         </div>
                     );
@@ -1126,40 +1332,63 @@
                     <div className="ai-particle" style={{top: '60%', right: '25%', animationDelay: '9s'}}></div>
                     <div className="ai-particle" style={{bottom: '20%', right: '10%', animationDelay: '12s'}}></div>
 
-                    <div className="page-container relative z-10 container mx-auto px-4 py-8 max-w-7xl">
-                        {/* Header with Navigation */}
-                        <header className="text-center mb-8">
-                            <div className="flex justify-center gap-4 mb-6">
+                    {/* Sticky Header */}
+                    <header className="sticky-header">
+                        <div className="container mx-auto px-4 py-4">
+                            <div className="flex justify-center items-center gap-4">
                                 <button
                                     onClick={() => setCurrentPage('home')}
                                     className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
                                         currentPage === 'home'
-                                            ? 'glass-effect text-gray-800 border-2 border-indigo-400'
+                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
                                             : 'glass-dark text-gray-700 hover:bg-white/70'
                                     }`}
                                 >
-                                    🏠 Home
+                                    Home
                                 </button>
+                                {emailConnected && (
+                                    <>
+                                        <button
+                                            onClick={() => setCurrentPage('inbox')}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                                currentPage === 'inbox'
+                                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
+                                                    : 'glass-dark text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Inbox
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentPage('sent')}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                                currentPage === 'sent'
+                                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
+                                                    : 'glass-dark text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Sent
+                                        </button>
+                                    </>
+                                )}
                                 <button
                                     onClick={() => setCurrentPage('settings')}
                                     className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
                                         currentPage === 'settings'
-                                            ? 'glass-effect text-gray-800 border-2 border-indigo-400'
+                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
                                             : 'glass-dark text-gray-700 hover:bg-white/70'
                                     }`}
                                 >
-                                    ⚙️ Settings
+                                    Settings
                                 </button>
                             </div>
-                            <h1 className="text-5xl md:text-6xl font-bold gradient-text mb-4">
-                                AI Tools Suite
-                            </h1>
-                            <p className="text-gray-700 text-lg">
-                                Transform your communication with intelligent AI-powered tools
-                            </p>
-                        </header>
+                        </div>
+                    </header>
 
-                        {currentPage === 'settings' ? renderSettings() : (
+                    <div className="page-container relative z-10 container mx-auto px-4 py-8 max-w-8xl">
+
+                        {currentPage === 'settings' ? renderSettings() :
+                         currentPage === 'inbox' ? renderInbox() :
+                         currentPage === 'sent' ? renderSent() : (
                             <>
                                 {/* Main Center Container with Tabs */}
                                 <div className="glass-effect rounded-3xl p-8 ai-glow relative">
