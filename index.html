@@ -372,6 +372,14 @@
             display: flex;
         }
 
+        .modern-email-item:hover .email-hover-buttons {
+            display: flex;
+        }
+
+        .priority-email-stacked:hover .email-hover-buttons {
+            display: flex;
+        }
+
         .email-hover-btn {
             padding: 4px 12px;
             font-size: 11px;
@@ -1479,7 +1487,7 @@
         }
 
         .welcome-text {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 600;
             background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
             background-size: 200% 200%;
@@ -1487,6 +1495,12 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.4rem;
         }
 
         body.dark-mode .welcome-text {
@@ -1503,14 +1517,35 @@
 
         .welcome-text span {
             display: inline-block;
-            animation: text-fade-in 0.8s ease forwards;
+            animation: typing-fade 0.5s ease forwards;
             opacity: 0;
+            transform: translateY(10px);
         }
 
-        @keyframes text-fade-in {
-            to {
-                opacity: 1;
+        @keyframes typing-fade {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
             }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typing cursor effect */
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.5rem;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            margin-left: 4px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
         }
 
         @keyframes inbox-expand-glow {
@@ -3760,17 +3795,23 @@
                                 {/* Animated Welcome Text */}
                                 {showWelcomeAnimation && currentPage === 'home' && (
                                     <div className={`welcome-text-container ${!showWelcomeAnimation ? 'fade-out' : ''}`}>
-                                        <div className="welcome-text">
+                                        <div className="welcome-text" key={currentWelcomeMessage}>
                                             {welcomeMessages[currentWelcomeMessage].split(' ').map((word, i) => (
-                                                <span key={i} style={{animationDelay: `${i * 0.1}s`}}>
-                                                    {word}{' '}
+                                                <span key={`${currentWelcomeMessage}-${i}`} style={{animationDelay: `${i * 0.08}s`}}>
+                                                    {word}
                                                 </span>
                                             ))}
                                             {userName && (
-                                                <span style={{animationDelay: `${welcomeMessages[currentWelcomeMessage].split(' ').length * 0.1}s`}}>
-                                                    , {userName}!
-                                                </span>
+                                                <>
+                                                    <span style={{animationDelay: `${welcomeMessages[currentWelcomeMessage].split(' ').length * 0.08}s`}}>
+                                                        ,
+                                                    </span>
+                                                    <span style={{animationDelay: `${(welcomeMessages[currentWelcomeMessage].split(' ').length + 1) * 0.08}s`}}>
+                                                        {userName}!
+                                                    </span>
+                                                </>
                                             )}
+                                            <span className="typing-cursor" style={{animationDelay: `${(welcomeMessages[currentWelcomeMessage].split(' ').length + (userName ? 2 : 0)) * 0.08}s`}}></span>
                                         </div>
                                     </div>
                                 )}
