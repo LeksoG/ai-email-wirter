@@ -786,24 +786,32 @@
 
         /* Delete Animation */
         .email-delete-fade {
-            animation: delete-fade-out 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+            animation: delete-slide-out 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
         }
 
-        @keyframes delete-fade-out {
+        @keyframes delete-slide-out {
             0% {
                 opacity: 1;
                 transform: translateX(0) scale(1);
+                max-height: 200px;
             }
-            50% {
-                opacity: 0.5;
-                transform: translateX(-20px) scale(0.98);
+            30% {
+                opacity: 0.7;
+                transform: translateX(-30px) scale(0.98);
+            }
+            60% {
+                opacity: 0.3;
+                transform: translateX(-80px) scale(0.95);
             }
             100% {
                 opacity: 0;
-                transform: translateX(-60px) scale(0.95);
-                height: 0;
-                padding: 0;
-                margin: 0;
+                transform: translateX(-120px) scale(0.9);
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin-top: 0;
+                margin-bottom: 0;
+                overflow: hidden;
             }
         }
 
@@ -1488,13 +1496,14 @@
 
         .welcome-text {
             font-size: 1.8rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #9333ea, #db2777);
             background-size: 200% 200%;
             animation: gradient-shift 3s ease infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            color: #4f46e5; /* Fallback color for browsers without gradient support */
             min-height: 60px;
             display: flex;
             align-items: center;
@@ -1504,10 +1513,13 @@
         }
 
         body.dark-mode .welcome-text {
-            background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+            background: linear-gradient(135deg, #a5b4fc, #d8b4fe, #fbcfe8);
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            color: #a5b4fc; /* Fallback color */
         }
 
         @keyframes gradient-shift {
@@ -1536,11 +1548,15 @@
         /* Typing cursor effect */
         .typing-cursor {
             display: inline-block;
-            width: 2px;
-            height: 1.5rem;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            width: 3px;
+            height: 1.8rem;
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
             margin-left: 4px;
             animation: blink 0.8s infinite;
+        }
+
+        body.dark-mode .typing-cursor {
+            background: linear-gradient(135deg, #a5b4fc, #d8b4fe);
         }
 
         @keyframes blink {
@@ -1638,6 +1654,7 @@
             const [showUndoDelete, setShowUndoDelete] = useState(false);
             const [isPrioritizing, setIsPrioritizing] = useState(false);
             const [emailsPrioritized, setEmailsPrioritized] = useState(false);
+            const [locallyDeletedEmailIds, setLocallyDeletedEmailIds] = useState(new Set());
             const [isRewritingReply, setIsRewritingReply] = useState(false);
             const [autoPrioritize, setAutoPrioritize] = useState(false);
             const [priorityEmails, setPriorityEmails] = useState([]);
@@ -2132,10 +2149,13 @@
                         };
                     });
 
-                    // Detect new emails
+                    // Detect new emails and filter out locally deleted ones
                     setGmailEmails(prevEmails => {
+                        // Filter out locally deleted emails
+                        const filteredEmails = formattedEmails.filter(e => !locallyDeletedEmailIds.has(e.id));
+
                         const prevEmailIds = new Set(prevEmails.map(e => e.id));
-                        const newEmails = formattedEmails.filter(e => !prevEmailIds.has(e.id));
+                        const newEmails = filteredEmails.filter(e => !prevEmailIds.has(e.id));
 
                         if (newEmails.length > 0 && prevEmails.length > 0) {
                             console.log(`🔔 ${newEmails.length} new email(s) detected!`);
@@ -2156,7 +2176,7 @@
                             playNotificationSound();
                         }
 
-                        return formattedEmails;
+                        return filteredEmails;
                     });
                     console.log(`✅ Loaded ${formattedEmails.length} emails from inbox`);
                 } catch (error) {
@@ -2700,6 +2720,15 @@
                 setDeletedEmail({ email: emailToDelete, type });
                 setShowUndoDelete(true);
 
+                // Track locally deleted email ID
+                if (type === 'inbox') {
+                    setLocallyDeletedEmailIds(prev => {
+                        const updated = new Set(prev);
+                        updated.add(emailId);
+                        return updated;
+                    });
+                }
+
                 // Delete with animation
                 const emailElement = document.querySelector(`[data-email-id="${emailId}"]`);
                 if (emailElement) {
@@ -2711,7 +2740,7 @@
                             setSentEmails(prev => prev.filter(e => e.id !== emailId));
                         }
                         console.log(`🗑️ Deleted ${type} email:`, emailId);
-                    }, 400);
+                    }, 500);
                 } else {
                     if (type === 'inbox') {
                         setGmailEmails(prev => prev.filter(e => e.id !== emailId));
@@ -2726,6 +2755,12 @@
                     playNotificationSound();
                     if (deletedEmail.type === 'inbox') {
                         setGmailEmails(prev => [deletedEmail.email, ...prev]);
+                        // Remove from locally deleted IDs
+                        setLocallyDeletedEmailIds(prev => {
+                            const updated = new Set(prev);
+                            updated.delete(deletedEmail.email.id);
+                            return updated;
+                        });
                     } else {
                         setSentEmails(prev => [deletedEmail.email, ...prev]);
                     }
@@ -2740,6 +2775,12 @@
                 playNotificationSound();
 
                 if (type === 'inbox') {
+                    // Track deleted email IDs
+                    setLocallyDeletedEmailIds(prev => {
+                        const updated = new Set(prev);
+                        selectedEmails.forEach(id => updated.add(id));
+                        return updated;
+                    });
                     setGmailEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
                 } else {
                     setSentEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
@@ -2753,6 +2794,12 @@
                 const confirmDelete = confirm(`Are you sure you want to delete all ${type} emails?`);
                 if (confirmDelete) {
                     if (type === 'inbox') {
+                        // Track all deleted email IDs
+                        setLocallyDeletedEmailIds(prev => {
+                            const updated = new Set(prev);
+                            gmailEmails.forEach(e => updated.add(e.id));
+                            return updated;
+                        });
                         setGmailEmails([]);
                     } else {
                         setSentEmails([]);
