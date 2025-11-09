@@ -16,6 +16,7 @@ module.exports = async function handler(req, res) {
         const { accessToken } = req.body;
 
         if (!accessToken) {
+            console.error('❌ No access token provided');
             return res.status(400).json({ error: 'Access token is required' });
         }
 
@@ -34,27 +35,46 @@ module.exports = async function handler(req, res) {
         });
 
         const messages = listResponse.data.messages || [];
+        console.log(`📨 Found ${messages.length} messages in sent folder`);
+
+        // If no messages, return empty array
+        if (messages.length === 0) {
+            console.log('✅ No messages in sent folder, returning empty array');
+            return res.status(200).json({ emails: [] });
+        }
 
         // Fetch full message details
         const emails = await Promise.all(
             messages.map(async (msg) => {
-                const fullMsg = await gmail.users.messages.get({
-                    userId: 'me',
-                    id: msg.id,
-                    format: 'full'
-                });
-                return fullMsg.data;
+                try {
+                    const fullMsg = await gmail.users.messages.get({
+                        userId: 'me',
+                        id: msg.id,
+                        format: 'full'
+                    });
+                    return fullMsg.data;
+                } catch (err) {
+                    console.error(`❌ Error fetching message ${msg.id}:`, err.message);
+                    return null;
+                }
             })
         );
 
-        console.log(`✅ Fetched ${emails.length} sent emails`);
+        // Filter out any null results
+        const validEmails = emails.filter(email => email !== null);
 
-        res.status(200).json({ emails });
+        console.log(`✅ Successfully fetched ${validEmails.length} sent emails`);
+
+        res.status(200).json({ emails: validEmails });
     } catch (error) {
         console.error('❌ Error fetching sent emails:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+
         res.status(500).json({
             error: 'Failed to fetch sent emails',
-            message: error.message
+            message: error.message,
+            details: error.toString()
         });
     }
 };
