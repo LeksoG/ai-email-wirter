@@ -1234,38 +1234,59 @@
                     <div className="ai-particle" style={{top: '60%', right: '25%', animationDelay: '9s'}}></div>
                     <div className="ai-particle" style={{bottom: '20%', right: '10%', animationDelay: '12s'}}></div>
 
-                    <div className="page-container relative z-10 container mx-auto px-4 py-8 max-w-7xl">
-                        {/* Header with Navigation */}
-                        <header className="text-center mb-8">
-                            <div className="flex justify-center gap-4 mb-6">
+                    {/* Sticky Header */}
+                    <header className="sticky-header">
+                        <div className="container mx-auto px-4 py-4">
+                            <div className="flex justify-center items-center gap-4">
                                 <button
                                     onClick={() => setCurrentPage('home')}
                                     className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
                                         currentPage === 'home'
-                                            ? 'glass-effect text-gray-800 border-2 border-indigo-400'
+                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
                                             : 'glass-dark text-gray-700 hover:bg-white/70'
                                     }`}
                                 >
-                                    🏠 Home
+                                    Home
                                 </button>
+                                {emailConnected && (
+                                    <>
+                                        <button
+                                            onClick={() => setCurrentPage('inbox')}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                                currentPage === 'inbox'
+                                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
+                                                    : 'glass-dark text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Inbox
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentPage('sent')}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                                currentPage === 'sent'
+                                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
+                                                    : 'glass-dark text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Sent
+                                        </button>
+                                    </>
+                                )}
                                 <button
                                     onClick={() => setCurrentPage('settings')}
                                     className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
                                         currentPage === 'settings'
-                                            ? 'glass-effect text-gray-800 border-2 border-indigo-400'
+                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
                                             : 'glass-dark text-gray-700 hover:bg-white/70'
                                     }`}
                                 >
-                                    ⚙️ Settings
+                                    Settings
                                 </button>
                             </div>
-                            <h1 className="text-5xl md:text-6xl font-bold gradient-text mb-4">
-                                AI Tools Suite
-                            </h1>
-                            <p className="text-gray-700 text-lg">
-                                Transform your communication with intelligent AI-powered tools
-                            </p>
-                        </header>
+                        </div>
+                    </header>
+
+                    <div className="page-container relative z-10 container mx-auto px-4 py-8 max-w-8xl">
 
                         {currentPage === 'settings' ? renderSettings() : (
                             <>
