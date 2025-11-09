@@ -670,6 +670,12 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
+        body.dark-mode .file-viewer-content {
+            background: rgba(30, 30, 30, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
         @keyframes modal-slide-up {
             from {
                 transform: translateY(50px) scale(0.95);
@@ -1447,6 +1453,51 @@
         .unread-email {
             border-left: 4px solid #ef4444;
         }
+
+        /* Inbox Button Expansion Animation */
+        .inbox-button-expanded {
+            min-width: 180px !important;
+            animation: inbox-expand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes inbox-expand {
+            0% {
+                min-width: 80px;
+            }
+            100% {
+                min-width: 180px;
+            }
+        }
+
+        .inbox-text-transition {
+            display: inline-block;
+            animation: text-fade-switch 3s ease-in-out forwards;
+        }
+
+        @keyframes text-fade-switch {
+            0%, 100% {
+                opacity: 1;
+            }
+            45%, 55% {
+                opacity: 0;
+            }
+        }
+
+        /* Email List Ladder Animation */
+        .email-ladder-animation {
+            animation: ladder-slide-in 0.4s ease-out backwards;
+        }
+
+        @keyframes ladder-slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1504,6 +1555,10 @@
             const [newEmailCount, setNewEmailCount] = useState(0);
             const [unreadEmails, setUnreadEmails] = useState(new Set());
             const [lastEmailCheck, setLastEmailCheck] = useState(Date.now());
+            const [showInboxExpand, setShowInboxExpand] = useState(false);
+            const [userName, setUserName] = useState('');
+            const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
+            const [aiLoadingState, setAiLoadingState] = useState('');
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -1650,9 +1705,9 @@
                 }
             }, [autoPrioritize, gmailEmails.length, currentPage]);
 
-            // Live Gmail sync - Poll for new emails every 30 seconds
+            // Live Gmail sync - Poll for new emails every 6 seconds (works on all tabs)
             useEffect(() => {
-                if (!emailConnected || currentPage !== 'inbox') return;
+                if (!emailConnected) return;
 
                 const pollInterval = setInterval(async () => {
                     try {
@@ -1665,10 +1720,10 @@
                     } catch (error) {
                         console.error('❌ Error polling for new emails:', error);
                     }
-                }, 30000); // Poll every 30 seconds
+                }, 6000); // Poll every 6 seconds
 
                 return () => clearInterval(pollInterval);
-            }, [emailConnected, currentPage]);
+            }, [emailConnected]);
 
             // Reset new email count when user views inbox
             useEffect(() => {
@@ -1893,6 +1948,14 @@
                                 newEmails.forEach(e => updated.add(e.id));
                                 return updated;
                             });
+
+                            // Trigger inbox button expansion animation
+                            setShowInboxExpand(true);
+                            setTimeout(() => {
+                                setShowInboxExpand(false);
+                            }, 3000);
+
+                            // Play notification sound
                             playNotificationSound();
                         }
 
@@ -2795,7 +2858,8 @@
                                                     });
                                                 }
                                             }}
-                                            className={`modern-email-item ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                            className={`modern-email-item email-ladder-animation ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                            style={{animationDelay: `${index * 0.05}s`}}
                                         >
                                             {/* Unread Label */}
                                             {unreadEmails.has(email.id) && (
@@ -2957,11 +3021,12 @@
 
                             <div className="space-y-3">
                                 {sentEmails.length > 0 ? (
-                                    sentEmails.map(email => (
+                                    sentEmails.map((email, index) => (
                                         <div
                                             key={email.id}
                                             data-email-id={email.id}
-                                            className="email-item glass-dark px-6 py-4 rounded-2xl relative hover:shadow-lg transition-all"
+                                            className="email-item email-ladder-animation glass-dark px-6 py-4 rounded-2xl relative hover:shadow-lg transition-all"
+                                            style={{animationDelay: `${index * 0.05}s`}}
                                         >
                                             {/* Checkbox for Selection */}
                                             <div
@@ -3464,10 +3529,12 @@
                                                 currentPage === 'inbox'
                                                     ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
                                                     : 'glass-dark text-gray-700 hover:bg-white/70'
-                                            }`}
-                                            style={{position: 'relative'}}
+                                            } ${showInboxExpand ? 'inbox-button-expanded' : ''}`}
+                                            style={{position: 'relative', transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'}}
                                         >
-                                            Inbox
+                                            <span className={showInboxExpand ? 'inbox-text-transition' : ''}>
+                                                {showInboxExpand ? '🔔 New Email!' : 'Inbox'}
+                                            </span>
                                             {newEmailCount > 0 && (
                                                 <span className="new-email-badge">
                                                     {newEmailCount}
@@ -3508,49 +3575,6 @@
                             <>
                                 {/* Main Center Container with Tabs */}
                                 <div className="rounded-3xl p-8 relative">
-                                    {/* Filter Dropdown Button */}
-                                    <div className="absolute top-6 right-6">
-                                        <button
-                                            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                                            className="px-4 py-2 glass-effect rounded-full text-gray-700 font-medium hover:bg-white/90 transition-all oval-button border border-indigo-300 flex items-center gap-2"
-                                        >
-                                            <span>🔧</span>
-                                            <span className="text-sm">Tools</span>
-                                            <span className={`text-xs transform transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`}>▼</span>
-                                        </button>
-                                        {showFilterDropdown && (
-                                            <div className="filter-dropdown glass-effect rounded-2xl p-3 shadow-xl">
-                                                {tools.map((tool) => (
-                                                    <button
-                                                        key={tool.id}
-                                                        onClick={() => {
-                                                            setActiveTab(tool.id);
-                                                            setResult('');
-                                                            setEmailText('');
-                                                            setCustomPrompt('');
-                                                            setActiveView('writer');
-                                                            setShowFilterDropdown(false);
-                                                            console.log('🔧 Switched to tool:', tool.name);
-                                                        }}
-                                                        className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                                                            activeTab === tool.id
-                                                                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
-                                                                : 'hover:bg-white/80 text-gray-700'
-                                                        }`}
-                                                    >
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-2xl">{tool.icon}</span>
-                                                            <div>
-                                                                <div className="text-sm font-semibold">{tool.name}</div>
-                                                                <div className="text-xs opacity-80">{tool.desc}</div>
-                                                            </div>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
                                     {/* Tab Switches */}
                                     <div className="flex justify-center mb-8">
                                         <div className="tab-container tab-button-container">
