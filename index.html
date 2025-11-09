@@ -67,15 +67,17 @@
         }
 
         .glass-effect {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
         }
 
         .glass-dark {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.05);
         }
 
         .gradient-text {
@@ -133,15 +135,19 @@
         }
 
         .custom-textarea {
-            background: rgba(255, 255, 255, 0.7);
-            border: 2px solid rgba(99, 102, 241, 0.2);
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(99, 102, 241, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
+            line-height: 1.6;
         }
 
         .custom-textarea:focus {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid rgba(99, 102, 241, 0.4);
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1),
+                        0 8px 24px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
         }
 
         .tab-container {
@@ -161,52 +167,113 @@
             z-index: 0;
         }
 
-        /* Loading Lines Animation */
+        /* Loading Lines Animation - Gemini Style */
         .loading-lines {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
             width: 100%;
+            padding: 20px 0;
         }
 
         .loading-line {
-            height: 8px;
-            background: linear-gradient(90deg, 
-                rgba(99, 102, 241, 0.3) 0%, 
-                rgba(139, 92, 246, 0.8) 50%,
-                rgba(99, 102, 241, 0.3) 100%
+            height: 12px;
+            background: linear-gradient(90deg,
+                rgba(99, 102, 241, 0.1) 0%,
+                rgba(139, 92, 246, 0.6) 50%,
+                rgba(99, 102, 241, 0.1) 100%
             );
             background-size: 200% 100%;
-            border-radius: 10px;
-            animation: loading-shimmer 1.5s ease-in-out infinite;
+            border-radius: 20px;
+            animation: loading-wave 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
         }
 
-        .loading-line:nth-child(1) { animation-delay: 0s; width: 90%; }
-        .loading-line:nth-child(2) { animation-delay: 0.2s; width: 85%; }
-        .loading-line:nth-child(3) { animation-delay: 0.4s; width: 92%; }
-        .loading-line:nth-child(4) { animation-delay: 0.6s; width: 88%; }
-        .loading-line:nth-child(5) { animation-delay: 0.8s; width: 86%; }
-
-        @keyframes loading-shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+        .loading-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                transparent 100%
+            );
+            animation: loading-shine 2s ease-in-out infinite;
         }
 
-        /* Apple Intelligence Wave Animation */
+        .loading-line:nth-child(1) {
+            animation-delay: 0s;
+            width: 95%;
+        }
+        .loading-line:nth-child(2) {
+            animation-delay: 0.15s;
+            width: 88%;
+        }
+        .loading-line:nth-child(3) {
+            animation-delay: 0.3s;
+            width: 92%;
+        }
+        .loading-line:nth-child(4) {
+            animation-delay: 0.45s;
+            width: 85%;
+        }
+        .loading-line:nth-child(5) {
+            animation-delay: 0.6s;
+            width: 90%;
+        }
+        .loading-line:nth-child(6) {
+            animation-delay: 0.75s;
+            width: 80%;
+        }
+
+        @keyframes loading-wave {
+            0%, 100% {
+                background-position: -200% 0;
+                transform: scaleX(0.98);
+                opacity: 0.7;
+            }
+            50% {
+                background-position: 200% 0;
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes loading-shine {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Fast Wave Animation - Gemini Style */
         .wave-char {
             display: inline-block;
             opacity: 0;
-            animation: wave-appear 0.3s ease-out forwards;
+            animation: wave-appear 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         @keyframes wave-appear {
             0% {
                 opacity: 0;
-                transform: translateY(10px) translateX(-5px);
+                transform: translateY(8px) scale(0.95);
+                filter: blur(2px);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-2px) scale(1.02);
+                filter: blur(0);
             }
             100% {
                 opacity: 1;
-                transform: translateY(0) translateX(0);
+                transform: translateY(0) scale(1);
+                filter: blur(0);
             }
         }
 
@@ -351,15 +418,16 @@
 
                 resultElement.innerHTML = '';
                 const chars = text.split('');
-                
+
+                // Faster animation - display characters quicker
                 chars.forEach((char, index) => {
                     setTimeout(() => {
                         const span = document.createElement('span');
                         span.className = 'wave-char';
                         span.textContent = char;
-                        span.style.animationDelay = `${index * 0.01}s`;
+                        span.style.animationDelay = `${index * 0.005}s`;
                         resultElement.appendChild(span);
-                    }, index * 20);
+                    }, index * 8); // Faster: 8ms instead of 20ms
                 });
             };
 
@@ -644,10 +712,11 @@
                         <div className="flex flex-col justify-center items-start h-96 space-y-8 px-6">
                             <div className="w-full space-y-4">
                                 <div className="text-left mb-6">
-                                    <p className="text-gray-700 text-lg mb-2">✨ AI is transforming your content</p>
-                                    <p className="text-gray-500 text-sm">Please wait a moment...</p>
+                                    <p className="text-gray-700 text-xl font-semibold mb-2">✨ Generating with AI</p>
+                                    <p className="text-gray-500 text-sm">Transforming your content...</p>
                                 </div>
                                 <div className="loading-lines">
+                                    <div className="loading-line"></div>
                                     <div className="loading-line"></div>
                                     <div className="loading-line"></div>
                                     <div className="loading-line"></div>
@@ -662,13 +731,16 @@
                 if (result) {
                     return (
                         <div className="result-container px-6 py-4">
-                            <div className="text-left">
-                                <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left"></pre>
+                            <div className="glass-dark rounded-2xl p-6 mb-6">
+                                <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
                             </div>
-                            <div className="flex gap-3 mt-6">
+                            <div className="flex gap-3">
                                 <button
-                                    onClick={() => navigator.clipboard.writeText(result)}
-                                    className="flex-1 px-6 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border border-indigo-300"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(result);
+                                        // Optional: Add a toast notification here
+                                    }}
+                                    className="flex-1 px-6 py-4 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 hover:border-indigo-500"
                                 >
                                     📋 Copy to Clipboard
                                 </button>
@@ -677,7 +749,7 @@
                                         setResult('');
                                         setActiveView('writer');
                                     }}
-                                    className="flex-1 px-6 py-3 glass-effect border border-indigo-300 rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button"
+                                    className="flex-1 px-6 py-4 glass-effect border-2 border-purple-400 hover:border-purple-500 rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button"
                                 >
                                     🔄 Start New
                                 </button>
