@@ -1674,11 +1674,10 @@
 
             // Initialize audio with local files
             useEffect(() => {
-                audioRef.current = new Audio('/mixkit-magic-marimba-2820.wav');
+                audioRef.current = new Audio('/notification.mp3');
                 audioRef.current.load();
 
-                sendAudioRef.current = new Audio('/
-whoosh-motion-405445.mp3');
+                sendAudioRef.current = new Audio('/send.mp3');
                 sendAudioRef.current.load();
 
                 // Load auto-prioritize setting
@@ -1754,29 +1753,84 @@ whoosh-motion-405445.mp3');
 
             // Handle send email with animation
             const handleSendEmail = async () => {
-                if (!emailReply) return;
+                if (!emailReply || !viewingEmail) return;
 
                 setIsSending(true);
 
-                // Wait 1.5 seconds before sending
-                setTimeout(() => {
-                    // Show envelope animation
+                try {
+                    // Get access token
+                    const savedTokens = localStorage.getItem('gmailTokens');
+                    if (!savedTokens) {
+                        alert('⚠️ Not connected to Gmail. Please connect your account in Settings.');
+                        setIsSending(false);
+                        return;
+                    }
+
+                    const tokens = JSON.parse(savedTokens);
+
+                    // Extract email address from "Name <email@domain.com>" format
+                    const extractEmail = (fromString) => {
+                        const match = fromString.match(/<(.+?)>/);
+                        return match ? match[1] : fromString;
+                    };
+
+                    const recipientEmail = extractEmail(viewingEmail.from);
+                    const originalSubject = viewingEmail.subject;
+                    const replySubject = originalSubject.startsWith('Re:') ? originalSubject : `Re: ${originalSubject}`;
+
+                    console.log('📤 Sending reply to:', recipientEmail);
+                    console.log('Subject:', replySubject);
+
+                    // Send the email via Gmail API
+                    const response = await fetch('/api/gmail-send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            accessToken: tokens.access_token,
+                            to: recipientEmail,
+                            subject: replySubject,
+                            body: emailReply,
+                            threadId: viewingEmail.threadId,
+                            messageId: viewingEmail.id
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Failed to send email');
+                    }
+
+                    // Success! Show animations
                     setShowEnvelope(true);
                     playSendSound();
 
-                    console.log('📤 Sending reply:', emailReply.substring(0, 50) + '...');
-                    alert('Reply sent successfully! ✉️');
+                    console.log('✅ Email sent successfully!');
+                    console.log('Message ID:', data.messageId);
 
-                    // Clear fields
-                    setEmailReply('');
-                    setReplyPrompt('');
-                    setIsSending(false);
-
-                    // Remove envelope after animation completes
+                    // Show success message
                     setTimeout(() => {
-                        setShowEnvelope(false);
-                    }, 1500);
-                }, 1500);
+                        alert('✉️ Reply sent successfully!');
+
+                        // Clear fields and close modal
+                        setEmailReply('');
+                        setReplyPrompt('');
+                        setViewingEmail(null);
+                        setIsSending(false);
+
+                        // Remove envelope after animation
+                        setTimeout(() => {
+                            setShowEnvelope(false);
+                        }, 1500);
+                    }, 1000);
+
+                } catch (error) {
+                    console.error('❌ Error sending email:', error);
+                    alert(`❌ Failed to send email: ${error.message}`);
+                    setIsSending(false);
+                }
             };
 
             const emailStyles = [
@@ -1925,6 +1979,7 @@ whoosh-motion-405445.mp3');
                         const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
                         const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
                         const date = headers.find(h => h.name === 'Date')?.value || '';
+                        const messageId = headers.find(h => h.name === 'Message-ID')?.value || '';
 
                         return {
                             id: email.id,
@@ -1932,7 +1987,9 @@ whoosh-motion-405445.mp3');
                             subject: subject,
                             snippet: email.snippet,
                             date: new Date(parseInt(email.internalDate)).toLocaleString(),
-                            internalDate: email.internalDate
+                            internalDate: email.internalDate,
+                            threadId: email.threadId,
+                            messageId: messageId
                         };
                     });
 
