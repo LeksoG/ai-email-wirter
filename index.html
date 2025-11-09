@@ -961,9 +961,78 @@
                 }
             };
 
-            const fetchGmailEmails = async (accessToken) => {
+            const isTokenExpired = (expiryDate) => {
+                if (!expiryDate) return true;
+                // Add 5 minute buffer before actual expiry
+                return Date.now() >= (expiryDate - 300000);
+            };
+
+            const refreshAccessToken = async () => {
+                try {
+                    const savedTokens = localStorage.getItem('gmailTokens');
+                    if (!savedTokens) {
+                        throw new Error('No tokens found');
+                    }
+
+                    const tokens = JSON.parse(savedTokens);
+                    if (!tokens.refresh_token) {
+                        throw new Error('No refresh token available');
+                    }
+
+                    console.log('🔄 Refreshing access token...');
+
+                    const response = await fetch('/api/gmail-refresh', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ refreshToken: tokens.refresh_token })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to refresh token');
+                    }
+
+                    const data = await response.json();
+                    console.log('✅ Access token refreshed successfully');
+
+                    // Update tokens in localStorage (keep refresh_token)
+                    const updatedTokens = {
+                        ...tokens,
+                        access_token: data.access_token,
+                        expiry_date: data.expiry_date
+                    };
+                    localStorage.setItem('gmailTokens', JSON.stringify(updatedTokens));
+
+                    return data.access_token;
+                } catch (error) {
+                    console.error('❌ Token refresh failed:', error);
+                    // Clear tokens and force re-authentication
+                    localStorage.removeItem('gmailTokens');
+                    localStorage.removeItem('emailConnected');
+                    localStorage.removeItem('userEmail');
+                    setEmailConnected(false);
+                    setUserEmail('');
+                    alert('Your session has expired. Please reconnect your Gmail account.');
+                    throw error;
+                }
+            };
+
+            const fetchGmailEmails = async (accessToken, isRetry = false) => {
                 try {
                     console.log('📬 Fetching Gmail inbox...');
+
+                    // Check if token is expired before making request
+                    const savedTokens = localStorage.getItem('gmailTokens');
+                    if (savedTokens && !isRetry) {
+                        const tokens = JSON.parse(savedTokens);
+                        if (isTokenExpired(tokens.expiry_date)) {
+                            console.log('⚠️ Token expired, refreshing...');
+                            const newAccessToken = await refreshAccessToken();
+                            return fetchGmailEmails(newAccessToken, true);
+                        }
+                    }
 
                     const response = await fetch('/api/gmail-inbox', {
                         method: 'POST',
@@ -975,7 +1044,14 @@
 
                     const data = await response.json();
 
+                    // Handle authentication errors by refreshing token
                     if (!response.ok) {
+                        if ((response.status === 401 || response.status === 403) && !isRetry) {
+                            console.log('🔄 Authentication failed, refreshing token...');
+                            const newAccessToken = await refreshAccessToken();
+                            return fetchGmailEmails(newAccessToken, true);
+                        }
+
                         console.error('❌ API Error Response:', data);
                         console.error('Error message:', data.message);
                         console.error('Error details:', data.details);
@@ -1006,9 +1082,20 @@
                 }
             };
 
-            const fetchSentEmails = async (accessToken) => {
+            const fetchSentEmails = async (accessToken, isRetry = false) => {
                 try {
                     console.log('📤 Fetching sent emails...');
+
+                    // Check if token is expired before making request
+                    const savedTokens = localStorage.getItem('gmailTokens');
+                    if (savedTokens && !isRetry) {
+                        const tokens = JSON.parse(savedTokens);
+                        if (isTokenExpired(tokens.expiry_date)) {
+                            console.log('⚠️ Token expired, refreshing...');
+                            const newAccessToken = await refreshAccessToken();
+                            return fetchSentEmails(newAccessToken, true);
+                        }
+                    }
 
                     const response = await fetch('/api/gmail-sent', {
                         method: 'POST',
@@ -1020,7 +1107,14 @@
 
                     const data = await response.json();
 
+                    // Handle authentication errors by refreshing token
                     if (!response.ok) {
+                        if ((response.status === 401 || response.status === 403) && !isRetry) {
+                            console.log('🔄 Authentication failed, refreshing token...');
+                            const newAccessToken = await refreshAccessToken();
+                            return fetchSentEmails(newAccessToken, true);
+                        }
+
                         console.error('❌ API Error Response:', data);
                         console.error('Error message:', data.message);
                         console.error('Error details:', data.details);
