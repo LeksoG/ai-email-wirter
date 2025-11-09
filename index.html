@@ -356,6 +356,60 @@
             box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
         }
 
+        /* File Viewer Modal */
+        .file-viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modal-appear 0.3s ease-out;
+        }
+
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .file-viewer-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 800px;
+            max-height: 80vh;
+            width: 90%;
+            overflow: hidden;
+            animation: modal-slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes modal-slide-up {
+            from {
+                transform: translateY(50px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
         /* Floating AI particles */
         .ai-particle {
             position: fixed;
@@ -404,6 +458,10 @@
             const [showSuggestions, setShowSuggestions] = useState(false);
             const [emailConnected, setEmailConnected] = useState(false);
             const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+            const [selectedTone, setSelectedTone] = useState(null);
+            const [uploadedFile, setUploadedFile] = useState(null);
+            const [savedResults, setSavedResults] = useState([]);
+            const [viewingFile, setViewingFile] = useState(null);
             const [userEmails, setUserEmails] = useState([
                 { id: 1, from: 'john@example.com', subject: 'Meeting Tomorrow', preview: 'Hey, just wanted to confirm...', date: '2 hours ago' },
                 { id: 2, from: 'sarah@company.com', subject: 'Project Update', preview: 'The latest updates on the project...', date: '5 hours ago' },
@@ -494,48 +552,74 @@
                 resultElement.innerHTML = '';
                 const chars = text.split('');
 
-                // Faster animation - display characters quicker
+                // Display all characters at once with staggered wave animation
                 chars.forEach((char, index) => {
-                    setTimeout(() => {
-                        const span = document.createElement('span');
-                        span.className = 'wave-char';
-                        span.textContent = char;
-                        span.style.animationDelay = `${index * 0.005}s`;
-                        resultElement.appendChild(span);
-                    }, index * 8); // Faster: 8ms instead of 20ms
+                    const span = document.createElement('span');
+                    span.className = 'wave-char';
+                    span.textContent = char;
+                    // Faster stagger - all appear together in a wave
+                    span.style.animationDelay = `${index * 0.003}s`;
+                    resultElement.appendChild(span);
                 });
             };
 
-            const handleStyleClick = async (style) => {
+            const handleStyleClick = (style) => {
+                // Just set the selected tone, don't generate yet
+                setSelectedTone(style);
+                console.log('🎨 Tone selected:', style);
+            };
+
+            const handleGenerate = async () => {
+                if (!selectedTone && !customPrompt) return;
+
                 setIsProcessing(true);
                 setResult('');
                 setActiveView('results');
-                
-                let prompt = '';
-                switch(style) {
-                    case 'professional':
-                        prompt = 'Rewrite this email in a professional, formal business tone';
-                        break;
-                    case 'friendly':
-                        prompt = 'Rewrite this email in a warm, friendly, and approachable tone';
-                        break;
-                    case 'concise':
-                        prompt = 'Rewrite this email to be brief and to the point';
-                        break;
-                    case 'persuasive':
-                        prompt = 'Rewrite this email to be compelling and convincing';
-                        break;
-                    case 'apologetic':
-                        prompt = 'Rewrite this email with a sincere and apologetic tone';
-                        break;
-                    case 'enthusiastic':
-                        prompt = 'Rewrite this email with an energetic and enthusiastic tone';
-                        break;
+
+                let prompt = customPrompt;
+
+                if (selectedTone && !customPrompt) {
+                    switch(selectedTone) {
+                        case 'professional':
+                            prompt = 'Rewrite this email in a professional, formal business tone';
+                            break;
+                        case 'friendly':
+                            prompt = 'Rewrite this email in a warm, friendly, and approachable tone';
+                            break;
+                        case 'concise':
+                            prompt = 'Rewrite this email to be brief and to the point';
+                            break;
+                        case 'persuasive':
+                            prompt = 'Rewrite this email to be compelling and convincing';
+                            break;
+                        case 'apologetic':
+                            prompt = 'Rewrite this email with a sincere and apologetic tone';
+                            break;
+                        case 'enthusiastic':
+                            prompt = 'Rewrite this email with an energetic and enthusiastic tone';
+                            break;
+                    }
+                } else if (selectedTone && customPrompt) {
+                    // Combine tone with custom prompt
+                    const toneLabel = emailStyles.find(s => s.id === selectedTone)?.label || '';
+                    prompt = `${customPrompt} in a ${toneLabel} tone`;
                 }
 
                 try {
-                    const transformedText = await callAIAPI(prompt, emailText);
+                    const transformedText = await callAIAPI(prompt, uploadedFile?.content || emailText);
                     setResult(transformedText);
+
+                    // Save to history
+                    const newResult = {
+                        id: Date.now(),
+                        content: transformedText,
+                        prompt: prompt,
+                        originalText: uploadedFile?.content || emailText,
+                        timestamp: new Date().toLocaleString(),
+                        tone: selectedTone
+                    };
+                    setSavedResults(prev => [newResult, ...prev]);
+
                     setIsProcessing(false);
                     setTimeout(() => animateText(transformedText), 100);
                 } catch (error) {
@@ -545,23 +629,27 @@
                 }
             };
 
-            const handleCustomPrompt = async () => {
-                if (!customPrompt.trim()) return;
-                
-                setIsProcessing(true);
-                setResult('');
-                setActiveView('results');
-                
-                try {
-                    const transformedText = await callAIAPI(customPrompt, emailText);
-                    setResult(transformedText);
-                    setIsProcessing(false);
-                    setTimeout(() => animateText(transformedText), 100);
-                } catch (error) {
-                    console.error('API Error:', error);
-                    setResult(`Error: ${error.message}\n\nPlease check that:\n1. Your MISTRAL_API_KEY is set in Vercel\n2. Your API key is valid\n3. You have sufficient credits`);
-                    setIsProcessing(false);
-                }
+            const handleFileUpload = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const content = event.target.result;
+                    setUploadedFile({
+                        name: file.name,
+                        content: content,
+                        size: file.size
+                    });
+                    setEmailText(''); // Clear textarea when file is uploaded
+                    console.log('📁 File uploaded:', file.name);
+                };
+                reader.readAsText(file);
+            };
+
+            const handleDeleteResult = (id) => {
+                setSavedResults(prev => prev.filter(r => r.id !== id));
+                console.log('🗑️ Deleted result:', id);
             };
 
             const handleToolProcess = async () => {
@@ -697,19 +785,79 @@
                     case 'email':
                         return (
                             <div className="space-y-6 fade-in">
+                                {/* Current Tool Indicator */}
+                                <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
+                                    <span className="text-xl">✉️</span>
+                                    <span className="text-sm font-semibold text-gray-700">Email Rewriter</span>
+                                </div>
+
+                                {/* File Upload or Text Area */}
                                 <div className="relative">
-                                    <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center justify-between mb-3">
                                         <label className="text-sm font-medium text-gray-700 flex items-center">
                                             <span className="text-lg mr-2">✍️</span>
                                             Paste your email content
                                         </label>
+                                        <label className="px-4 py-2 glass-effect rounded-full text-gray-700 text-xs font-medium hover:bg-white/90 transition-all cursor-pointer border border-indigo-300">
+                                            <span>📎 Upload File</span>
+                                            <input type="file" accept=".txt,.eml" onChange={handleFileUpload} className="hidden" />
+                                        </label>
+                                    </div>
+
+                                    {uploadedFile ? (
+                                        <div className="glass-dark rounded-2xl p-4 mb-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-3xl">📄</span>
+                                                    <div>
+                                                        <div className="text-sm font-semibold text-gray-800">{uploadedFile.name}</div>
+                                                        <div className="text-xs text-gray-600">{(uploadedFile.size / 1024).toFixed(2)} KB</div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setViewingFile(uploadedFile)}
+                                                        className="px-3 py-1 glass-effect rounded-full text-xs text-gray-700 hover:bg-white/90"
+                                                    >
+                                                        👁️ View
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setUploadedFile(null)}
+                                                        className="px-3 py-1 glass-effect rounded-full text-xs text-red-600 hover:bg-white/90"
+                                                    >
+                                                        ✕ Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <textarea
+                                            value={emailText}
+                                            onChange={(e) => setEmailText(e.target.value)}
+                                            className="w-full h-64 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
+                                            placeholder="Type or paste your email content here and watch the magic happen..."
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Custom Transformation + Suggestions */}
+                                <div className="pt-4 border-t border-gray-300 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center">
+                                            <span className="text-lg mr-2">🎨</span>
+                                            Custom Transformation
+                                        </label>
                                         {showSuggestions && (
-                                            <div className="suggestions-container flex flex-wrap gap-2 max-w-xl">
+                                            <div className="suggestions-container flex flex-wrap gap-2 max-w-md">
                                                 {emailStyles.map((style) => (
                                                     <button
                                                         key={style.id}
                                                         onClick={() => handleStyleClick(style.id)}
-                                                        className="suggestion-pill glass-effect text-gray-800 font-medium hover:bg-white/90 oval-button border border-indigo-300 px-4 py-1.5 rounded-full text-xs"
+                                                        className={`suggestion-pill glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all ${
+                                                            selectedTone === style.id
+                                                                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
+                                                                : 'text-gray-800 border border-indigo-300'
+                                                        }`}
                                                     >
                                                         {style.label}
                                                     </button>
@@ -717,19 +865,27 @@
                                             </div>
                                         )}
                                     </div>
-                                    <textarea
-                                        value={emailText}
-                                        onChange={(e) => setEmailText(e.target.value)}
-                                        className="w-full h-64 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
-                                        placeholder="Type or paste your email content here and watch the magic happen..."
-                                    />
-                                </div>
 
-                                <div className="pt-4 border-t border-gray-300">
-                                    <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
-                                        <span className="text-lg mr-2">🎨</span>
-                                        Custom Transformation
-                                    </label>
+                                    {/* Selected Tone Indicator */}
+                                    {selectedTone && (
+                                        <div className="suggestions-container glass-dark rounded-xl p-3 flex items-center gap-3">
+                                            <span className="text-2xl">{emailStyles.find(s => s.id === selectedTone)?.label}</span>
+                                            <div className="flex-1">
+                                                <div className="text-xs text-gray-600 mb-1">Selected Tone</div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-1 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full"></div>
+                                                    <span className="text-xs text-gray-700">Connected to prompt</span>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setSelectedTone(null)}
+                                                className="text-gray-500 hover:text-red-600"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    )}
+
                                     <div className="flex gap-3">
                                         <input
                                             type="text"
@@ -737,13 +893,14 @@
                                             onChange={(e) => setCustomPrompt(e.target.value)}
                                             className="flex-1 px-5 py-3 glass-effect border border-indigo-300 rounded-full text-gray-800 placeholder-gray-500"
                                             placeholder="e.g., 'Make it more casual' or 'Add urgency'"
-                                            onKeyPress={(e) => e.key === 'Enter' && handleCustomPrompt()}
+                                            onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
                                         />
                                         <button
-                                            onClick={handleCustomPrompt}
-                                            className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-indigo-400"
+                                            onClick={handleGenerate}
+                                            disabled={!emailText && !uploadedFile && !selectedTone}
+                                            className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            Transform
+                                            ✨ Generate
                                         </button>
                                     </div>
                                 </div>
@@ -779,6 +936,9 @@
             };
 
             const renderResultsContent = () => {
+                // If there are saved results and we're in results view, show swap layout
+                const shouldSwapLayout = savedResults.length > 0 && activeView === 'results';
+
                 if (isProcessing) {
                     return (
                         <div className="flex flex-col justify-center items-start h-96 space-y-8 px-6">
@@ -800,6 +960,81 @@
                     );
                 }
 
+                if (shouldSwapLayout) {
+                    // Swapped layout: Current result on left (Writer position), Saved results on right
+                    return (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-6 py-4">
+                            {/* Current Result (in Writer position) */}
+                            <div className="suggestions-container">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4">📝 Current Result</h3>
+                                {result ? (
+                                    <div>
+                                        <div className="glass-dark rounded-2xl p-6 mb-4">
+                                            <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => navigator.clipboard.writeText(result)}
+                                                className="flex-1 px-4 py-3 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 text-sm"
+                                            >
+                                                📋 Copy
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setResult('');
+                                                    setActiveView('writer');
+                                                }}
+                                                className="flex-1 px-4 py-3 glass-effect border-2 border-purple-400 rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button text-sm"
+                                            >
+                                                🔄 New
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="glass-dark rounded-2xl p-8 text-center text-gray-500">
+                                        <p>No current result</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Saved Results (in Results position) */}
+                            <div className="suggestions-container">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4">💾 Saved Results ({savedResults.length})</h3>
+                                <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                                    {savedResults.map((savedResult) => (
+                                        <div key={savedResult.id} className="glass-dark rounded-xl p-4 hover:bg-white/80 transition-all">
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div className="flex-1">
+                                                    <div className="text-xs text-gray-500 mb-1">{savedResult.timestamp}</div>
+                                                    <div className="text-sm font-semibold text-gray-800 line-clamp-2">{savedResult.prompt}</div>
+                                                    {savedResult.tone && (
+                                                        <span className="inline-block mt-1 px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-xs">
+                                                            {emailStyles.find(s => s.id === savedResult.tone)?.label}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    onClick={() => handleDeleteResult(savedResult.id)}
+                                                    className="ml-2 text-gray-400 hover:text-red-600 transition-colors"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                            <button
+                                                onClick={() => setViewingFile(savedResult)}
+                                                className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                                            >
+                                                👁️ View Full Content
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                // Normal layout when no saved results
                 if (result) {
                     return (
                         <div className="result-container px-6 py-4">
@@ -808,10 +1043,7 @@
                             </div>
                             <div className="flex gap-3">
                                 <button
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(result);
-                                        // Optional: Add a toast notification here
-                                    }}
+                                    onClick={() => navigator.clipboard.writeText(result)}
                                     className="flex-1 px-6 py-4 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 hover:border-indigo-500"
                                 >
                                     📋 Copy to Clipboard
@@ -841,6 +1073,52 @@
 
             return (
                 <div className="min-h-screen relative">
+                    {/* File Viewer Modal */}
+                    {viewingFile && (
+                        <div className="file-viewer-modal" onClick={() => setViewingFile(null)}>
+                            <div className="file-viewer-content" onClick={(e) => e.stopPropagation()}>
+                                <div className="p-6 border-b border-gray-200">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-xl font-bold text-gray-800">
+                                            {viewingFile.name || 'Viewing Content'}
+                                        </h2>
+                                        <button
+                                            onClick={() => setViewingFile(null)}
+                                            className="text-gray-500 hover:text-gray-700 text-2xl"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                    {viewingFile.timestamp && (
+                                        <p className="text-sm text-gray-500 mt-1">{viewingFile.timestamp}</p>
+                                    )}
+                                </div>
+                                <div className="p-6 overflow-y-auto max-h-[60vh]">
+                                    <pre className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-base">
+                                        {viewingFile.content}
+                                    </pre>
+                                </div>
+                                <div className="p-6 border-t border-gray-200 flex gap-3">
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(viewingFile.content);
+                                            alert('Copied to clipboard!');
+                                        }}
+                                        className="flex-1 px-6 py-3 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400"
+                                    >
+                                        📋 Copy
+                                    </button>
+                                    <button
+                                        onClick={() => setViewingFile(null)}
+                                        className="px-6 py-3 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-gray-300"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* AI Floating Particles */}
                     <div className="ai-particle" style={{top: '20%', left: '10%', animationDelay: '0s'}}></div>
                     <div className="ai-particle" style={{top: '40%', right: '15%', animationDelay: '3s'}}></div>
