@@ -973,11 +973,14 @@
                         body: JSON.stringify({ accessToken })
                     });
 
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch emails');
-                    }
-
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        console.error('❌ API Error Response:', data);
+                        console.error('Error message:', data.message);
+                        console.error('Error details:', data.details);
+                        throw new Error(data.message || 'Failed to fetch emails');
+                    }
 
                     // Transform Gmail API response to our format
                     const formattedEmails = data.emails.map(email => {
@@ -999,6 +1002,7 @@
                     console.log(`✅ Loaded ${formattedEmails.length} emails from inbox`);
                 } catch (error) {
                     console.error('❌ Error fetching emails:', error);
+                    console.error('Full error object:', error);
                 }
             };
 
@@ -1014,11 +1018,14 @@
                         body: JSON.stringify({ accessToken })
                     });
 
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch sent emails');
-                    }
-
                     const data = await response.json();
+
+                    if (!response.ok) {
+                        console.error('❌ API Error Response:', data);
+                        console.error('Error message:', data.message);
+                        console.error('Error details:', data.details);
+                        throw new Error(data.message || 'Failed to fetch sent emails');
+                    }
 
                     // Transform Gmail API response to our format
                     const formattedEmails = data.emails.map(email => {
@@ -1040,6 +1047,7 @@
                     console.log(`✅ Loaded ${formattedEmails.length} sent emails`);
                 } catch (error) {
                     console.error('❌ Error fetching sent emails:', error);
+                    console.error('Full error object:', error);
                 }
             };
 
