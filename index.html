@@ -570,10 +570,51 @@
                 console.log('📊 Initial state:', { activeTab, activeView, currentPage });
                 console.log('🔌 API endpoint:', '/api/transform');
 
+                // Check for OAuth callback with tokens
+                const urlParams = new URLSearchParams(window.location.search);
+                const tokensParam = urlParams.get('tokens');
+
+                if (tokensParam) {
+                    try {
+                        const tokens = JSON.parse(decodeURIComponent(tokensParam));
+                        console.log('🎉 OAuth tokens received!');
+
+                        // Store tokens in localStorage
+                        localStorage.setItem('gmailTokens', JSON.stringify(tokens));
+                        localStorage.setItem('emailConnected', 'true');
+
+                        setEmailConnected(true);
+
+                        // Fetch emails
+                        fetchGmailEmails(tokens.access_token);
+                        fetchSentEmails(tokens.access_token);
+
+                        // Clean URL
+                        window.history.replaceState({}, '', '/');
+                    } catch (error) {
+                        console.error('❌ Error processing OAuth tokens:', error);
+                    }
+                }
+
                 // Load email connection from localStorage
                 const savedConnection = localStorage.getItem('emailConnected');
-                if (savedConnection === 'true') {
+                const savedTokens = localStorage.getItem('gmailTokens');
+
+                if (savedConnection === 'true' && savedTokens) {
                     setEmailConnected(true);
+
+                    // Fetch emails with saved tokens
+                    try {
+                        const tokens = JSON.parse(savedTokens);
+                        fetchGmailEmails(tokens.access_token);
+                        fetchSentEmails(tokens.access_token);
+                    } catch (error) {
+                        console.error('❌ Error loading saved tokens:', error);
+                        // Clear invalid tokens
+                        localStorage.removeItem('gmailTokens');
+                        localStorage.removeItem('emailConnected');
+                        setEmailConnected(false);
+                    }
                 }
 
                 // Load dark mode preference
@@ -622,27 +663,108 @@
                 { id: 'tone', icon: '🎭', name: 'Tone Analyzer', desc: 'Understand message sentiment' }
             ];
 
-            const handleGmailConnect = () => {
-                // For Gmail OAuth, the user needs to set up Google Cloud OAuth
-                // This would open a popup or redirect to Google OAuth
-                alert('Gmail OAuth Setup Required!\n\nTo connect Gmail, you need to:\n\n1. Create a Google Cloud Project\n2. Enable Gmail API\n3. Create OAuth 2.0 credentials\n4. Add authorized redirect URI\n5. Implement OAuth flow\n\nFor now, simulating connection...');
+            const handleGmailConnect = async () => {
+                try {
+                    console.log('🔐 Initiating Gmail OAuth...');
 
-                setEmailConnected(true);
-                localStorage.setItem('emailConnected', 'true');
-                console.log('📧 Gmail connected');
+                    // Call your auth endpoint to get the OAuth URL
+                    const response = await fetch('/api/auth/gmail');
 
-                // In production, this would fetch real emails via Gmail API
-                // For now, using mock data
-                setGmailEmails([
-                    { id: 1, from: 'boss@company.com', subject: 'Quarterly Review', snippet: 'Please prepare for our quarterly review...', date: '10:30 AM' },
-                    { id: 2, from: 'client@business.com', subject: 'Project Proposal', snippet: 'I have reviewed your proposal and...', date: 'Yesterday' },
-                    { id: 3, from: 'team@startup.io', subject: 'Team Meeting', snippet: 'Reminder: Team meeting at 3 PM...', date: '2 days ago' }
-                ]);
+                    if (!response.ok) {
+                        throw new Error('Failed to initiate OAuth');
+                    }
 
-                setSentEmails([
-                    { id: 1, to: 'john@example.com', subject: 'Re: Meeting Tomorrow', snippet: 'Thanks for confirming. See you then!', date: '9:15 AM' },
-                    { id: 2, to: 'support@service.com', subject: 'Feature Request', snippet: 'I would like to request a new feature...', date: 'Yesterday' }
-                ]);
+                    const data = await response.json();
+                    console.log('📧 Redirecting to Google OAuth...');
+
+                    // Redirect to Google's OAuth consent screen
+                    window.location.href = data.authUrl;
+                } catch (error) {
+                    console.error('❌ Gmail OAuth error:', error);
+                    alert('Failed to connect to Gmail. Please check:\n\n1. GOOGLE_CLIENT_ID is set in Vercel\n2. GOOGLE_CLIENT_SECRET is set in Vercel\n3. OAuth redirect URI is configured correctly\n4. Gmail API is enabled in Google Cloud Console');
+                }
+            };
+
+            const fetchGmailEmails = async (accessToken) => {
+                try {
+                    console.log('📬 Fetching Gmail inbox...');
+
+                    const response = await fetch('/api/gmail/inbox', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ accessToken })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch emails');
+                    }
+
+                    const data = await response.json();
+
+                    // Transform Gmail API response to our format
+                    const formattedEmails = data.emails.map(email => {
+                        const headers = email.payload.headers;
+                        const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
+                        const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+                        const date = headers.find(h => h.name === 'Date')?.value || '';
+
+                        return {
+                            id: email.id,
+                            from: from,
+                            subject: subject,
+                            snippet: email.snippet,
+                            date: new Date(parseInt(email.internalDate)).toLocaleString()
+                        };
+                    });
+
+                    setGmailEmails(formattedEmails);
+                    console.log(`✅ Loaded ${formattedEmails.length} emails from inbox`);
+                } catch (error) {
+                    console.error('❌ Error fetching emails:', error);
+                }
+            };
+
+            const fetchSentEmails = async (accessToken) => {
+                try {
+                    console.log('📤 Fetching sent emails...');
+
+                    const response = await fetch('/api/gmail/sent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ accessToken })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch sent emails');
+                    }
+
+                    const data = await response.json();
+
+                    // Transform Gmail API response to our format
+                    const formattedEmails = data.emails.map(email => {
+                        const headers = email.payload.headers;
+                        const to = headers.find(h => h.name === 'To')?.value || 'Unknown';
+                        const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+                        const date = headers.find(h => h.name === 'Date')?.value || '';
+
+                        return {
+                            id: email.id,
+                            to: to,
+                            subject: subject,
+                            snippet: email.snippet,
+                            date: new Date(parseInt(email.internalDate)).toLocaleString()
+                        };
+                    });
+
+                    setSentEmails(formattedEmails);
+                    console.log(`✅ Loaded ${formattedEmails.length} sent emails`);
+                } catch (error) {
+                    console.error('❌ Error fetching sent emails:', error);
+                }
             };
 
             const callAIAPI = async (prompt, text) => {
@@ -922,7 +1044,14 @@
                                             <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
                                                 <span className="text-sm font-medium text-gray-700">✅ Connected to Gmail</span>
                                                 <button
-                                                    onClick={() => setEmailConnected(false)}
+                                                    onClick={() => {
+                                                        setEmailConnected(false);
+                                                        localStorage.removeItem('emailConnected');
+                                                        localStorage.removeItem('gmailTokens');
+                                                        setGmailEmails([]);
+                                                        setSentEmails([]);
+                                                        console.log('📧 Gmail disconnected');
+                                                    }}
                                                     className="text-xs text-red-600 hover:text-red-700"
                                                 >
                                                     Disconnect
