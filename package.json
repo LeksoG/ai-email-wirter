@@ -1,0 +1,12 @@
+{
+  "name": "ai-email-writer",
+  "version": "1.0.0",
+  "description": "AI-powered email transformation tool",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}
