@@ -1457,15 +1457,73 @@
         /* Inbox Button Expansion Animation */
         .inbox-button-expanded {
             min-width: 180px !important;
-            animation: inbox-expand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            border-color: #ef4444 !important;
+            animation: inbox-expand-glow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
         }
 
-        @keyframes inbox-expand {
+        /* Welcome Text Animation */
+        .welcome-text-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            margin-top: 1rem;
+            opacity: 1;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .welcome-text-container.fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+        }
+
+        .welcome-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.dark-mode .welcome-text {
+            background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .welcome-text span {
+            display: inline-block;
+            animation: text-fade-in 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes text-fade-in {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes inbox-expand-glow {
             0% {
-                min-width: 80px;
+                min-width: 100px;
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+            50% {
+                box-shadow: 0 0 30px 10px rgba(239, 68, 68, 0.6);
             }
             100% {
                 min-width: 180px;
+                box-shadow: 0 0 20px 5px rgba(239, 68, 68, 0.4);
             }
         }
 
@@ -1559,6 +1617,7 @@
             const [userName, setUserName] = useState('');
             const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
             const [aiLoadingState, setAiLoadingState] = useState('');
+            const [currentWelcomeMessage, setCurrentWelcomeMessage] = useState(0);
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -1586,7 +1645,7 @@
 
                         setEmailConnected(true);
 
-                        // Fetch user info to get email address
+                        // Fetch user info to get email address and name
                         fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
                             headers: {
                                 Authorization: `Bearer ${tokens.access_token}`
@@ -1597,6 +1656,12 @@
                             console.log('👤 User:', userInfo.email);
                             setUserEmail(userInfo.email);
                             localStorage.setItem('userEmail', userInfo.email);
+
+                            // Extract user's first name
+                            const name = userInfo.given_name || userInfo.name?.split(' ')[0] || 'there';
+                            setUserName(name);
+                            localStorage.setItem('userName', name);
+                            console.log('👋 Welcome', name);
                         })
                         .catch(err => console.error('Error fetching user info:', err));
 
@@ -1615,10 +1680,15 @@
                 const savedConnection = localStorage.getItem('emailConnected');
                 const savedTokens = localStorage.getItem('gmailTokens');
                 const savedUserEmail = localStorage.getItem('userEmail');
+                const savedUserName = localStorage.getItem('userName');
                 const savedShowSuggestions = localStorage.getItem('showSuggestions');
 
                 if (savedUserEmail) {
                     setUserEmail(savedUserEmail);
+                }
+
+                if (savedUserName) {
+                    setUserName(savedUserName);
                 }
 
                 if (savedShowSuggestions !== null) {
@@ -1674,10 +1744,10 @@
 
             // Initialize audio with local files
             useEffect(() => {
-                audioRef.current = new Audio('/mixkit-magic-marimba-2820.wav');
+                audioRef.current = new Audio('/notification.mp3');
                 audioRef.current.load();
 
-                sendAudioRef.current = new Audio('/whoosh-motion-405445.mp3');
+                sendAudioRef.current = new Audio('/send.mp3');
                 sendAudioRef.current.load();
 
                 // Load auto-prioritize setting
@@ -1734,6 +1804,24 @@
                     return () => clearTimeout(timer);
                 }
             }, [currentPage, newEmailCount]);
+
+            // Rotate welcome messages
+            useEffect(() => {
+                if (!showWelcomeAnimation) return;
+
+                const interval = setInterval(() => {
+                    setCurrentWelcomeMessage(prev => (prev + 1) % welcomeMessages.length);
+                }, 3000);
+
+                return () => clearInterval(interval);
+            }, [showWelcomeAnimation]);
+
+            // Hide welcome text when user starts typing
+            useEffect(() => {
+                if ((emailText.length > 0 || customPrompt.length > 0) && showWelcomeAnimation) {
+                    setShowWelcomeAnimation(false);
+                }
+            }, [emailText, customPrompt]);
 
             // Play notification sound
             const playNotificationSound = () => {
@@ -1840,6 +1928,22 @@
                 { id: 'persuasive', label: '🎯 Persuasive' },
                 { id: 'apologetic', label: '🙏 Apologetic' },
                 { id: 'enthusiastic', label: '🚀 Enthusiastic' }
+            ];
+
+            const generalSuggestions = [
+                { id: 'longer', label: '📏 Make Longer', prompt: 'Expand this email with more details and context' },
+                { id: 'clearer', label: '💡 More Clear', prompt: 'Rewrite this email to be more clear and understandable' },
+                { id: 'simpler', label: '🔤 Simplify', prompt: 'Simplify this email to be easier to understand' },
+                { id: 'formal', label: '🎩 More Formal', prompt: 'Make this email more formal and professional' },
+                { id: 'action', label: '⚡ Add Action Items', prompt: 'Add clear action items and next steps to this email' },
+                { id: 'polite', label: '🌟 More Polite', prompt: 'Make this email more polite and courteous' }
+            ];
+
+            const welcomeMessages = [
+                "Turn hours of emails into seconds",
+                "Transform your inbox with AI",
+                "Write better emails faster",
+                "Your AI email assistant"
             ];
 
             const tools = [
@@ -3204,10 +3308,32 @@
 
                                 {/* Custom Transformation + Suggestions */}
                                 <div className="pt-4 border-t border-gray-300 space-y-4">
+                                    {/* General Suggestions */}
+                                    {showSuggestions && (
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700 flex items-center mb-2">
+                                                <span className="text-lg mr-2">💡</span>
+                                                Quick Actions
+                                            </label>
+                                            <div className="suggestions-container flex gap-2 overflow-x-auto pb-2">
+                                                {generalSuggestions.map((suggestion) => (
+                                                    <button
+                                                        key={suggestion.id}
+                                                        onClick={() => setCustomPrompt(suggestion.prompt)}
+                                                        className="suggestion-pill glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all text-gray-800 border border-green-300 hover:border-green-500"
+                                                    >
+                                                        {suggestion.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Tone Suggestions */}
                                     <div className="flex items-center justify-between">
                                         <label className="text-sm font-medium text-gray-700 flex items-center">
                                             <span className="text-lg mr-2">🎨</span>
-                                            Custom Transformation
+                                            Tone Styles
                                         </label>
                                         {showSuggestions && (
                                             <div className="suggestions-container flex gap-2 overflow-x-auto" style={{marginLeft: '-20px'}}>
@@ -3631,8 +3757,26 @@
                          currentPage === 'inbox' ? renderInbox() :
                          currentPage === 'sent' ? renderSent() : (
                             <>
+                                {/* Animated Welcome Text */}
+                                {showWelcomeAnimation && currentPage === 'home' && (
+                                    <div className={`welcome-text-container ${!showWelcomeAnimation ? 'fade-out' : ''}`}>
+                                        <div className="welcome-text">
+                                            {welcomeMessages[currentWelcomeMessage].split(' ').map((word, i) => (
+                                                <span key={i} style={{animationDelay: `${i * 0.1}s`}}>
+                                                    {word}{' '}
+                                                </span>
+                                            ))}
+                                            {userName && (
+                                                <span style={{animationDelay: `${welcomeMessages[currentWelcomeMessage].split(' ').length * 0.1}s`}}>
+                                                    , {userName}!
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Main Center Container with Tabs */}
-                                <div className="rounded-3xl p-8 relative">
+                                <div className="rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
                                     {/* Tab Switches */}
                                     <div className="flex justify-center mb-8">
                                         <div className="tab-container tab-button-container">
