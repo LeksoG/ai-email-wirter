@@ -1566,32 +1566,32 @@
         }
 
         .welcome-text {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-            background-size: 200% 200%;
-            animation: gradient-shift 3s ease infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: #6366f1; /* Fallback color for browsers without gradient support */
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    /* REMOVE THIS LINE: color: #6366f1; */
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
 
-        body.dark-mode .welcome-text {
-            background: linear-gradient(135deg, #a5b4fc, #d8b4fe, #fbcfe8);
-            background-size: 200% 200%;
-            animation: gradient-shift 3s ease infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: #a5b4fc; /* Fallback color */
-        }
+body.dark-mode .welcome-text {
+    background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 50%, #fbcfe8 100%);
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    /* REMOVE THIS LINE: color: #a5b4fc; */
+}
 
         @keyframes gradient-shift {
             0%, 100% { background-position: 0% 50%; }
@@ -2362,13 +2362,16 @@
 
                     // Detect new emails and filter out locally deleted ones
                     setGmailEmails(prevEmails => {
-                        // Filter out locally deleted emails
-                        const filteredEmails = formattedEmails.filter(e => !locallyDeletedEmailIds.has(e.id));
+    // Filter out locally deleted emails FIRST
+    const filteredEmails = formattedEmails.filter(e => !locallyDeletedEmailIds.has(e.id));
 
-                        const prevEmailIds = new Set(prevEmails.map(e => e.id));
-                        const newEmails = filteredEmails.filter(e => !prevEmailIds.has(e.id));
+    // Only detect new emails if we're not just filtering deleted ones
+    const prevEmailIds = new Set(prevEmails.map(e => e.id));
+    const allPrevIds = new Set([...prevEmailIds, ...locallyDeletedEmailIds]);
+    const newEmails = filteredEmails.filter(e => !allPrevIds.has(e.id));
 
-                        if (newEmails.length > 0 && prevEmails.length > 0) {
+    // Only trigger notification if there are genuinely NEW emails (not just un-deleted ones)
+    if (newEmails.length > 0 && prevEmails.length > 0 && !localStorage.getItem('just_deleted')) {
                             console.log(`🔔 ${newEmails.length} new email(s) detected!`);
                             setNewEmailCount(prev => prev + newEmails.length);
                             setUnreadEmails(prev => {
@@ -2940,25 +2943,25 @@
                     });
                 }
 
-                // Delete immediately with smooth slide-fade-left animation
                 const emailElement = document.querySelector(`[data-email-id="${emailId}"]`);
-                if (emailElement) {
-                    emailElement.classList.add('email-deleting');
-                    setTimeout(() => {
-                        if (type === 'inbox') {
-                            setGmailEmails(prev => prev.filter(e => e.id !== emailId));
-                        } else {
-                            setSentEmails(prev => prev.filter(e => e.id !== emailId));
-                        }
-                        console.log(`🗑️ Deleted ${type} email:`, emailId);
-                    }, 500);
-                } else {
-                    if (type === 'inbox') {
-                        setGmailEmails(prev => prev.filter(e => e.id !== emailId));
-                    } else {
-                        setSentEmails(prev => prev.filter(e => e.id !== emailId));
-                    }
-                }
+if (emailElement) {
+    emailElement.classList.add('email-deleting');
+    setTimeout(() => {
+        if (type === 'inbox') {
+            setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+        } else {
+            setSentEmails(prev => prev.filter(e => e.id !== emailId));
+        }
+        console.log(`🗑️ Deleted ${type} email:`, emailId);
+    }, 500);  // Make sure this matches the animation duration in CSS
+}
+
+                // ADD THIS AT THE END:
+    localStorage.setItem('just_deleted', 'true');
+    setTimeout(() => {
+        localStorage.removeItem('just_deleted');
+    }, 2000);
+    
             };
 
             const handleUndoDelete = () => {
