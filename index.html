@@ -519,13 +519,14 @@
                 rgba(99, 102, 241, 0.1) 100%
             );
             background-size: 200% 100%;
-            animation: prioritize-wave-motion 3s ease-in-out infinite;
+            animation: prioritize-wave-motion 2s ease-in-out infinite;
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
             color: #6366f1;
+            margin-bottom: 24px;
         }
 
         @keyframes prioritize-wave-motion {
@@ -539,12 +540,24 @@
 
         .priority-container {
             position: relative;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
             padding: 24px;
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
             border-radius: 24px;
             border: 2px solid rgba(99, 102, 241, 0.25);
             box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+            animation: priority-container-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes priority-container-appear {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         body.dark-mode .priority-container {
@@ -552,31 +565,54 @@
             border-color: rgba(99, 102, 241, 0.4);
         }
 
-        .priority-header {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        .priority-container-glow {
+            animation: priority-smooth-glow 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+        }
+
+        @keyframes priority-smooth-glow {
+            0% {
+                box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+            }
+            40% {
+                box-shadow: 0 8px 40px rgba(99, 102, 241, 0.5),
+                            0 4px 80px rgba(139, 92, 246, 0.4),
+                            inset 0 0 40px rgba(99, 102, 241, 0.2);
+            }
+            100% {
+                box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+            }
+        }
+
+        .priority-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 16px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-weight: 600;
-            position: relative;
-            z-index: 10;
+            gap: 12px;
         }
 
-        .priority-header:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        body.dark-mode .priority-section-title {
+            color: #a5b4fc;
         }
 
-        .priority-stack {
-            position: relative;
-            margin-top: 16px;
-            min-height: 100px;
+        .inbox-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #374151;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            padding-top: 24px;
+            border-top: 2px solid rgba(99, 102, 241, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.dark-mode .inbox-section-title {
+            color: #e5e5e5;
+            border-top-color: rgba(99, 102, 241, 0.4);
         }
 
         .priority-email-stacked {
@@ -589,6 +625,7 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             margin-bottom: 12px;
+            cursor: pointer;
         }
 
         body.dark-mode .priority-email-stacked {
@@ -597,110 +634,9 @@
             color: #e5e5e5;
         }
 
-        .priority-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .welcome-text-container {
-            text-align: center;
-            margin-bottom: 2rem;
-            margin-top: 1rem;
-            opacity: 1;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            position: relative;
-            z-index: 20;
-        }
-
-        .welcome-text-container.fade-out {
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-        }
-
-        .welcome-text {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #6366f1;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
-        body.dark-mode .welcome-text {
-            color: #a5b4fc;
-        }
-
-        @supports (-webkit-background-clip: text) {
-            .welcome-text {
-                background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-                background-size: 200% 200%;
-                animation: gradient-shift 3s ease infinite;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                color: transparent;
-            }
-
-            body.dark-mode .welcome-text {
-                background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 50%, #fbcfe8 100%);
-                background-size: 200% 200%;
-                animation: gradient-shift 3s ease infinite;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                color: transparent;
-            }
-        }
-
-        @keyframes gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .welcome-text span {
-            display: inline-block;
-            animation: typing-fade 0.5s ease forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        @keyframes typing-fade {
-            0% {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .typing-cursor {
-            display: inline-block;
-            width: 3px;
-            height: 1.8rem;
-            background: linear-gradient(135deg, #4f46e5, #9333ea);
-            margin-left: 4px;
-            animation: blink 0.8s infinite;
-        }
-
-        body.dark-mode .typing-cursor {
-            background: linear-gradient(135deg, #a5b4fc, #d8b4fe);
-        }
-
-        @keyframes blink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
+        .priority-email-stacked:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
         }
 
         .email-checkbox {
@@ -1018,6 +954,15 @@
             color: #a5b4fc;
         }
 
+        /* MOBILE NAV - ONLY SHOW ON MOBILE */
+        .mobile-nav-toggle {
+            display: none;
+        }
+
+        .mobile-nav-menu {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             input, textarea, select, button {
                 font-size: 16px !important;
@@ -1068,17 +1013,21 @@
             }
 
             body {
-                padding-top: 80px;
+                padding-top: 20px;
             }
 
-            .welcome-text {
-                font-size: 1.4rem;
+            .sticky-header {
+                display: none;
             }
         }
 
         @media (min-width: 769px) {
             .mobile-nav-toggle {
-                display: none;
+                display: none !important;
+            }
+
+            .mobile-nav-menu {
+                display: none !important;
             }
 
             .desktop-nav {
@@ -1123,18 +1072,14 @@
             const [deletedEmail, setDeletedEmail] = useState(null);
             const [showUndoDelete, setShowUndoDelete] = useState(false);
             const [isPrioritizing, setIsPrioritizing] = useState(false);
-            const [emailsPrioritized, setEmailsPrioritized] = useState(false);
             const [locallyDeletedEmailIds, setLocallyDeletedEmailIds] = useState(() => {
                 const saved = localStorage.getItem('deletedEmailIds');
                 return saved ? new Set(JSON.parse(saved)) : new Set();
             });
-            const [searchQuery, setSearchQuery] = useState('');
-            const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
             const [mobileNavOpen, setMobileNavOpen] = useState(false);
             const [isRewritingReply, setIsRewritingReply] = useState(false);
             const [autoPrioritize, setAutoPrioritize] = useState(false);
             const [priorityEmails, setPriorityEmails] = useState([]);
-            const [isPriorityExpanded, setIsPriorityExpanded] = useState(false);
             const [isSending, setIsSending] = useState(false);
             const [showEnvelope, setShowEnvelope] = useState(false);
             const [showPriorityGlow, setShowPriorityGlow] = useState(false);
@@ -1142,15 +1087,12 @@
             const [unreadEmails, setUnreadEmails] = useState(new Set());
             const [showInboxExpand, setShowInboxExpand] = useState(false);
             const [userName, setUserName] = useState('');
-            const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
-            const [currentWelcomeMessage, setCurrentWelcomeMessage] = useState(0);
 
             const audioRef = useRef(null);
             const sendAudioRef = useRef(null);
+            const deletingEmailsRef = useRef(new Set());
 
             useEffect(() => {
-                console.log('🚀 AI Email Writer initialized');
-
                 const urlParams = new URLSearchParams(window.location.search);
                 const tokensParam = urlParams.get('tokens');
 
@@ -1276,20 +1218,6 @@
                 }
             }, [currentPage, newEmailCount]);
 
-            useEffect(() => {
-                if (!showWelcomeAnimation) return;
-                const interval = setInterval(() => {
-                    setCurrentWelcomeMessage(prev => (prev + 1) % welcomeMessages.length);
-                }, 3000);
-                return () => clearInterval(interval);
-            }, [showWelcomeAnimation]);
-
-            useEffect(() => {
-                if ((emailText.length > 0 || customPrompt.length > 0) && showWelcomeAnimation) {
-                    setShowWelcomeAnimation(false);
-                }
-            }, [emailText, customPrompt]);
-
             const playNotificationSound = () => {
                 if (audioRef.current) {
                     audioRef.current.currentTime = 0;
@@ -1376,13 +1304,6 @@
                 { id: 'formal', label: '🎩 More Formal', prompt: 'Make this email more formal and professional' },
                 { id: 'action', label: '⚡ Add Action Items', prompt: 'Add clear action items and next steps to this email' },
                 { id: 'polite', label: '🌟 More Polite', prompt: 'Make this email more polite and courteous' }
-            ];
-
-            const welcomeMessages = [
-                "Turn hours of emails into seconds",
-                "Transform your inbox with AI",
-                "Write better emails faster",
-                "Your AI email assistant"
             ];
 
             const handleGmailConnect = async () => {
@@ -1483,9 +1404,13 @@
                     });
 
                     setGmailEmails(prevEmails => {
-                        const filteredEmails = formattedEmails.filter(e => !locallyDeletedEmailIds.has(e.id));
+                        // Filter out deleted AND currently deleting emails
+                        const currentlyDeleting = Array.from(deletingEmailsRef.current);
+                        const allExcluded = new Set([...locallyDeletedEmailIds, ...currentlyDeleting]);
+                        const filteredEmails = formattedEmails.filter(e => !allExcluded.has(e.id));
                         
-                        if (!localStorage.getItem('just_deleted')) {
+                        // Only check for new emails if not in delete operation
+                        if (deletingEmailsRef.current.size === 0) {
                             const prevEmailIds = new Set(prevEmails.map(e => e.id));
                             const allPrevIds = new Set([...prevEmailIds, ...Array.from(locallyDeletedEmailIds)]);
                             const newEmails = filteredEmails.filter(e => !allPrevIds.has(e.id));
@@ -1777,6 +1702,7 @@
                                             onClick={() => {
                                                 setAutoPrioritize(false);
                                                 localStorage.setItem('autoPrioritize', 'false');
+                                                setPriorityEmails([]);
                                                 playNotificationSound();
                                             }}
                                             className={`priority-preview-card priority-preview-off ${!autoPrioritize ? 'priority-mode-active' : 'priority-mode-inactive'}`}
@@ -1867,6 +1793,7 @@
                                                     setGmailEmails([]);
                                                     setSentEmails([]);
                                                     setUserEmail('');
+                                                    setPriorityEmails([]);
                                                 }}
                                                 className="text-xs text-red-600 hover:text-red-700"
                                             >
@@ -1900,6 +1827,9 @@
             const handleDeleteEmail = (emailId, type = 'inbox') => {
                 playNotificationSound();
 
+                // Add to deleting set
+                deletingEmailsRef.current.add(emailId);
+
                 const emailToDelete = type === 'inbox'
                     ? gmailEmails.find(e => e.id === emailId)
                     : sentEmails.find(e => e.id === emailId);
@@ -1921,21 +1851,24 @@
                     setTimeout(() => {
                         if (type === 'inbox') {
                             setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+                            // Also remove from priority emails if present
+                            setPriorityEmails(prev => prev.filter(e => e.id !== emailId));
                         } else {
                             setSentEmails(prev => prev.filter(e => e.id !== emailId));
                         }
+                        // Remove from deleting set after deletion is complete
+                        deletingEmailsRef.current.delete(emailId);
                     }, 500);
                 }
-
-                localStorage.setItem('just_deleted', 'true');
-                setTimeout(() => {
-                    localStorage.removeItem('just_deleted');
-                }, 2000);
             };
 
             const handleUndoDelete = () => {
                 if (deletedEmail) {
                     playNotificationSound();
+                    
+                    // Remove from deleting set
+                    deletingEmailsRef.current.delete(deletedEmail.email.id);
+                    
                     if (deletedEmail.type === 'inbox') {
                         setGmailEmails(prev => [deletedEmail.email, ...prev]);
                         setLocallyDeletedEmailIds(prev => {
@@ -1955,6 +1888,9 @@
                 if (selectedEmails.length === 0) return;
                 playNotificationSound();
 
+                // Add all selected to deleting set
+                selectedEmails.forEach(id => deletingEmailsRef.current.add(id));
+
                 if (type === 'inbox') {
                     setLocallyDeletedEmailIds(prev => {
                         const updated = new Set(prev);
@@ -1962,9 +1898,16 @@
                         return updated;
                     });
                     setGmailEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
+                    setPriorityEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
                 } else {
                     setSentEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
                 }
+                
+                // Remove from deleting set after deletion
+                setTimeout(() => {
+                    selectedEmails.forEach(id => deletingEmailsRef.current.delete(id));
+                }, 500);
+                
                 setSelectedEmails([]);
             };
 
@@ -1973,12 +1916,21 @@
                 const confirmDelete = confirm(`Are you sure you want to delete all ${type} emails?`);
                 if (confirmDelete) {
                     if (type === 'inbox') {
+                        // Add all to deleting set
+                        gmailEmails.forEach(e => deletingEmailsRef.current.add(e.id));
+                        
                         setLocallyDeletedEmailIds(prev => {
                             const updated = new Set(prev);
                             gmailEmails.forEach(e => updated.add(e.id));
                             return updated;
                         });
                         setGmailEmails([]);
+                        setPriorityEmails([]);
+                        
+                        // Clear deleting set after deletion
+                        setTimeout(() => {
+                            deletingEmailsRef.current.clear();
+                        }, 500);
                     } else {
                         setSentEmails([]);
                     }
@@ -2000,7 +1952,6 @@
 
                 playNotificationSound();
                 setIsPrioritizing(true);
-                setEmailsPrioritized(false);
 
                 const analyzePriority = (email) => {
                     let score = 0;
@@ -2029,20 +1980,14 @@
 
                     const priorityThreshold = 5;
                     const priority = scoredEmails.filter(e => e.priorityScore >= priorityThreshold).slice(0, 5);
-                    const regular = scoredEmails.filter(e => !priority.find(p => p.id === e.id));
 
                     setPriorityEmails(priority);
-                    setGmailEmails([...priority, ...regular]);
-
                     setIsPrioritizing(false);
-                    setEmailsPrioritized(true);
 
                     if (priority.length > 0) {
                         setShowPriorityGlow(true);
-                        setTimeout(() => setShowPriorityGlow(false), 3000);
+                        setTimeout(() => setShowPriorityGlow(false), 2500);
                     }
-
-                    setTimeout(() => setEmailsPrioritized(false), 2000);
                 }, 2000);
             };
 
@@ -2086,6 +2031,11 @@
             };
 
             const renderInbox = () => {
+                // Filter out priority emails from regular inbox list
+                const regularEmails = gmailEmails.filter(email => 
+                    !priorityEmails.find(p => p.id === email.id)
+                );
+
                 return (
                     <div className="space-y-6">
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
@@ -2144,149 +2094,132 @@
                             </div>
 
                             {isPrioritizing && (
-                                <div className="prioritize-wave mb-6">
+                                <div className="prioritize-wave">
                                     <span>🤖 AI is analyzing and prioritizing your emails...</span>
                                 </div>
                             )}
 
-                            {priorityEmails.length > 0 && !isPrioritizing && autoPrioritize && (
-                                <div className={`priority-container ${showPriorityGlow ? 'priority-container-glow' : ''}`}>
-                                    <div
-                                        className="priority-header"
-                                        onClick={() => setIsPriorityExpanded(!isPriorityExpanded)}
-                                    >
-                                        <div className="flex items-center gap-3">
+                            {/* PRIORITY EMAILS SECTION */}
+                            {priorityEmails.length > 0 && !isPrioritizing && (
+                                <>
+                                    <div className={`priority-container ${showPriorityGlow ? 'priority-container-glow' : ''}`}>
+                                        <div className="priority-section-title">
                                             <span>⚡ Priority Emails</span>
-                                            <div className="priority-badge">
+                                            <span style={{fontSize: '0.875rem', fontWeight: '600', background: 'rgba(255,255,255,0.3)', padding: '4px 12px', borderRadius: '12px'}}>
                                                 {priorityEmails.length} {priorityEmails.length === 1 ? 'email' : 'emails'}
-                                            </div>
+                                            </span>
                                         </div>
-                                        <span className="text-2xl" style={{transition: 'transform 0.3s', transform: isPriorityExpanded ? 'rotate(180deg)' : 'rotate(0)'}}>
-                                            ↓
+
+                                        <div className="space-y-3">
+                                            {priorityEmails.map((email, index) => (
+                                                <div
+                                                    key={email.id}
+                                                    data-email-id={email.id}
+                                                    onClick={() => {
+                                                        setViewingEmail(email);
+                                                        if (unreadEmails.has(email.id)) {
+                                                            setUnreadEmails(prev => {
+                                                                const updated = new Set(prev);
+                                                                updated.delete(email.id);
+                                                                return updated;
+                                                            });
+                                                        }
+                                                    }}
+                                                    className={`priority-email-stacked ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                    style={{animationDelay: `${index * 0.1}s`}}
+                                                >
+                                                    {unreadEmails.has(email.id) && (
+                                                        <div className="unread-label">UNREAD</div>
+                                                    )}
+                                                    <div className="email-hover-buttons">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleSummarizeEmail(email);
+                                                            }}
+                                                            className="email-hover-btn"
+                                                            style={{
+                                                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                                color: 'white',
+                                                                border: 'none'
+                                                            }}
+                                                        >
+                                                            Summarize
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteEmail(email.id, 'inbox');
+                                                            }}
+                                                            className="email-hover-btn"
+                                                            style={{
+                                                                background: 'rgba(239, 68, 68, 0.9)',
+                                                                color: 'white',
+                                                                border: 'none'
+                                                            }}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                    <div className="flex justify-between items-start">
+                                                        <div className="flex-1">
+                                                            <div className="text-sm font-bold text-gray-800 mb-1">{email.from}</div>
+                                                            <div className="text-base font-semibold text-gray-700 mb-1">{email.subject}</div>
+                                                            <div className="text-sm text-gray-600 mt-2">{email.snippet}</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {summarizingEmail === email.id && (
+                                                        <div className="summary-popup" onClick={(e) => e.stopPropagation()}>
+                                                            {isSummarizing ? (
+                                                                <div className="space-y-3">
+                                                                    <div className="flex items-center gap-3 mb-3">
+                                                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
+                                                                        <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <div>
+                                                                    <div className="flex justify-between items-center mb-2">
+                                                                        <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
+                                                                        <button
+                                                                            onClick={() => setSummaryHidden(!summaryHidden)}
+                                                                            className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+                                                                        >
+                                                                            {summaryHidden ? 'Show' : 'Hide'}
+                                                                        </button>
+                                                                    </div>
+                                                                    {!summaryHidden && (
+                                                                        <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* INBOX SECTION TITLE */}
+                                    <div className="inbox-section-title">
+                                        <span>📬 Inbox</span>
+                                        <span className="text-sm text-gray-500" style={{fontWeight: '400'}}>
+                                            {regularEmails.length} {regularEmails.length === 1 ? 'email' : 'emails'}
                                         </span>
                                     </div>
-
-                                    <div className="priority-stack">
-                                        {priorityEmails.map((email) => (
-                                            <div
-                                                key={email.id}
-                                                data-email-id={email.id}
-                                                onClick={() => {
-                                                    setViewingEmail(email);
-                                                    if (unreadEmails.has(email.id)) {
-                                                        setUnreadEmails(prev => {
-                                                            const updated = new Set(prev);
-                                                            updated.delete(email.id);
-                                                            return updated;
-                                                        });
-                                                    }
-                                                }}
-                                                className={`priority-email-stacked cursor-pointer ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
-                                            >
-                                                {unreadEmails.has(email.id) && (
-                                                    <div className="unread-label">UNREAD</div>
-                                                )}
-                                                <div className="email-hover-buttons">
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleSummarizeEmail(email);
-                                                        }}
-                                                        className="email-hover-btn"
-                                                        style={{
-                                                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                                            color: 'white',
-                                                            border: 'none'
-                                                        }}
-                                                    >
-                                                        Summarize
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteEmail(email.id, 'inbox');
-                                                        }}
-                                                        className="email-hover-btn"
-                                                        style={{
-                                                            background: 'rgba(239, 68, 68, 0.9)',
-                                                            color: 'white',
-                                                            border: 'none'
-                                                        }}
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                                <div className="flex justify-between items-start">
-                                                    <div className="flex-1">
-                                                        <div className="text-sm font-bold text-gray-800 mb-1">{email.from}</div>
-                                                        <div className="text-base font-semibold text-gray-700 mb-1">{email.subject}</div>
-                                                        <div className="text-sm text-gray-600 mt-2">{email.snippet}</div>
-                                                    </div>
-                                                </div>
-
-                                                {summarizingEmail === email.id && (
-                                                    <div className="summary-popup" onClick={(e) => e.stopPropagation()}>
-                                                        {isSummarizing ? (
-                                                            <div className="space-y-3">
-                                                                <div className="flex items-center gap-3 mb-3">
-                                                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
-                                                                    <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
-                                                                </div>
-                                                                <div className="space-y-2">
-                                                                    <div className="loading-line" style={{height: '8px'}}></div>
-                                                                    <div className="loading-line" style={{height: '8px'}}></div>
-                                                                    <div className="loading-line" style={{height: '8px'}}></div>
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div>
-                                                                <div className="flex justify-between items-center mb-2">
-                                                                    <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
-                                                                    <button
-                                                                        onClick={() => setSummaryHidden(!summaryHidden)}
-                                                                        className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
-                                                                    >
-                                                                        {summaryHidden ? 'Show' : 'Hide'}
-                                                                    </button>
-                                                                </div>
-                                                                {!summaryHidden && (
-                                                                    <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                </>
                             )}
 
-                            {priorityEmails.length > 0 && autoPrioritize && (
-                                <div style={{
-                                    marginTop: '32px',
-                                    marginBottom: '16px',
-                                    paddingBottom: '12px',
-                                    borderBottom: '2px solid rgba(99, 102, 241, 0.2)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px'
-                                }}>
-                                    <h3 className="text-xl font-bold text-gray-700" style={{color: darkMode ? '#e5e5e5' : '#374151'}}>
-                                        📬 Inbox
-                                    </h3>
-                                    <span className="text-sm text-gray-500" style={{color: darkMode ? '#a0a0a0' : '#6b7280'}}>
-                                        {gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).length} emails
-                                    </span>
-                                </div>
-                            )}
-
+                            {/* REGULAR INBOX EMAILS */}
                             <div className="space-y-3">
-                                {gmailEmails.length > 0 ? (
-                                    gmailEmails.filter(email => {
-                                        const notPriority = autoPrioritize ? !priorityEmails.find(p => p.id === email.id) : true;
-                                        return notPriority;
-                                    }).map((email, index) => (
+                                {regularEmails.length > 0 ? (
+                                    regularEmails.map((email, index) => (
                                         <div
                                             key={email.id}
                                             data-email-id={email.id}
@@ -2407,10 +2340,12 @@
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-12 text-gray-500">
-                                        <div className="text-6xl mb-4">📭</div>
-                                        <p>No emails in inbox</p>
-                                    </div>
+                                    gmailEmails.length === 0 && priorityEmails.length === 0 && (
+                                        <div className="text-center py-12 text-gray-500">
+                                            <div className="text-6xl mb-4">📭</div>
+                                            <p>No emails in inbox</p>
+                                        </div>
+                                    )
                                 )}
                             </div>
                         </div>
@@ -2805,7 +2740,7 @@
                                                 <button
                                                     onClick={handleSendEmail}
                                                     disabled={isSending}
-                                                    className={isSending ? 'send-button-float' : 'send-button-float'}
+                                                    className="send-button-float"
                                                     style={{opacity: isSending ? 0.7 : 1, cursor: isSending ? 'not-allowed' : 'pointer'}}
                                                 >
                                                     {isSending ? (
@@ -2850,7 +2785,8 @@
                         </div>
                     )}
 
-                    <button className="mobile-nav-toggle" onClick={() => setMobileNavOpen(!mobileNavOpen)} style={{display: 'none'}}>
+                    {/* MOBILE NAV - ONLY SHOWS ON MOBILE */}
+                    <button className="mobile-nav-toggle" onClick={() => setMobileNavOpen(!mobileNavOpen)}>
                         {mobileNavOpen ? '✕' : '☰'}
                     </button>
 
@@ -2901,6 +2837,7 @@
                         </button>
                     </div>
 
+                    {/* DESKTOP NAV - ONLY AT TOP */}
                     <header className="sticky-header">
                         <div className="container mx-auto px-4 py-4">
                             <div className="desktop-nav flex justify-center items-center gap-4">
@@ -2963,30 +2900,7 @@
                          currentPage === 'inbox' ? renderInbox() :
                          currentPage === 'sent' ? renderSent() : (
                             <>
-                                {showWelcomeAnimation && currentPage === 'home' && (
-                                    <div className={`welcome-text-container ${!showWelcomeAnimation ? 'fade-out' : ''}`}>
-                                        <div className="welcome-text" key={currentWelcomeMessage}>
-                                            {welcomeMessages[currentWelcomeMessage].split(' ').map((word, i) => (
-                                                <span key={`${currentWelcomeMessage}-${i}`} style={{animationDelay: `${i * 0.08}s`}}>
-                                                    {word}
-                                                </span>
-                                            ))}
-                                            {userName && (
-                                                <>
-                                                    <span style={{animationDelay: `${welcomeMessages[currentWelcomeMessage].split(' ').length * 0.08}s`}}>
-                                                        ,
-                                                    </span>
-                                                    <span style={{animationDelay: `${(welcomeMessages[currentWelcomeMessage].split(' ').length + 1) * 0.08}s`}}>
-                                                        {userName}!
-                                                    </span>
-                                                </>
-                                            )}
-                                            <span className="typing-cursor" style={{animationDelay: `${(welcomeMessages[currentWelcomeMessage].split(' ').length + (userName ? 2 : 0)) * 0.08}s`}}></span>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
+                                <div className="rounded-3xl p-8 relative">
                                     <div className="flex justify-center mb-8">
                                         <div className="tab-container tab-button-container">
                                             <div 
@@ -3036,7 +2950,14 @@
                     )}
 
                     {showEnvelope && (
-                        <div className="envelope-animation">
+                        <div style={{
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            fontSize: '48px',
+                            zIndex: 10000,
+                            animation: 'envelope-fly 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+                        }}>
                             📧
                         </div>
                     )}
