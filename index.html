@@ -359,19 +359,28 @@
             transform: translateX(5px);
         }
 
-        /* Delete Animation - Slide Fade Left */
+        /* Delete Animation - Smooth Slide Fade Left */
         .email-deleting {
-            animation: slide-fade-left 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
+            animation: slide-fade-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            pointer-events: none;
         }
 
         @keyframes slide-fade-left {
             0% {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateX(0) scale(1);
+                max-height: 200px;
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateX(-30px) scale(0.98);
             }
             100% {
                 opacity: 0;
-                transform: translateX(-100%);
+                transform: translateX(-100%) scale(0.95);
+                max-height: 0;
+                margin: 0;
+                padding: 0;
             }
         }
 
@@ -995,7 +1004,16 @@
         /* Priority Email Stacking */
         .priority-container {
             position: relative;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border-radius: 24px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+        }
+
+        body.dark-mode .priority-container {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
         }
 
         .priority-header {
@@ -1989,26 +2007,6 @@
                 }
             }, [autoPrioritize, gmailEmails.length, currentPage]);
 
-            // Live Gmail sync - Poll for new emails every 6 seconds (works on all tabs)
-            useEffect(() => {
-                if (!emailConnected) return;
-
-                const pollInterval = setInterval(async () => {
-                    try {
-                        const savedTokens = localStorage.getItem('gmailTokens');
-                        if (savedTokens) {
-                            const tokens = JSON.parse(savedTokens);
-                            console.log('🔄 Checking for new emails...');
-                            await fetchGmailEmails(tokens.access_token);
-                        }
-                    } catch (error) {
-                        console.error('❌ Error polling for new emails:', error);
-                    }
-                }, 6000); // Poll every 6 seconds
-
-                return () => clearInterval(pollInterval);
-            }, [emailConnected]);
-
             // Reset new email count when user views inbox
             useEffect(() => {
                 if (currentPage === 'inbox' && newEmailCount > 0) {
@@ -2891,7 +2889,7 @@
                     });
                 }
 
-                // Delete with slide-fade-left animation
+                // Delete immediately with smooth slide-fade-left animation
                 const emailElement = document.querySelector(`[data-email-id="${emailId}"]`);
                 if (emailElement) {
                     emailElement.classList.add('email-deleting');
@@ -2902,7 +2900,7 @@
                             setSentEmails(prev => prev.filter(e => e.id !== emailId));
                         }
                         console.log(`🗑️ Deleted ${type} email:`, emailId);
-                    }, 500);
+                    }, 400);
                 } else {
                     if (type === 'inbox') {
                         setGmailEmails(prev => prev.filter(e => e.id !== emailId));
@@ -3104,6 +3102,21 @@
                                 <div className="flex gap-3">
                                     {gmailEmails.length > 0 && (
                                         <>
+                                            <button
+                                                onClick={async () => {
+                                                    const savedTokens = localStorage.getItem('gmailTokens');
+                                                    if (savedTokens) {
+                                                        const tokens = JSON.parse(savedTokens);
+                                                        await fetchGmailEmails(tokens.access_token);
+                                                    }
+                                                }}
+                                                className="oval-button px-4 py-2 text-sm font-semibold text-white"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                                                }}
+                                            >
+                                                🔄 Refresh
+                                            </button>
                                             {!autoPrioritize && (
                                                 <button
                                                     onClick={() => handlePrioritizeEmails()}
