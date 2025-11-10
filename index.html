@@ -359,28 +359,84 @@
             transform: translateX(5px);
         }
 
-        /* Delete Animation - Smooth Slide Fade Left */
+        /* Delete Animation - Smooth Slide Fade Left with Container Collapse */
         .email-deleting {
-            animation: slide-fade-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: slide-fade-delete 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             pointer-events: none;
+            overflow: hidden;
         }
 
-        @keyframes slide-fade-left {
+        @keyframes slide-fade-delete {
             0% {
                 opacity: 1;
                 transform: translateX(0) scale(1);
-                max-height: 200px;
+                max-height: 500px;
+                margin-bottom: 12px;
+                padding: 16px;
             }
-            50% {
-                opacity: 0.5;
-                transform: translateX(-30px) scale(0.98);
+            30% {
+                opacity: 0.7;
+                transform: translateX(-20px) scale(0.98);
+            }
+            60% {
+                opacity: 0.3;
+                transform: translateX(-60px) scale(0.95);
+                max-height: 500px;
             }
             100% {
                 opacity: 0;
-                transform: translateX(-100%) scale(0.95);
+                transform: translateX(-120%) scale(0.9);
                 max-height: 0;
-                margin: 0;
-                padding: 0;
+                margin-bottom: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+        }
+
+        /* Modern email item - ensure smooth transitions */
+        .modern-email-item {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Priority email glow animation */
+        .priority-email-glow {
+            animation: priority-glow-pulse 2s ease-in-out;
+            position: relative;
+        }
+
+        @keyframes priority-glow-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+            50% {
+                box-shadow: 0 0 30px 10px rgba(99, 102, 241, 0.6),
+                            0 0 60px 20px rgba(139, 92, 246, 0.4),
+                            inset 0 0 20px rgba(99, 102, 241, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+        }
+
+        .priority-container-glow {
+            animation: container-glow-fade 3s ease-in-out;
+        }
+
+        @keyframes container-glow-fade {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+                border-color: rgba(99, 102, 241, 0.2);
+            }
+            30% {
+                box-shadow: 0 0 40px 5px rgba(99, 102, 241, 0.4),
+                            0 0 80px 10px rgba(139, 92, 246, 0.3),
+                            inset 0 0 30px rgba(99, 102, 241, 0.1);
+                border-color: rgba(99, 102, 241, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+                border-color: rgba(99, 102, 241, 0.2);
             }
         }
 
@@ -1004,16 +1060,17 @@
         /* Priority Email Stacking */
         .priority-container {
             position: relative;
-            margin-bottom: 32px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            margin-bottom: 40px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
             border-radius: 24px;
-            border: 2px solid rgba(99, 102, 241, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.25);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
         }
 
         body.dark-mode .priority-container {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border-color: rgba(99, 102, 241, 0.4);
         }
 
         .priority-header {
@@ -1039,18 +1096,19 @@
 
         .priority-stack {
             position: relative;
-            margin-top: -12px;
+            margin-top: 16px;
+            min-height: 100px;
         }
 
         .priority-email-stacked {
             position: absolute;
-            width: calc(100% - 16px);
-            left: 8px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid rgba(99, 102, 241, 0.3);
+            width: calc(100% - 20px);
+            left: 10px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid rgba(99, 102, 241, 0.4);
             border-radius: 16px;
-            padding: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: stack-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
@@ -1092,16 +1150,9 @@
             }
         }
 
-        .priority-stack {
-            position: relative;
-            margin-top: -12px;
-            min-height: 80px;
-            transition: min-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         .priority-stack-expanded {
             position: relative;
-            margin-top: 0;
+            margin-top: 16px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -1109,7 +1160,7 @@
             position: relative;
             width: 100%;
             left: 0;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             opacity: 1;
             transform: scale(1);
             animation: priority-expand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -2900,7 +2951,7 @@
                             setSentEmails(prev => prev.filter(e => e.id !== emailId));
                         }
                         console.log(`🗑️ Deleted ${type} email:`, emailId);
-                    }, 400);
+                    }, 500);
                 } else {
                     if (type === 'inbox') {
                         setGmailEmails(prev => prev.filter(e => e.id !== emailId));
@@ -3038,7 +3089,7 @@
                         // Trigger priority glow effect (once)
                         if (priority.length > 0) {
                             setShowPriorityGlow(true);
-                            setTimeout(() => setShowPriorityGlow(false), 2000);
+                            setTimeout(() => setShowPriorityGlow(false), 3000);
                         }
 
                         // Reset prioritized flag after animation
@@ -3206,7 +3257,7 @@
 
                             {/* Priority Emails Stacked */}
                             {priorityEmails.length > 0 && !isPrioritizing && autoPrioritize && (
-                                <div className={`priority-container ${showPriorityGlow ? 'priority-fade-glow' : ''}`}>
+                                <div className={`priority-container ${showPriorityGlow ? 'priority-container-glow' : ''}`}>
                                     <div
                                         className="priority-header"
                                         onClick={() => setIsPriorityExpanded(!isPriorityExpanded)}
@@ -3237,7 +3288,7 @@
                                                         });
                                                     }
                                                 }}
-                                                className={`priority-email-stacked cursor-pointer ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                className={`priority-email-stacked cursor-pointer ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${showPriorityGlow ? 'priority-email-glow' : ''}`}
                                             >
                                                 {/* Unread Label for Priority Emails */}
                                                 {unreadEmails.has(email.id) && isPriorityExpanded && (
