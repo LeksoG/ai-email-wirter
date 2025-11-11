@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Tools Suite - Transform Your Communication</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -10,19 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-        }
         
         body {
             font-family: 'Inter', sans-serif;
@@ -38,7 +25,7 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            padding-top: 80px;
+            padding-top: 100px; /* Space for sticky header */
         }
 
         body.dark-mode {
@@ -77,8 +64,7 @@
         }
 
         body.dark-mode .sticky-header {
-            background: rgba(10, 10, 10, 0.7);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
         }
 
         body.dark-mode .action-btn {
@@ -97,6 +83,7 @@
             50% { background-position: 100% 50%; }
         }
 
+        /* AI Grid Pattern Overlay */
         body::before {
             content: '';
             position: fixed;
@@ -112,6 +99,7 @@
             z-index: 0;
         }
 
+        /* Page Load Blur-in Animation */
         .page-container {
             animation: blur-in 1.2s ease-out;
         }
@@ -130,10 +118,23 @@
         }
 
         .glass-effect {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.95);
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(249, 250, 251, 0.85) 100%
+            );
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12),
+                        0 2px 8px rgba(99, 102, 241, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-effect:hover {
+            box-shadow: 0 12px 48px rgba(99, 102, 241, 0.15),
+                        0 4px 12px rgba(99, 102, 241, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
         }
 
         .glass-dark {
@@ -143,18 +144,55 @@
             box-shadow: 0 4px 16px rgba(99, 102, 241, 0.05);
         }
 
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         .ai-glow {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.15),
-                        0 0 60px rgba(139, 92, 246, 0.1);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.2),
+                        0 0 80px rgba(139, 92, 246, 0.15),
+                        0 0 120px rgba(167, 139, 250, 0.1);
+            animation: ai-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes ai-pulse {
+            0%, 100% {
+                box-shadow: 0 0 40px rgba(99, 102, 241, 0.2),
+                           0 0 80px rgba(139, 92, 246, 0.15),
+                           0 0 120px rgba(167, 139, 250, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 60px rgba(99, 102, 241, 0.3),
+                           0 0 100px rgba(139, 92, 246, 0.2),
+                           0 0 140px rgba(167, 139, 250, 0.15);
+            }
         }
 
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .oval-button {
@@ -165,6 +203,15 @@
         .oval-button:hover {
             transform: translateY(-2px) scale(1.05);
             box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .tool-card {
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.15);
         }
 
         textarea:focus, input:focus {
@@ -205,6 +252,7 @@
             z-index: 0;
         }
 
+        /* Loading Lines Animation - Gemini Style */
         .loading-lines {
             display: flex;
             flex-direction: column;
@@ -242,12 +290,30 @@
             animation: loading-shine 2s ease-in-out infinite;
         }
 
-        .loading-line:nth-child(1) { animation-delay: 0s; width: 95%; }
-        .loading-line:nth-child(2) { animation-delay: 0.15s; width: 88%; }
-        .loading-line:nth-child(3) { animation-delay: 0.3s; width: 92%; }
-        .loading-line:nth-child(4) { animation-delay: 0.45s; width: 85%; }
-        .loading-line:nth-child(5) { animation-delay: 0.6s; width: 90%; }
-        .loading-line:nth-child(6) { animation-delay: 0.75s; width: 80%; }
+        .loading-line:nth-child(1) {
+            animation-delay: 0s;
+            width: 95%;
+        }
+        .loading-line:nth-child(2) {
+            animation-delay: 0.15s;
+            width: 88%;
+        }
+        .loading-line:nth-child(3) {
+            animation-delay: 0.3s;
+            width: 92%;
+        }
+        .loading-line:nth-child(4) {
+            animation-delay: 0.45s;
+            width: 85%;
+        }
+        .loading-line:nth-child(5) {
+            animation-delay: 0.6s;
+            width: 90%;
+        }
+        .loading-line:nth-child(6) {
+            animation-delay: 0.75s;
+            width: 80%;
+        }
 
         @keyframes loading-wave {
             0%, 100% {
@@ -263,10 +329,15 @@
         }
 
         @keyframes loading-shine {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
         }
 
+        /* Fast Wave Animation - Gemini Style */
         .wave-char {
             display: inline-block;
             opacity: 0;
@@ -296,6 +367,21 @@
             min-height: 300px;
         }
 
+        .settings-panel {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .email-item {
             transition: all 0.2s ease;
             position: relative;
@@ -304,59 +390,6 @@
         .email-item:hover {
             background: rgba(99, 102, 241, 0.1);
             transform: translateX(5px);
-        }
-
-        .email-deleting {
-            animation: slide-fade-delete 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-            pointer-events: none !important;
-            overflow: hidden !important;
-        }
-
-        @keyframes slide-fade-delete {
-            0% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-                max-height: 300px;
-                margin-bottom: 12px;
-            }
-            30% {
-                opacity: 0.7;
-                transform: translateX(-30px) scale(0.98);
-            }
-            60% {
-                opacity: 0.3;
-                transform: translateX(-80px) scale(0.95);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-150px) scale(0.9);
-                max-height: 0;
-                margin-bottom: 0;
-                padding-top: 0;
-                padding-bottom: 0;
-            }
-        }
-
-        .modern-email-item {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
-            border: 2px solid rgba(99, 102, 241, 0.15);
-            border-radius: 20px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .modern-email-item:hover {
-            transform: translateY(-5px) translateX(5px);
-            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.2);
-            border-color: rgba(99, 102, 241, 0.4);
-        }
-
-        body.dark-mode .modern-email-item {
-            background: linear-gradient(135deg, rgba(40, 40, 40, 0.95) 0%, rgba(30, 30, 30, 0.85) 100%);
-            border-color: rgba(99, 102, 241, 0.3);
         }
 
         .email-hover-buttons {
@@ -368,8 +401,14 @@
             z-index: 10;
         }
 
-        .email-item:hover .email-hover-buttons,
-        .modern-email-item:hover .email-hover-buttons,
+        .email-item:hover .email-hover-buttons {
+            display: flex;
+        }
+
+        .modern-email-item:hover .email-hover-buttons {
+            display: flex;
+        }
+
         .priority-email-stacked:hover .email-hover-buttons {
             display: flex;
         }
@@ -390,6 +429,7 @@
             border-color: rgba(99, 102, 241, 0.5);
         }
 
+        /* Summarize Popup */
         .summary-popup {
             position: absolute;
             top: 100%;
@@ -421,332 +461,7 @@
             }
         }
 
-        .sticky-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.05);
-            animation: header-slide-down 0.3s ease-out;
-        }
-
-        @keyframes header-slide-down {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10;
-        }
-
-        .action-btn {
-            padding: 6px 16px;
-            font-size: 12px;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 1);
-            border-color: rgba(99, 102, 241, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .undo-delete-button {
-            position: fixed;
-            bottom: 32px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            background: rgba(20, 20, 20, 0.95);
-            color: white;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            animation: undo-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .undo-delete-button:hover {
-            background: rgba(40, 40, 40, 0.95);
-            transform: translateX(-50%) translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        @keyframes undo-slide-up {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        .prioritize-wave {
-            height: 60px;
-            background: linear-gradient(90deg,
-                rgba(99, 102, 241, 0.1) 0%,
-                rgba(139, 92, 246, 0.3) 25%,
-                rgba(167, 139, 250, 0.4) 50%,
-                rgba(139, 92, 246, 0.3) 75%,
-                rgba(99, 102, 241, 0.1) 100%
-            );
-            background-size: 200% 100%;
-            animation: prioritize-wave-motion 2s ease-in-out infinite;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: #6366f1;
-            margin-bottom: 24px;
-        }
-
-        @keyframes prioritize-wave-motion {
-            0%, 100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-        }
-
-        .priority-container {
-            position: relative;
-            margin-bottom: 32px;
-            padding: 24px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
-            border-radius: 24px;
-            border: 2px solid rgba(99, 102, 241, 0.25);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
-            animation: priority-container-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes priority-container-appear {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        body.dark-mode .priority-container {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
-            border-color: rgba(99, 102, 241, 0.4);
-        }
-
-        .priority-container-glow {
-            animation: priority-smooth-glow 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-        }
-
-        @keyframes priority-smooth-glow {
-            0% {
-                box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
-            }
-            40% {
-                box-shadow: 0 8px 40px rgba(99, 102, 241, 0.5),
-                            0 4px 80px rgba(139, 92, 246, 0.4),
-                            inset 0 0 40px rgba(99, 102, 241, 0.2);
-            }
-            100% {
-                box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
-            }
-        }
-
-        .priority-section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #6366f1;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        body.dark-mode .priority-section-title {
-            color: #a5b4fc;
-        }
-
-        .inbox-section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #374151;
-            margin-top: 32px;
-            margin-bottom: 16px;
-            padding-top: 24px;
-            border-top: 2px solid rgba(99, 102, 241, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        body.dark-mode .inbox-section-title {
-            color: #e5e5e5;
-            border-top-color: rgba(99, 102, 241, 0.4);
-        }
-
-        .priority-email-stacked {
-            position: relative;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.98);
-            border: 2px solid rgba(99, 102, 241, 0.4);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            margin-bottom: 12px;
-            cursor: pointer;
-        }
-
-        body.dark-mode .priority-email-stacked {
-            background: rgba(40, 40, 40, 0.95);
-            border-color: rgba(99, 102, 241, 0.5);
-            color: #e5e5e5;
-        }
-
-        .priority-email-stacked:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
-        }
-
-        .email-checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(99, 102, 241, 0.5);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .email-checkbox.checked {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-color: #6366f1;
-        }
-
-        .email-checkbox:hover {
-            border-color: #6366f1;
-            transform: scale(1.1);
-        }
-
-        .unread-label {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 12px;
-            z-index: 5;
-        }
-
-        .unread-email {
-            border-left: 4px solid #ef4444;
-        }
-
-        .new-email-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 10px;
-            min-width: 20px;
-            text-align: center;
-            animation: badge-pulse 1.5s ease-in-out infinite;
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
-        }
-
-        @keyframes badge-pulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
-            }
-            50% {
-                transform: scale(1.1);
-                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.7);
-            }
-        }
-
-        .email-ladder-animation {
-            animation: ladder-slide-in 0.4s ease-out backwards;
-        }
-
-        @keyframes ladder-slide-in {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid rgba(99, 102, 241, 0.3);
-            border-radius: 50px;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        body.dark-mode .search-input {
-            background: rgba(30, 30, 30, 0.8);
-            color: #e5e5e5;
-        }
-
-        .gmail-icon {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-        }
-
+        /* Send Button - Floating */
         .send-button-float {
             position: absolute;
             bottom: 16px;
@@ -761,6 +476,7 @@
             border: none;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
             transition: all 0.3s ease;
+            animation: float-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -772,36 +488,18 @@
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
         }
 
-        .email-viewer-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @keyframes float-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
-        .email-viewer-container {
-            width: 90%;
-            max-width: 900px;
-            height: 90vh;
-            background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-        }
-
-        body.dark-mode .email-viewer-container {
-            background: rgba(20, 20, 20, 0.95);
-        }
-
+        /* AI Transform Container */
         .ai-transform-container {
             position: relative;
             max-width: 800px;
@@ -854,12 +552,813 @@
             cursor: not-allowed;
         }
 
+        /* Wave Animation - Apple Intelligence Style */
+        .wave-char {
+            display: inline-block;
+            opacity: 0;
+            animation: wave-splash 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes wave-splash {
+            0% {
+                opacity: 0;
+                transform: translate(-4px, -4px) scale(0.9);
+                filter: blur(3px);
+            }
+            50% {
+                opacity: 1;
+                filter: blur(0);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Full-page email viewer - iOS style */
+        .email-viewer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: overlay-fade-in 0.3s ease-out;
+        }
+
+        @keyframes overlay-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .email-viewer-container {
+            width: 90%;
+            max-width: 900px;
+            height: 90vh;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: viewer-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode .email-viewer-container {
+            background: rgba(20, 20, 20, 0.95);
+        }
+
+        @keyframes viewer-slide-up {
+            from {
+                transform: translateY(100px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Filter Dropdown */
+        .filter-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            min-width: 200px;
+            max-width: 300px;
+            z-index: 50;
+            animation: dropdown-appear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes dropdown-appear {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Suggestions blur animation */
+        .suggestions-container {
+            animation: blur-slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes blur-slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+                filter: blur(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+                filter: blur(0);
+            }
+        }
+
+        /* Tab container styling */
         .tab-button-container {
             background: rgba(255, 255, 255, 0.6);
             border: 2px solid rgba(99, 102, 241, 0.2);
             box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
         }
 
+        /* File Viewer Modal */
+        .file-viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: modal-appear 0.3s ease-out;
+        }
+
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .file-viewer-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 800px;
+            max-height: 80vh;
+            width: 90%;
+            overflow: hidden;
+            animation: modal-slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .file-viewer-content {
+            background: rgba(30, 30, 30, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes modal-slide-up {
+            from {
+                transform: translateY(50px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Sticky Header */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: transparent;
+            animation: header-slide-down 0.3s ease-out;
+            padding-top: 12px;
+        }
+
+        @keyframes header-slide-down {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Action Buttons (Copy/Retry) */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .action-btn {
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-1px);
+        }
+
+        /* Floating AI particles */
+        .ai-particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.4), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float-particle 15s infinite ease-in-out;
+        }
+
+        @keyframes float-particle {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(30px, -40px) scale(1.5);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translate(-20px, -80px) scale(1);
+                opacity: 0.4;
+            }
+            75% {
+                transform: translate(-50px, -40px) scale(1.2);
+                opacity: 0.5;
+            }
+        }
+
+        /* Delete Animation */
+        .email-delete-fade {
+            animation: delete-slide-out 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        @keyframes delete-slide-out {
+            0% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                max-height: 200px;
+            }
+            30% {
+                opacity: 0.7;
+                transform: translateX(-30px) scale(0.98);
+            }
+            60% {
+                opacity: 0.3;
+                transform: translateX(-80px) scale(0.95);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-120px) scale(0.9);
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin-top: 0;
+                margin-bottom: 0;
+                overflow: hidden;
+            }
+        }
+
+        /* Undo Delete Button */
+        .undo-delete-button {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: rgba(20, 20, 20, 0.95);
+            color: white;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: undo-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .undo-delete-button:hover {
+            background: rgba(40, 40, 40, 0.95);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes undo-slide-up {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Prioritize Email Animation */
+        .prioritize-wave {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 16px 32px;
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.15) 0%,
+                rgba(139, 92, 246, 0.25) 50%,
+                rgba(167, 139, 250, 0.15) 100%
+            );
+            background-size: 200% 200%;
+            animation: prioritize-glow 2s ease-in-out infinite;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #6366f1;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 24px rgba(99, 102, 241, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .prioritize-wave {
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.2) 0%,
+                rgba(139, 92, 246, 0.3) 50%,
+                rgba(167, 139, 250, 0.2) 100%
+            );
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #a5b4fc;
+        }
+
+        @keyframes prioritize-glow {
+            0%, 100% {
+                background-position: 0% 50%;
+                box-shadow: 0 4px 24px rgba(99, 102, 241, 0.1),
+                           inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            }
+            50% {
+                background-position: 100% 50%;
+                box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25),
+                           inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .email-slide-up {
+            animation: email-priority-slide 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes email-priority-slide {
+            0% {
+                opacity: 0.5;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Gmail Icon Styles */
+        .gmail-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        .gmail-connecting {
+            animation: gmail-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes gmail-pulse {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .gmail-connected {
+            position: relative;
+        }
+
+        .gmail-connected::after {
+            content: '✓';
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            color: white;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* Email Selection Checkbox */
+        .email-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(99, 102, 241, 0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .email-checkbox.checked {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: #6366f1;
+        }
+
+        .email-checkbox:hover {
+            border-color: #6366f1;
+            transform: scale(1.1);
+        }
+
+        /* Improved Email Content Display */
+        .email-content-formatted {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .email-content-formatted p {
+            margin-bottom: 12px;
+        }
+
+        /* Priority Email Stacking */
+        .priority-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .priority-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            position: relative;
+            z-index: 10;
+        }
+
+        .priority-header:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .priority-stack {
+            position: relative;
+            margin-top: -12px;
+        }
+
+        .priority-email-stacked {
+            position: absolute;
+            width: calc(100% - 16px);
+            left: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: stack-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        body.dark-mode .priority-email-stacked {
+            background: rgba(40, 40, 40, 0.95);
+            border-color: rgba(99, 102, 241, 0.5);
+            color: #e5e5e5;
+        }
+
+        @keyframes stack-appear {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .priority-email-stacked:nth-child(1) {
+            top: 8px;
+            z-index: 3;
+            transform: scale(0.98);
+            animation: stack-glow 2s ease-in-out infinite;
+        }
+
+        .priority-email-stacked:nth-child(2) {
+            top: 12px;
+            z-index: 2;
+            transform: scale(0.96);
+            opacity: 0.7;
+            animation-delay: 0.1s;
+        }
+
+        .priority-email-stacked:nth-child(3) {
+            top: 16px;
+            z-index: 1;
+            transform: scale(0.94);
+            opacity: 0.5;
+            animation-delay: 0.2s;
+        }
+
+        .priority-email-stacked:nth-child(n+4) {
+            display: none;
+        }
+
+        @keyframes stack-glow {
+            0%, 100% {
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 0 rgba(99, 102, 241, 0);
+            }
+            50% {
+                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3), 0 0 20px rgba(99, 102, 241, 0.2);
+            }
+        }
+
+        .priority-stack {
+            position: relative;
+            margin-top: -12px;
+            min-height: 80px;
+            transition: min-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .priority-stack-expanded {
+            position: relative;
+            margin-top: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .priority-stack-expanded .priority-email-stacked {
+            position: relative;
+            width: 100%;
+            left: 0;
+            margin-bottom: 12px;
+            opacity: 1;
+            transform: scale(1);
+            animation: priority-expand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .priority-stack-expanded .priority-email-stacked:nth-child(n+4) {
+            display: block;
+        }
+
+        @keyframes priority-expand {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Collapse animation */
+        .priority-stack .priority-email-stacked {
+            animation: priority-collapse 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes priority-collapse {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0.5;
+                transform: translateY(-5px) scale(0.94);
+            }
+        }
+
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Auto-Prioritize Setting */
+        .setting-preview-container {
+            margin-top: 12px;
+            padding: 16px;
+            background: rgba(99, 102, 241, 0.05);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            animation: setting-preview-appear 0.3s ease-out;
+        }
+
+        @keyframes setting-preview-appear {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .preview-animation {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .preview-email-item {
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            font-size: 12px;
+            animation: preview-slide 2s ease-in-out infinite;
+        }
+
+        .preview-email-item:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .preview-email-item:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .preview-email-item:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes preview-slide {
+            0%, 100% {
+                transform: translateX(0);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateX(10px);
+                opacity: 1;
+            }
+        }
+
+        /* Dark mode support for preview */
+        body.dark-mode .setting-preview-container {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        body.dark-mode .preview-email-item {
+            background: rgba(40, 40, 40, 0.9);
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #e5e5e5;
+        }
+
+        /* Send Button States */
+        .send-button-sending {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .send-button-sending:hover {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Envelope Flying Animation */
+        .envelope-animation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 48px;
+            z-index: 10000;
+            animation: envelope-fly 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes envelope-fly {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            30% {
+                transform: scale(0.8) rotate(-10deg);
+            }
+            60% {
+                transform: scale(1.2) rotate(5deg) translateY(-20px);
+            }
+            100% {
+                transform: scale(0.5) rotate(45deg) translate(300px, -300px);
+                opacity: 0;
+            }
+        }
+
+        /* Priority Fade Glow */
+        .priority-fade-glow {
+            animation: priority-glow-fade 2s ease-out forwards;
+        }
+
+        @keyframes priority-glow-fade {
+            0% {
+                box-shadow: 0 0 0 rgba(99, 102, 241, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(99, 102, 241, 0.8), 0 0 80px rgba(139, 92, 246, 0.6);
+            }
+            100% {
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            }
+        }
+
+        /* Improved Email Container Design */
+        .modern-email-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+            border: 2px solid rgba(99, 102, 241, 0.15);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-email-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .modern-email-item:hover::before {
+            left: 100%;
+        }
+
+        .modern-email-item:hover {
+            transform: translateY(-5px) translateX(5px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        body.dark-mode .modern-email-item {
+            background: linear-gradient(135deg, rgba(40, 40, 40, 0.95) 0%, rgba(30, 30, 30, 0.85) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Priority Preview Containers */
         .priority-preview-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -911,6 +1410,18 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: 700;
+            animation: checkmark-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes checkmark-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotate(-10deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
         }
 
         body.dark-mode .priority-preview-off {
@@ -954,84 +1465,199 @@
             color: #a5b4fc;
         }
 
-        /* MOBILE NAV - ONLY SHOW ON MOBILE */
-        .mobile-nav-toggle {
-            display: none;
+        /* New Email Indicator */
+        .new-email-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+            animation: badge-pulse 1.5s ease-in-out infinite;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
         }
 
-        .mobile-nav-menu {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            input, textarea, select, button {
-                font-size: 16px !important;
+        @keyframes badge-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
             }
-
-            .mobile-nav-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 1000;
-                background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-                color: white;
-                padding: 12px 16px;
-                border-radius: 50px;
-                border: none;
-                cursor: pointer;
-                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-                transition: all 0.3s ease;
-            }
-
-            .mobile-nav-menu {
-                position: fixed;
-                top: 70px;
-                right: 20px;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(25px);
-                border-radius: 20px;
-                padding: 12px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                z-index: 999;
-                display: none;
-                flex-direction: column;
-                gap: 8px;
-                min-width: 200px;
-            }
-
-            .mobile-nav-menu.open {
-                display: flex;
-            }
-
-            body.dark-mode .mobile-nav-menu {
-                background: rgba(30, 30, 30, 0.95);
-            }
-
-            .desktop-nav {
-                display: none !important;
-            }
-
-            body {
-                padding-top: 20px;
-            }
-
-            .sticky-header {
-                display: none;
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.7);
             }
         }
 
-        @media (min-width: 769px) {
-            .mobile-nav-toggle {
-                display: none !important;
-            }
+        /* Unread Email Label */
+        .unread-label {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            animation: unread-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 5;
+        }
 
-            .mobile-nav-menu {
-                display: none !important;
+        @keyframes unread-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.5) translateY(-10px);
             }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
 
-            .desktop-nav {
-                display: flex !important;
+        .unread-email {
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Inbox Button Expansion Animation */
+        .inbox-button-expanded {
+            min-width: 180px !important;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            border-color: #ef4444 !important;
+            animation: inbox-expand-glow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+
+        /* Welcome Text Animation */
+        .welcome-text-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            margin-top: 1rem;
+            opacity: 1;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .welcome-text-container.fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+        }
+
+        .welcome-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #9333ea, #db2777);
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: #4f46e5; /* Fallback color for browsers without gradient support */
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        body.dark-mode .welcome-text {
+            background: linear-gradient(135deg, #a5b4fc, #d8b4fe, #fbcfe8);
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: #a5b4fc; /* Fallback color */
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .welcome-text span {
+            display: inline-block;
+            animation: typing-fade 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes typing-fade {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typing cursor effect */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.8rem;
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            margin-left: 4px;
+            animation: blink 0.8s infinite;
+        }
+
+        body.dark-mode .typing-cursor {
+            background: linear-gradient(135deg, #a5b4fc, #d8b4fe);
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        @keyframes inbox-expand-glow {
+            0% {
+                min-width: 100px;
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+            50% {
+                box-shadow: 0 0 30px 10px rgba(239, 68, 68, 0.6);
+            }
+            100% {
+                min-width: 180px;
+                box-shadow: 0 0 20px 5px rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        .inbox-text-transition {
+            display: inline-block;
+            animation: text-fade-switch 3s ease-in-out forwards;
+        }
+
+        @keyframes text-fade-switch {
+            0%, 100% {
+                opacity: 1;
+            }
+            45%, 55% {
+                opacity: 0;
+            }
+        }
+
+        /* Email List Ladder Animation */
+        .email-ladder-animation {
+            animation: ladder-slide-in 0.4s ease-out backwards;
+        }
+
+        @keyframes ladder-slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
             }
         }
     </style>
@@ -1052,6 +1678,7 @@
             const [isProcessing, setIsProcessing] = useState(false);
             const [showSuggestions, setShowSuggestions] = useState(false);
             const [emailConnected, setEmailConnected] = useState(false);
+            const [showFilterDropdown, setShowFilterDropdown] = useState(false);
             const [selectedTone, setSelectedTone] = useState(null);
             const [uploadedFile, setUploadedFile] = useState(null);
             const [savedResults, setSavedResults] = useState([]);
@@ -1068,82 +1695,122 @@
             const [summaryText, setSummaryText] = useState('');
             const [isSummarizing, setIsSummarizing] = useState(false);
             const [summaryHidden, setSummaryHidden] = useState(false);
+            const [userEmails, setUserEmails] = useState([
+                { id: 1, from: 'john@example.com', subject: 'Meeting Tomorrow', preview: 'Hey, just wanted to confirm...', date: '2 hours ago' },
+                { id: 2, from: 'sarah@company.com', subject: 'Project Update', preview: 'The latest updates on the project...', date: '5 hours ago' },
+                { id: 3, from: 'mike@startup.io', subject: 'Quick Question', preview: 'Do you have a moment to discuss...', date: '1 day ago' },
+            ]);
+
+            // New state variables for enhanced features
             const [selectedEmails, setSelectedEmails] = useState([]);
             const [deletedEmail, setDeletedEmail] = useState(null);
             const [showUndoDelete, setShowUndoDelete] = useState(false);
             const [isPrioritizing, setIsPrioritizing] = useState(false);
-            const [locallyDeletedEmailIds, setLocallyDeletedEmailIds] = useState(() => {
-                const saved = localStorage.getItem('deletedEmailIds');
-                return saved ? new Set(JSON.parse(saved)) : new Set();
-            });
-            const [mobileNavOpen, setMobileNavOpen] = useState(false);
+            const [emailsPrioritized, setEmailsPrioritized] = useState(false);
+            const [locallyDeletedEmailIds, setLocallyDeletedEmailIds] = useState(new Set());
             const [isRewritingReply, setIsRewritingReply] = useState(false);
             const [autoPrioritize, setAutoPrioritize] = useState(false);
             const [priorityEmails, setPriorityEmails] = useState([]);
+            const [isPriorityExpanded, setIsPriorityExpanded] = useState(false);
             const [isSending, setIsSending] = useState(false);
             const [showEnvelope, setShowEnvelope] = useState(false);
             const [showPriorityGlow, setShowPriorityGlow] = useState(false);
             const [newEmailCount, setNewEmailCount] = useState(0);
             const [unreadEmails, setUnreadEmails] = useState(new Set());
+            const [lastEmailCheck, setLastEmailCheck] = useState(Date.now());
             const [showInboxExpand, setShowInboxExpand] = useState(false);
             const [userName, setUserName] = useState('');
+            const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
+            const [aiLoadingState, setAiLoadingState] = useState('');
+            const [currentWelcomeMessage, setCurrentWelcomeMessage] = useState(0);
 
+            // Audio references for notifications
             const audioRef = useRef(null);
             const sendAudioRef = useRef(null);
-            const deletingEmailsRef = useRef(new Set());
 
+            // Initialize app with console logging
             useEffect(() => {
+                console.log('🚀 AI Email Writer initialized');
+                console.log('📊 Initial state:', { activeTab, activeView, currentPage });
+                console.log('🔌 API endpoint:', '/api/transform');
+
+                // Check for OAuth callback with tokens
                 const urlParams = new URLSearchParams(window.location.search);
                 const tokensParam = urlParams.get('tokens');
 
                 if (tokensParam) {
                     try {
                         const tokens = JSON.parse(decodeURIComponent(tokensParam));
+                        console.log('🎉 OAuth tokens received!');
+
+                        // Store tokens in localStorage
                         localStorage.setItem('gmailTokens', JSON.stringify(tokens));
                         localStorage.setItem('emailConnected', 'true');
                         localStorage.removeItem('oauth_in_progress');
+
                         setEmailConnected(true);
 
+                        // Fetch user info to get email address and name
                         fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                            headers: { Authorization: `Bearer ${tokens.access_token}` }
+                            headers: {
+                                Authorization: `Bearer ${tokens.access_token}`
+                            }
                         })
                         .then(res => res.json())
                         .then(userInfo => {
+                            console.log('👤 User:', userInfo.email);
                             setUserEmail(userInfo.email);
                             localStorage.setItem('userEmail', userInfo.email);
+
+                            // Extract user's first name
                             const name = userInfo.given_name || userInfo.name?.split(' ')[0] || 'there';
                             setUserName(name);
                             localStorage.setItem('userName', name);
-                        });
+                            console.log('👋 Welcome', name);
+                        })
+                        .catch(err => console.error('Error fetching user info:', err));
 
+                        // Fetch emails
                         fetchGmailEmails(tokens.access_token);
                         fetchSentEmails(tokens.access_token);
+
+                        // Clean URL
                         window.history.replaceState({}, '', '/');
                     } catch (error) {
                         console.error('❌ Error processing OAuth tokens:', error);
                     }
                 }
 
+                // Load email connection from localStorage
                 const savedConnection = localStorage.getItem('emailConnected');
                 const savedTokens = localStorage.getItem('gmailTokens');
                 const savedUserEmail = localStorage.getItem('userEmail');
                 const savedUserName = localStorage.getItem('userName');
                 const savedShowSuggestions = localStorage.getItem('showSuggestions');
 
-                if (savedUserEmail) setUserEmail(savedUserEmail);
-                if (savedUserName) setUserName(savedUserName);
+                if (savedUserEmail) {
+                    setUserEmail(savedUserEmail);
+                }
+
+                if (savedUserName) {
+                    setUserName(savedUserName);
+                }
+
                 if (savedShowSuggestions !== null) {
                     setShowSuggestionsEnabled(savedShowSuggestions === 'true');
                 }
 
                 if (savedConnection === 'true' && savedTokens) {
                     setEmailConnected(true);
+
+                    // Fetch emails with saved tokens
                     try {
                         const tokens = JSON.parse(savedTokens);
                         fetchGmailEmails(tokens.access_token);
                         fetchSentEmails(tokens.access_token);
                     } catch (error) {
                         console.error('❌ Error loading saved tokens:', error);
+                        // Clear invalid tokens
                         localStorage.removeItem('gmailTokens');
                         localStorage.removeItem('emailConnected');
                         localStorage.removeItem('userEmail');
@@ -1152,6 +1819,7 @@
                     }
                 }
 
+                // Load dark mode preference
                 const savedDarkMode = localStorage.getItem('darkMode');
                 if (savedDarkMode === 'true') {
                     setDarkMode(true);
@@ -1159,6 +1827,7 @@
                 }
             }, []);
 
+            // Update dark mode
             useEffect(() => {
                 if (darkMode) {
                     document.body.classList.add('dark-mode');
@@ -1169,10 +1838,7 @@
                 }
             }, [darkMode]);
 
-            useEffect(() => {
-                localStorage.setItem('deletedEmailIds', JSON.stringify(Array.from(locallyDeletedEmailIds)));
-            }, [locallyDeletedEmailIds]);
-
+            // Update suggestions based on custom prompt only
             useEffect(() => {
                 if (showSuggestionsEnabled && customPrompt.length > 0) {
                     setShowSuggestions(true);
@@ -1181,18 +1847,22 @@
                 }
             }, [customPrompt, showSuggestionsEnabled]);
 
+            // Initialize audio with local files
             useEffect(() => {
-                audioRef.current = new Audio('/mixkit-magic-marimba-2820.wav');
+                audioRef.current = new Audio('/notification.mp3');
                 audioRef.current.load();
-                sendAudioRef.current = new Audio('/whoosh-motion-405445.mp3');
+
+                sendAudioRef.current = new Audio('/send.mp3');
                 sendAudioRef.current.load();
 
+                // Load auto-prioritize setting
                 const savedAutoPrioritize = localStorage.getItem('autoPrioritize');
                 if (savedAutoPrioritize === 'true') {
                     setAutoPrioritize(true);
                 }
             }, []);
 
+            // Auto-hide undo delete button after 5 seconds
             useEffect(() => {
                 if (showUndoDelete) {
                     const timer = setTimeout(() => {
@@ -1203,12 +1873,34 @@
                 }
             }, [showUndoDelete]);
 
+            // Auto-prioritize emails when inbox loads
             useEffect(() => {
                 if (autoPrioritize && gmailEmails.length > 0 && currentPage === 'inbox' && priorityEmails.length === 0) {
                     handlePrioritizeEmails();
                 }
             }, [autoPrioritize, gmailEmails.length, currentPage]);
 
+            // Live Gmail sync - Poll for new emails every 6 seconds (works on all tabs)
+            useEffect(() => {
+                if (!emailConnected) return;
+
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const savedTokens = localStorage.getItem('gmailTokens');
+                        if (savedTokens) {
+                            const tokens = JSON.parse(savedTokens);
+                            console.log('🔄 Checking for new emails...');
+                            await fetchGmailEmails(tokens.access_token);
+                        }
+                    } catch (error) {
+                        console.error('❌ Error polling for new emails:', error);
+                    }
+                }, 6000); // Poll every 6 seconds
+
+                return () => clearInterval(pollInterval);
+            }, [emailConnected]);
+
+            // Reset new email count when user views inbox
             useEffect(() => {
                 if (currentPage === 'inbox' && newEmailCount > 0) {
                     const timer = setTimeout(() => {
@@ -1218,6 +1910,25 @@
                 }
             }, [currentPage, newEmailCount]);
 
+            // Rotate welcome messages
+            useEffect(() => {
+                if (!showWelcomeAnimation) return;
+
+                const interval = setInterval(() => {
+                    setCurrentWelcomeMessage(prev => (prev + 1) % welcomeMessages.length);
+                }, 3000);
+
+                return () => clearInterval(interval);
+            }, [showWelcomeAnimation]);
+
+            // Hide welcome text when user starts typing
+            useEffect(() => {
+                if ((emailText.length > 0 || customPrompt.length > 0) && showWelcomeAnimation) {
+                    setShowWelcomeAnimation(false);
+                }
+            }, [emailText, customPrompt]);
+
+            // Play notification sound
             const playNotificationSound = () => {
                 if (audioRef.current) {
                     audioRef.current.currentTime = 0;
@@ -1225,6 +1936,7 @@
                 }
             };
 
+            // Play send sound
             const playSendSound = () => {
                 if (sendAudioRef.current) {
                     sendAudioRef.current.currentTime = 0;
@@ -1232,11 +1944,14 @@
                 }
             };
 
+            // Handle send email with animation
             const handleSendEmail = async () => {
                 if (!emailReply || !viewingEmail) return;
+
                 setIsSending(true);
 
                 try {
+                    // Get access token
                     const savedTokens = localStorage.getItem('gmailTokens');
                     if (!savedTokens) {
                         alert('⚠️ Not connected to Gmail. Please connect your account in Settings.');
@@ -1245,6 +1960,8 @@
                     }
 
                     const tokens = JSON.parse(savedTokens);
+
+                    // Extract email address from "Name <email@domain.com>" format
                     const extractEmail = (fromString) => {
                         const match = fromString.match(/<(.+?)>/);
                         return match ? match[1] : fromString;
@@ -1254,9 +1971,15 @@
                     const originalSubject = viewingEmail.subject;
                     const replySubject = originalSubject.startsWith('Re:') ? originalSubject : `Re: ${originalSubject}`;
 
+                    console.log('📤 Sending reply to:', recipientEmail);
+                    console.log('Subject:', replySubject);
+
+                    // Send the email via Gmail API
                     const response = await fetch('/api/gmail-send', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
                         body: JSON.stringify({
                             accessToken: tokens.access_token,
                             to: recipientEmail,
@@ -1268,19 +1991,34 @@
                     });
 
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.message || 'Failed to send email');
 
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Failed to send email');
+                    }
+
+                    // Success! Show animations
                     setShowEnvelope(true);
                     playSendSound();
 
+                    console.log('✅ Email sent successfully!');
+                    console.log('Message ID:', data.messageId);
+
+                    // Show success message
                     setTimeout(() => {
                         alert('✉️ Reply sent successfully!');
+
+                        // Clear fields and close modal
                         setEmailReply('');
                         setReplyPrompt('');
                         setViewingEmail(null);
                         setIsSending(false);
-                        setTimeout(() => setShowEnvelope(false), 1500);
+
+                        // Remove envelope after animation
+                        setTimeout(() => {
+                            setShowEnvelope(false);
+                        }, 1500);
                     }, 1000);
+
                 } catch (error) {
                     console.error('❌ Error sending email:', error);
                     alert(`❌ Failed to send email: ${error.message}`);
@@ -1306,34 +2044,72 @@
                 { id: 'polite', label: '🌟 More Polite', prompt: 'Make this email more polite and courteous' }
             ];
 
+            const welcomeMessages = [
+                "Turn hours of emails into seconds",
+                "Transform your inbox with AI",
+                "Write better emails faster",
+                "Your AI email assistant"
+            ];
+
+            const tools = [
+                { id: 'email', icon: '✉️', name: 'Email Rewriter', desc: 'Transform your emails instantly' },
+                { id: 'summary', icon: '📝', name: 'Text Summarizer', desc: 'Condense long content' },
+                { id: 'grammar', icon: '✅', name: 'Grammar Check', desc: 'Polish your writing' },
+                { id: 'translate', icon: '🌐', name: 'Translator', desc: 'Translate to any language' },
+                { id: 'ideas', icon: '💡', name: 'Idea Generator', desc: 'Brainstorm creative ideas' },
+                { id: 'tone', icon: '🎭', name: 'Tone Analyzer', desc: 'Understand message sentiment' }
+            ];
+
             const handleGmailConnect = async () => {
                 try {
+                    console.log('🔐 Initiating Gmail OAuth...');
+
+                    // Call your auth endpoint to get the OAuth URL
                     const response = await fetch('/api/gmail-auth');
-                    if (!response.ok) throw new Error('Failed to initiate OAuth');
+
+                    if (!response.ok) {
+                        throw new Error('Failed to initiate OAuth');
+                    }
+
                     const data = await response.json();
+                    console.log('📧 Redirecting to Google OAuth...');
+
+                    // Store that we're in OAuth flow
                     localStorage.setItem('oauth_in_progress', 'true');
+
+                    // Redirect to Google's OAuth consent screen
                     window.location.href = data.authUrl;
                 } catch (error) {
                     console.error('❌ Gmail OAuth error:', error);
+                    console.error('Please check: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set in Vercel');
                 }
             };
 
             const isTokenExpired = (expiryDate) => {
                 if (!expiryDate) return true;
+                // Add 5 minute buffer before actual expiry
                 return Date.now() >= (expiryDate - 300000);
             };
 
             const refreshAccessToken = async () => {
                 try {
                     const savedTokens = localStorage.getItem('gmailTokens');
-                    if (!savedTokens) throw new Error('No tokens found');
+                    if (!savedTokens) {
+                        throw new Error('No tokens found');
+                    }
 
                     const tokens = JSON.parse(savedTokens);
-                    if (!tokens.refresh_token) throw new Error('No refresh token available');
+                    if (!tokens.refresh_token) {
+                        throw new Error('No refresh token available');
+                    }
+
+                    console.log('🔄 Refreshing access token...');
 
                     const response = await fetch('/api/gmail-refresh', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
                         body: JSON.stringify({ refreshToken: tokens.refresh_token })
                     });
 
@@ -1343,15 +2119,20 @@
                     }
 
                     const data = await response.json();
+                    console.log('✅ Access token refreshed successfully');
+
+                    // Update tokens in localStorage (keep refresh_token)
                     const updatedTokens = {
                         ...tokens,
                         access_token: data.access_token,
                         expiry_date: data.expiry_date
                     };
                     localStorage.setItem('gmailTokens', JSON.stringify(updatedTokens));
+
                     return data.access_token;
                 } catch (error) {
                     console.error('❌ Token refresh failed:', error);
+                    // Clear tokens and force re-authentication
                     localStorage.removeItem('gmailTokens');
                     localStorage.removeItem('emailConnected');
                     localStorage.removeItem('userEmail');
@@ -1364,10 +2145,14 @@
 
             const fetchGmailEmails = async (accessToken, isRetry = false) => {
                 try {
+                    console.log('📬 Fetching Gmail inbox...');
+
+                    // Check if token is expired before making request
                     const savedTokens = localStorage.getItem('gmailTokens');
                     if (savedTokens && !isRetry) {
                         const tokens = JSON.parse(savedTokens);
                         if (isTokenExpired(tokens.expiry_date)) {
+                            console.log('⚠️ Token expired, refreshing...');
                             const newAccessToken = await refreshAccessToken();
                             return fetchGmailEmails(newAccessToken, true);
                         }
@@ -1375,72 +2160,94 @@
 
                     const response = await fetch('/api/gmail-inbox', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
                         body: JSON.stringify({ accessToken })
                     });
 
                     const data = await response.json();
 
+                    // Handle authentication errors by refreshing token
                     if (!response.ok) {
                         if ((response.status === 401 || response.status === 403) && !isRetry) {
+                            console.log('🔄 Authentication failed, refreshing token...');
                             const newAccessToken = await refreshAccessToken();
                             return fetchGmailEmails(newAccessToken, true);
                         }
+
+                        console.error('❌ API Error Response:', data);
+                        console.error('Error message:', data.message);
+                        console.error('Error details:', data.details);
                         throw new Error(data.message || 'Failed to fetch emails');
                     }
 
+                    // Transform Gmail API response to our format
                     const formattedEmails = data.emails.map(email => {
                         const headers = email.payload.headers;
+                        const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
+                        const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+                        const date = headers.find(h => h.name === 'Date')?.value || '';
+                        const messageId = headers.find(h => h.name === 'Message-ID')?.value || '';
+
                         return {
                             id: email.id,
-                            from: headers.find(h => h.name === 'From')?.value || 'Unknown',
-                            subject: headers.find(h => h.name === 'Subject')?.value || 'No Subject',
+                            from: from,
+                            subject: subject,
                             snippet: email.snippet,
                             date: new Date(parseInt(email.internalDate)).toLocaleString(),
                             internalDate: email.internalDate,
                             threadId: email.threadId,
-                            messageId: headers.find(h => h.name === 'Message-ID')?.value || ''
+                            messageId: messageId
                         };
                     });
 
+                    // Detect new emails and filter out locally deleted ones
                     setGmailEmails(prevEmails => {
-                        // Filter out deleted AND currently deleting emails
-                        const currentlyDeleting = Array.from(deletingEmailsRef.current);
-                        const allExcluded = new Set([...locallyDeletedEmailIds, ...currentlyDeleting]);
-                        const filteredEmails = formattedEmails.filter(e => !allExcluded.has(e.id));
-                        
-                        // Only check for new emails if not in delete operation
-                        if (deletingEmailsRef.current.size === 0) {
-                            const prevEmailIds = new Set(prevEmails.map(e => e.id));
-                            const allPrevIds = new Set([...prevEmailIds, ...Array.from(locallyDeletedEmailIds)]);
-                            const newEmails = filteredEmails.filter(e => !allPrevIds.has(e.id));
+                        // Filter out locally deleted emails
+                        const filteredEmails = formattedEmails.filter(e => !locallyDeletedEmailIds.has(e.id));
 
-                            if (newEmails.length > 0 && prevEmails.length > 0) {
-                                setNewEmailCount(prev => prev + newEmails.length);
-                                setUnreadEmails(prev => {
-                                    const updated = new Set(prev);
-                                    newEmails.forEach(e => updated.add(e.id));
-                                    return updated;
-                                });
-                                setShowInboxExpand(true);
-                                setTimeout(() => setShowInboxExpand(false), 3000);
-                                playNotificationSound();
-                            }
+                        const prevEmailIds = new Set(prevEmails.map(e => e.id));
+                        const newEmails = filteredEmails.filter(e => !prevEmailIds.has(e.id));
+
+                        if (newEmails.length > 0 && prevEmails.length > 0) {
+                            console.log(`🔔 ${newEmails.length} new email(s) detected!`);
+                            setNewEmailCount(prev => prev + newEmails.length);
+                            setUnreadEmails(prev => {
+                                const updated = new Set(prev);
+                                newEmails.forEach(e => updated.add(e.id));
+                                return updated;
+                            });
+
+                            // Trigger inbox button expansion animation
+                            setShowInboxExpand(true);
+                            setTimeout(() => {
+                                setShowInboxExpand(false);
+                            }, 3000);
+
+                            // Play notification sound
+                            playNotificationSound();
                         }
 
                         return filteredEmails;
                     });
+                    console.log(`✅ Loaded ${formattedEmails.length} emails from inbox`);
                 } catch (error) {
                     console.error('❌ Error fetching emails:', error);
+                    console.error('Full error object:', error);
                 }
             };
 
             const fetchSentEmails = async (accessToken, isRetry = false) => {
                 try {
+                    console.log('📤 Fetching sent emails...');
+
+                    // Check if token is expired before making request
                     const savedTokens = localStorage.getItem('gmailTokens');
                     if (savedTokens && !isRetry) {
                         const tokens = JSON.parse(savedTokens);
                         if (isTokenExpired(tokens.expiry_date)) {
+                            console.log('⚠️ Token expired, refreshing...');
                             const newAccessToken = await refreshAccessToken();
                             return fetchSentEmails(newAccessToken, true);
                         }
@@ -1448,56 +2255,89 @@
 
                     const response = await fetch('/api/gmail-sent', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
                         body: JSON.stringify({ accessToken })
                     });
 
                     const data = await response.json();
 
+                    // Handle authentication errors by refreshing token
                     if (!response.ok) {
                         if ((response.status === 401 || response.status === 403) && !isRetry) {
+                            console.log('🔄 Authentication failed, refreshing token...');
                             const newAccessToken = await refreshAccessToken();
                             return fetchSentEmails(newAccessToken, true);
                         }
+
+                        console.error('❌ API Error Response:', data);
+                        console.error('Error message:', data.message);
+                        console.error('Error details:', data.details);
                         throw new Error(data.message || 'Failed to fetch sent emails');
                     }
 
+                    // Transform Gmail API response to our format
                     const formattedEmails = data.emails.map(email => {
                         const headers = email.payload.headers;
+                        const to = headers.find(h => h.name === 'To')?.value || 'Unknown';
+                        const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+                        const date = headers.find(h => h.name === 'Date')?.value || '';
+
                         return {
                             id: email.id,
-                            to: headers.find(h => h.name === 'To')?.value || 'Unknown',
-                            subject: headers.find(h => h.name === 'Subject')?.value || 'No Subject',
+                            to: to,
+                            subject: subject,
                             snippet: email.snippet,
                             date: new Date(parseInt(email.internalDate)).toLocaleString()
                         };
                     });
 
                     setSentEmails(formattedEmails);
+                    console.log(`✅ Loaded ${formattedEmails.length} sent emails`);
                 } catch (error) {
                     console.error('❌ Error fetching sent emails:', error);
+                    console.error('Full error object:', error);
                 }
             };
 
             const callAIAPI = async (prompt, text) => {
+                console.log('🤖 Calling AI API...');
+                console.log('📝 Prompt:', prompt);
+                console.log('📄 Text length:', text.length, 'characters');
+
                 try {
                     const response = await fetch('/api/transform', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt, text })
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            prompt: prompt,
+                            text: text
+                        })
                     });
+
+                    console.log('📡 API Response status:', response.status);
 
                     if (!response.ok) {
                         const contentType = response.headers.get('content-type');
                         let errorMessage = 'API request failed';
+
                         if (contentType && contentType.includes('application/json')) {
                             const errorData = await response.json();
                             errorMessage = errorData.error || errorMessage;
+                        } else {
+                            const errorText = await response.text();
+                            console.error('❌ Non-JSON response:', errorText.substring(0, 200));
+                            errorMessage = 'Server error: API endpoint not available. Make sure you\'ve deployed to Vercel.';
                         }
+
                         throw new Error(errorMessage);
                     }
 
                     const data = await response.json();
+                    console.log('✅ AI Response received, length:', data.result?.length || 0);
                     return data.result;
                 } catch (error) {
                     console.error('❌ API Error:', error.message);
@@ -1512,22 +2352,26 @@
                 resultElement.innerHTML = '';
                 const lines = text.split('\n');
 
+                // Calculate position-based delay for splash effect (top-left to bottom-right)
                 lines.forEach((line, lineIndex) => {
                     const words = line.split(' ');
                     words.forEach((word, wordIndex) => {
                         const wordSpan = document.createElement('span');
                         wordSpan.className = 'wave-char';
                         wordSpan.textContent = word;
+                        // Diagonal splash: lineIndex + wordIndex for top-left to bottom-right
                         const diagonalDelay = (lineIndex + wordIndex * 0.3) * 0.015;
                         wordSpan.style.animationDelay = `${diagonalDelay}s`;
                         resultElement.appendChild(wordSpan);
 
+                        // Add space after word (except last word)
                         if (wordIndex < words.length - 1) {
                             const space = document.createTextNode(' ');
                             resultElement.appendChild(space);
                         }
                     });
 
+                    // Add line break (except after last line)
                     if (lineIndex < lines.length - 1) {
                         const br = document.createElement('br');
                         resultElement.appendChild(br);
@@ -1536,12 +2380,15 @@
             };
 
             const handleStyleClick = (style) => {
+                // Just set the selected tone, don't generate yet
                 setSelectedTone(style);
+                console.log('🎨 Tone selected:', style);
             };
 
             const handleGenerate = async () => {
                 if (!selectedTone && !customPrompt) return;
 
+                // Ensure we have text to process
                 const textToProcess = uploadedFile?.content || emailText;
                 if (!textToProcess || textToProcess.trim().length === 0) {
                     alert('Please enter some text or upload a file before generating!');
@@ -1555,29 +2402,42 @@
                 let prompt = customPrompt;
 
                 if (selectedTone && !customPrompt) {
-                    const prompts = {
-                        professional: 'Rewrite this email in a professional, formal business tone',
-                        friendly: 'Rewrite this email in a warm, friendly, and approachable tone',
-                        concise: 'Rewrite this email to be brief and to the point',
-                        persuasive: 'Rewrite this email to be compelling and convincing',
-                        apologetic: 'Rewrite this email with a sincere and apologetic tone',
-                        enthusiastic: 'Rewrite this email with an energetic and enthusiastic tone'
-                    };
-                    prompt = prompts[selectedTone];
+                    switch(selectedTone) {
+                        case 'professional':
+                            prompt = 'Rewrite this email in a professional, formal business tone';
+                            break;
+                        case 'friendly':
+                            prompt = 'Rewrite this email in a warm, friendly, and approachable tone';
+                            break;
+                        case 'concise':
+                            prompt = 'Rewrite this email to be brief and to the point';
+                            break;
+                        case 'persuasive':
+                            prompt = 'Rewrite this email to be compelling and convincing';
+                            break;
+                        case 'apologetic':
+                            prompt = 'Rewrite this email with a sincere and apologetic tone';
+                            break;
+                        case 'enthusiastic':
+                            prompt = 'Rewrite this email with an energetic and enthusiastic tone';
+                            break;
+                    }
                 } else if (selectedTone && customPrompt) {
+                    // Combine tone with custom prompt
                     const toneLabel = emailStyles.find(s => s.id === selectedTone)?.label || '';
                     prompt = `${customPrompt} in a ${toneLabel} tone`;
                 }
 
                 try {
-                    const transformedText = await callAIAPI(prompt, textToProcess);
+                    const transformedText = await callAIAPI(prompt, uploadedFile?.content || emailText);
                     setResult(transformedText);
 
+                    // Save to history
                     const newResult = {
                         id: Date.now(),
                         content: transformedText,
                         prompt: prompt,
-                        originalText: textToProcess,
+                        originalText: uploadedFile?.content || emailText,
                         timestamp: new Date().toLocaleString(),
                         tone: selectedTone
                     };
@@ -1586,7 +2446,8 @@
                     setIsProcessing(false);
                     setTimeout(() => animateText(transformedText), 100);
                 } catch (error) {
-                    setResult(`Error: ${error.message}`);
+                    console.error('API Error:', error);
+                    setResult(`Error: ${error.message}\n\nPlease check that:\n1. Your MISTRAL_API_KEY is set in Vercel\n2. Your API key is valid\n3. You have sufficient credits`);
                     setIsProcessing(false);
                 }
             };
@@ -1597,20 +2458,29 @@
 
                 const reader = new FileReader();
                 reader.onload = (event) => {
+                    const content = event.target.result;
                     setUploadedFile({
                         name: file.name,
-                        content: event.target.result,
+                        content: content,
                         size: file.size
                     });
-                    setEmailText('');
+                    setEmailText(''); // Clear textarea when file is uploaded
+                    console.log('📁 File uploaded:', file.name);
                 };
                 reader.readAsText(file);
+            };
+
+            const handleDeleteResult = (id) => {
+                setSavedResults(prev => prev.filter(r => r.id !== id));
+                console.log('🗑️ Deleted result:', id);
             };
 
             const handleRetry = async () => {
                 if (!savedResults.length) return;
 
                 const lastResult = savedResults[0];
+                console.log('🔄 Retrying with prompt:', lastResult.prompt);
+
                 setIsProcessing(true);
                 setResult('');
 
@@ -1618,6 +2488,7 @@
                     const transformedText = await callAIAPI(lastResult.prompt, lastResult.originalText);
                     setResult(transformedText);
 
+                    // Save new retry result
                     const newResult = {
                         id: Date.now(),
                         content: transformedText,
@@ -1631,18 +2502,56 @@
                     setIsProcessing(false);
                     setTimeout(() => animateText(transformedText), 100);
                 } catch (error) {
+                    console.error('Retry Error:', error);
                     setResult(`Error: ${error.message}`);
+                    setIsProcessing(false);
+                }
+            };
+
+            const handleToolProcess = async () => {
+                setIsProcessing(true);
+                setResult('');
+                setActiveView('results');
+                
+                let prompt = '';
+                switch(activeTab) {
+                    case 'summary':
+                        prompt = 'Summarize this text concisely';
+                        break;
+                    case 'grammar':
+                        prompt = 'Check and correct the grammar in this text';
+                        break;
+                    case 'translate':
+                        prompt = 'Translate this text to Spanish';
+                        break;
+                    case 'ideas':
+                        prompt = 'Generate creative ideas based on this text';
+                        break;
+                    case 'tone':
+                        prompt = 'Analyze the tone and sentiment of this text';
+                        break;
+                }
+
+                try {
+                    const output = await callAIAPI(prompt, emailText);
+                    setResult(output);
+                    setIsProcessing(false);
+                    setTimeout(() => animateText(output), 100);
+                } catch (error) {
+                    console.error('API Error:', error);
+                    setResult(`Error: ${error.message}\n\nPlease check that:\n1. Your MISTRAL_API_KEY is set in Vercel\n2. Your API key is valid\n3. You have sufficient credits`);
                     setIsProcessing(false);
                 }
             };
 
             const renderSettings = () => {
                 return (
-                    <div className="space-y-8">
+                    <div className="settings-panel space-y-8">
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
                             <h2 className="text-3xl font-bold text-gray-800 mb-6">⚙️ Settings</h2>
 
                             <div className="space-y-6">
+                                {/* Dark Mode Toggle */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         🌙 Dark Mode
@@ -1664,6 +2573,7 @@
                                     </div>
                                 </div>
 
+                                {/* Show Suggestions Toggle */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         💡 Show Suggestions
@@ -1689,6 +2599,7 @@
                                     </div>
                                 </div>
 
+                                {/* Priority Mode Selection */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         ✨ Priority Mode - Choose Your Preference
@@ -1697,12 +2608,13 @@
                                         Click a mode below to activate it
                                     </div>
 
+                                    {/* Clickable Mode Buttons */}
                                     <div className="priority-preview-grid">
+                                        {/* OFF Button */}
                                         <button
                                             onClick={() => {
                                                 setAutoPrioritize(false);
                                                 localStorage.setItem('autoPrioritize', 'false');
-                                                setPriorityEmails([]);
                                                 playNotificationSound();
                                             }}
                                             className={`priority-preview-card priority-preview-off ${!autoPrioritize ? 'priority-mode-active' : 'priority-mode-inactive'}`}
@@ -1726,6 +2638,7 @@
                                             {!autoPrioritize && <div className="mode-checkmark">✓ Active</div>}
                                         </button>
 
+                                        {/* ON Button */}
                                         <button
                                             onClick={() => {
                                                 setAutoPrioritize(true);
@@ -1755,6 +2668,7 @@
                                     </div>
                                 </div>
 
+                                {/* Email Connection Section */}
                                 <div className="pt-6 border-t border-gray-300">
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         📧 Email Connection
@@ -1768,7 +2682,7 @@
                                             onClick={handleGmailConnect}
                                             className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:from-indigo-600 hover:to-purple-700 transition-all oval-button flex items-center justify-center gap-3"
                                         >
-                                            <svg className="gmail-icon" viewBox="0 0 24 24" fill="white">
+                                            <svg className="gmail-icon gmail-connecting" viewBox="0 0 24 24" fill="white">
                                                 <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                             </svg>
                                             Connect Gmail
@@ -1776,7 +2690,7 @@
                                     ) : (
                                         <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
                                             <div className="flex items-center gap-3">
-                                                <svg className="gmail-icon" viewBox="0 0 24 24" fill="#10b981">
+                                                <svg className="gmail-icon gmail-connected" viewBox="0 0 24 24" fill="#10b981">
                                                     <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                                 </svg>
                                                 <div className="flex flex-col">
@@ -1793,7 +2707,7 @@
                                                     setGmailEmails([]);
                                                     setSentEmails([]);
                                                     setUserEmail('');
-                                                    setPriorityEmails([]);
+                                                    console.log('📧 Gmail disconnected');
                                                 }}
                                                 className="text-xs text-red-600 hover:text-red-700"
                                             >
@@ -1809,6 +2723,7 @@
             };
 
             const handleSummarizeEmail = async (email) => {
+                console.log('✨ Summarizing email:', email.subject);
                 setSummarizingEmail(email.id);
                 setIsSummarizing(true);
                 setSummaryText('');
@@ -1818,7 +2733,29 @@
                     const summary = await callAIAPI('Summarize this email concisely in 2-3 sentences', email.snippet);
                     setSummaryText(summary);
                     setIsSummarizing(false);
+
+                    // Animate summary text with wave effect
+                    setTimeout(() => {
+                        const summaryElement = document.getElementById(`summary-text-${email.id}`);
+                        if (summaryElement) {
+                            summaryElement.innerHTML = '';
+                            const words = summary.split(' ');
+                            words.forEach((word, index) => {
+                                const wordSpan = document.createElement('span');
+                                wordSpan.className = 'wave-char';
+                                wordSpan.textContent = word;
+                                wordSpan.style.animationDelay = `${index * 0.02}s`;
+                                summaryElement.appendChild(wordSpan);
+
+                                if (index < words.length - 1) {
+                                    const space = document.createTextNode(' ');
+                                    summaryElement.appendChild(space);
+                                }
+                            });
+                        }
+                    }, 50);
                 } catch (error) {
+                    console.error('Error summarizing:', error);
                     setSummaryText('Failed to summarize email');
                     setIsSummarizing(false);
                 }
@@ -1827,16 +2764,16 @@
             const handleDeleteEmail = (emailId, type = 'inbox') => {
                 playNotificationSound();
 
-                // Add to deleting set
-                deletingEmailsRef.current.add(emailId);
-
+                // Find the email being deleted
                 const emailToDelete = type === 'inbox'
                     ? gmailEmails.find(e => e.id === emailId)
                     : sentEmails.find(e => e.id === emailId);
 
+                // Store deleted email for undo
                 setDeletedEmail({ email: emailToDelete, type });
                 setShowUndoDelete(true);
 
+                // Track locally deleted email ID
                 if (type === 'inbox') {
                     setLocallyDeletedEmailIds(prev => {
                         const updated = new Set(prev);
@@ -1845,32 +2782,33 @@
                     });
                 }
 
+                // Delete with animation
                 const emailElement = document.querySelector(`[data-email-id="${emailId}"]`);
                 if (emailElement) {
-                    emailElement.classList.add('email-deleting');
+                    emailElement.classList.add('email-delete-fade');
                     setTimeout(() => {
                         if (type === 'inbox') {
                             setGmailEmails(prev => prev.filter(e => e.id !== emailId));
-                            // Also remove from priority emails if present
-                            setPriorityEmails(prev => prev.filter(e => e.id !== emailId));
                         } else {
                             setSentEmails(prev => prev.filter(e => e.id !== emailId));
                         }
-                        // Remove from deleting set after deletion is complete
-                        deletingEmailsRef.current.delete(emailId);
+                        console.log(`🗑️ Deleted ${type} email:`, emailId);
                     }, 500);
+                } else {
+                    if (type === 'inbox') {
+                        setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+                    } else {
+                        setSentEmails(prev => prev.filter(e => e.id !== emailId));
+                    }
                 }
             };
 
             const handleUndoDelete = () => {
                 if (deletedEmail) {
                     playNotificationSound();
-                    
-                    // Remove from deleting set
-                    deletingEmailsRef.current.delete(deletedEmail.email.id);
-                    
                     if (deletedEmail.type === 'inbox') {
                         setGmailEmails(prev => [deletedEmail.email, ...prev]);
+                        // Remove from locally deleted IDs
                         setLocallyDeletedEmailIds(prev => {
                             const updated = new Set(prev);
                             updated.delete(deletedEmail.email.id);
@@ -1881,6 +2819,7 @@
                     }
                     setShowUndoDelete(false);
                     setDeletedEmail(null);
+                    console.log('↩️ Undid delete');
                 }
             };
 
@@ -1888,27 +2827,19 @@
                 if (selectedEmails.length === 0) return;
                 playNotificationSound();
 
-                // Add all selected to deleting set
-                selectedEmails.forEach(id => deletingEmailsRef.current.add(id));
-
                 if (type === 'inbox') {
+                    // Track deleted email IDs
                     setLocallyDeletedEmailIds(prev => {
                         const updated = new Set(prev);
                         selectedEmails.forEach(id => updated.add(id));
                         return updated;
                     });
                     setGmailEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
-                    setPriorityEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
                 } else {
                     setSentEmails(prev => prev.filter(e => !selectedEmails.includes(e.id)));
                 }
-                
-                // Remove from deleting set after deletion
-                setTimeout(() => {
-                    selectedEmails.forEach(id => deletingEmailsRef.current.delete(id));
-                }, 500);
-                
                 setSelectedEmails([]);
+                console.log(`🗑️ Deleted ${selectedEmails.length} emails`);
             };
 
             const handleDeleteAll = (type = 'inbox') => {
@@ -1916,24 +2847,17 @@
                 const confirmDelete = confirm(`Are you sure you want to delete all ${type} emails?`);
                 if (confirmDelete) {
                     if (type === 'inbox') {
-                        // Add all to deleting set
-                        gmailEmails.forEach(e => deletingEmailsRef.current.add(e.id));
-                        
+                        // Track all deleted email IDs
                         setLocallyDeletedEmailIds(prev => {
                             const updated = new Set(prev);
                             gmailEmails.forEach(e => updated.add(e.id));
                             return updated;
                         });
                         setGmailEmails([]);
-                        setPriorityEmails([]);
-                        
-                        // Clear deleting set after deletion
-                        setTimeout(() => {
-                            deletingEmailsRef.current.clear();
-                        }, 500);
                     } else {
                         setSentEmails([]);
                     }
+                    console.log(`🗑️ Deleted all ${type} emails`);
                 }
             };
 
@@ -1952,43 +2876,90 @@
 
                 playNotificationSound();
                 setIsPrioritizing(true);
+                setEmailsPrioritized(false);
 
-                const analyzePriority = (email) => {
-                    let score = 0;
-                    const subjectLower = email.subject.toLowerCase();
-                    const snippetLower = email.snippet.toLowerCase();
+                try {
+                    // Simple AI-based priority detection using keywords and patterns
+                    const analyzePriority = (email) => {
+                        let score = 0;
+                        const subjectLower = email.subject.toLowerCase();
+                        const snippetLower = email.snippet.toLowerCase();
 
-                    if (subjectLower.match(/urgent|asap|important|critical|emergency|priority/)) score += 10;
-                    if (snippetLower.match(/urgent|asap|important|critical|emergency|priority/)) score += 5;
-                    if (subjectLower.match(/action required|respond|reply|feedback|review/)) score += 7;
-                    if (snippetLower.match(/action required|respond|reply|feedback|review/)) score += 3;
-                    if (subjectLower.match(/today|tomorrow|deadline|due|meeting/)) score += 8;
-                    if (snippetLower.match(/today|tomorrow|deadline|due|meeting/)) score += 4;
-                    if (subjectLower.includes('?')) score += 5;
-                    if (email.from.match(/boss|ceo|manager|director/i)) score += 6;
+                        // Urgent keywords
+                        if (subjectLower.match(/urgent|asap|important|critical|emergency|priority/)) score += 10;
+                        if (snippetLower.match(/urgent|asap|important|critical|emergency|priority/)) score += 5;
 
-                    return score;
-                };
+                        // Action required
+                        if (subjectLower.match(/action required|respond|reply|feedback|review/)) score += 7;
+                        if (snippetLower.match(/action required|respond|reply|feedback|review/)) score += 3;
 
-                setTimeout(() => {
-                    const scoredEmails = gmailEmails.map(email => ({
-                        ...email,
-                        priorityScore: analyzePriority(email)
-                    }));
+                        // Time-sensitive
+                        if (subjectLower.match(/today|tomorrow|deadline|due|meeting/)) score += 8;
+                        if (snippetLower.match(/today|tomorrow|deadline|due|meeting/)) score += 4;
 
-                    scoredEmails.sort((a, b) => b.priorityScore - a.priorityScore);
+                        // Question marks (usually need response)
+                        if (subjectLower.includes('?')) score += 5;
 
-                    const priorityThreshold = 5;
-                    const priority = scoredEmails.filter(e => e.priorityScore >= priorityThreshold).slice(0, 5);
+                        // Sender patterns (you can enhance this)
+                        if (email.from.match(/boss|ceo|manager|director/i)) score += 6;
 
-                    setPriorityEmails(priority);
+                        // Boost recent emails slightly
+                        const emailDate = new Date(email.internalDate);
+                        const hoursSinceReceived = (Date.now() - emailDate) / (1000 * 60 * 60);
+                        if (hoursSinceReceived < 24) score += 2;
+
+                        return score;
+                    };
+
+                    // Wait for wave animation
+                    setTimeout(() => {
+                        // Analyze and score all emails
+                        const scoredEmails = gmailEmails.map(email => ({
+                            ...email,
+                            priorityScore: analyzePriority(email)
+                        }));
+
+                        // Sort by priority score
+                        scoredEmails.sort((a, b) => b.priorityScore - a.priorityScore);
+
+                        // Determine how many emails to prioritize
+                        let numToPrioritize;
+                        if (gmailEmails.length <= 2) {
+                            // If 2 or fewer emails, don't prioritize any (show them normally)
+                            numToPrioritize = 0;
+                        } else if (gmailEmails.length <= 5) {
+                            // If 3-5 emails, prioritize top 2-3
+                            numToPrioritize = Math.min(3, Math.floor(gmailEmails.length * 0.6));
+                        } else {
+                            // For 6+ emails, prioritize top 3-5 with score >= threshold
+                            const priorityThreshold = 5;
+                            const highScoreEmails = scoredEmails.filter(e => e.priorityScore >= priorityThreshold);
+                            numToPrioritize = Math.min(5, Math.max(highScoreEmails.length, 3));
+                        }
+
+                        const priority = scoredEmails.slice(0, numToPrioritize);
+                        const regular = scoredEmails.slice(numToPrioritize);
+
+                        setPriorityEmails(priority);
+                        setGmailEmails([...priority, ...regular]);
+
+                        setIsPrioritizing(false);
+                        setEmailsPrioritized(true);
+
+                        // Trigger priority glow effect (once)
+                        if (priority.length > 0) {
+                            setShowPriorityGlow(true);
+                            setTimeout(() => setShowPriorityGlow(false), 2000);
+                        }
+
+                        // Reset prioritized flag after animation
+                        setTimeout(() => setEmailsPrioritized(false), 2000);
+                    }, 3000);
+
+                } catch (error) {
+                    console.error('Error prioritizing emails:', error);
                     setIsPrioritizing(false);
-
-                    if (priority.length > 0) {
-                        setShowPriorityGlow(true);
-                        setTimeout(() => setShowPriorityGlow(false), 2500);
-                    }
-                }, 2000);
+                }
             };
 
             const handleRewriteReply = async () => {
@@ -1998,6 +2969,7 @@
                 playNotificationSound();
 
                 try {
+                    // Check if user wants email structure
                     const needsStructure = replyPrompt.toLowerCase().includes('structure') ||
                                          replyPrompt.toLowerCase().includes('format') ||
                                          emailReply.match(/^(Hi|Hello|Hey|Dear)/i) === null;
@@ -2026,39 +2998,21 @@
 
                     setIsRewritingReply(false);
                 } catch (error) {
+                    console.error('Error rewriting reply:', error);
                     setIsRewritingReply(false);
                 }
             };
 
             const renderInbox = () => {
-                // Filter out priority emails from regular inbox list
-                const regularEmails = gmailEmails.filter(email => 
-                    !priorityEmails.find(p => p.id === email.id)
-                );
-
                 return (
                     <div className="space-y-6">
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
+                            {/* Header with Actions */}
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-3xl font-bold text-gray-800">📥 Inbox</h2>
                                 <div className="flex gap-3">
                                     {gmailEmails.length > 0 && (
                                         <>
-                                            <button
-                                                onClick={async () => {
-                                                    const savedTokens = localStorage.getItem('gmailTokens');
-                                                    if (savedTokens) {
-                                                        const tokens = JSON.parse(savedTokens);
-                                                        await fetchGmailEmails(tokens.access_token);
-                                                    }
-                                                }}
-                                                className="oval-button px-4 py-2 text-sm font-semibold text-white"
-                                                style={{
-                                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                                                }}
-                                            >
-                                                🔄 Refresh
-                                            </button>
                                             {!autoPrioritize && (
                                                 <button
                                                     onClick={() => handlePrioritizeEmails()}
@@ -2093,138 +3047,124 @@
                                 </div>
                             </div>
 
+                            {/* Prioritizing Wave Animation */}
                             {isPrioritizing && (
-                                <div className="prioritize-wave">
+                                <div className="prioritize-wave mb-6">
                                     <span>🤖 AI is analyzing and prioritizing your emails...</span>
                                 </div>
                             )}
 
-                            {/* PRIORITY EMAILS SECTION */}
-                            {priorityEmails.length > 0 && !isPrioritizing && (
-                                <>
-                                    <div className={`priority-container ${showPriorityGlow ? 'priority-container-glow' : ''}`}>
-                                        <div className="priority-section-title">
+                            {/* Priority Emails - Stacked only if more than 2 */}
+                            {priorityEmails.length > 2 && !isPrioritizing && autoPrioritize && (
+                                <div className={`priority-container ${showPriorityGlow ? 'priority-fade-glow' : ''}`}>
+                                    <div
+                                        className="priority-header"
+                                        onClick={() => setIsPriorityExpanded(!isPriorityExpanded)}
+                                    >
+                                        <div className="flex items-center gap-3">
                                             <span>⚡ Priority Emails</span>
-                                            <span style={{fontSize: '0.875rem', fontWeight: '600', background: 'rgba(255,255,255,0.3)', padding: '4px 12px', borderRadius: '12px'}}>
-                                                {priorityEmails.length} {priorityEmails.length === 1 ? 'email' : 'emails'}
-                                            </span>
+                                            <div className="priority-badge">
+                                                {priorityEmails.length} emails
+                                            </div>
                                         </div>
+                                        <span className="text-2xl" style={{transition: 'transform 0.3s', transform: isPriorityExpanded ? 'rotate(180deg)' : 'rotate(0)'}}>
+                                            ↓
+                                        </span>
+                                    </div>
 
-                                        <div className="space-y-3">
-                                            {priorityEmails.map((email, index) => (
-                                                <div
-                                                    key={email.id}
-                                                    data-email-id={email.id}
-                                                    onClick={() => {
-                                                        setViewingEmail(email);
-                                                        if (unreadEmails.has(email.id)) {
-                                                            setUnreadEmails(prev => {
-                                                                const updated = new Set(prev);
-                                                                updated.delete(email.id);
-                                                                return updated;
-                                                            });
-                                                        }
-                                                    }}
-                                                    className={`priority-email-stacked ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
-                                                    style={{animationDelay: `${index * 0.1}s`}}
-                                                >
-                                                    {unreadEmails.has(email.id) && (
-                                                        <div className="unread-label">UNREAD</div>
-                                                    )}
-                                                    <div className="email-hover-buttons">
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleSummarizeEmail(email);
-                                                            }}
-                                                            className="email-hover-btn"
-                                                            style={{
-                                                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                                                color: 'white',
-                                                                border: 'none'
-                                                            }}
-                                                        >
-                                                            Summarize
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDeleteEmail(email.id, 'inbox');
-                                                            }}
-                                                            className="email-hover-btn"
-                                                            style={{
-                                                                background: 'rgba(239, 68, 68, 0.9)',
-                                                                color: 'white',
-                                                                border: 'none'
-                                                            }}
-                                                        >
-                                                            Delete
-                                                        </button>
+                                    <div className={isPriorityExpanded ? 'priority-stack-expanded' : 'priority-stack'}>
+                                        {priorityEmails.map((email, index) => (
+                                            <div
+                                                key={email.id}
+                                                onClick={() => {
+                                                    setViewingEmail(email);
+                                                    // Mark email as read when clicked
+                                                    if (unreadEmails.has(email.id)) {
+                                                        setUnreadEmails(prev => {
+                                                            const updated = new Set(prev);
+                                                            updated.delete(email.id);
+                                                            return updated;
+                                                        });
+                                                    }
+                                                }}
+                                                className={`priority-email-stacked cursor-pointer ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                            >
+                                                {/* Unread Label for Priority Emails */}
+                                                {unreadEmails.has(email.id) && isPriorityExpanded && (
+                                                    <div className="unread-label">
+                                                        UNREAD
                                                     </div>
-                                                    <div className="flex justify-between items-start">
-                                                        <div className="flex-1">
-                                                            <div className="text-sm font-bold text-gray-800 mb-1">{email.from}</div>
-                                                            <div className="text-base font-semibold text-gray-700 mb-1">{email.subject}</div>
-                                                            <div className="text-sm text-gray-600 mt-2">{email.snippet}</div>
-                                                        </div>
+                                                )}
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-1">
+                                                        <div className="text-sm font-bold text-gray-800 mb-1">{email.from}</div>
+                                                        <div className="text-base font-semibold text-gray-700 mb-1">{email.subject}</div>
+                                                        {isPriorityExpanded && (
+                                                            <div className="text-sm text-gray-600 mt-2">{email.snippet.substring(0, 100)}...</div>
+                                                        )}
                                                     </div>
-
-                                                    {summarizingEmail === email.id && (
-                                                        <div className="summary-popup" onClick={(e) => e.stopPropagation()}>
-                                                            {isSummarizing ? (
-                                                                <div className="space-y-3">
-                                                                    <div className="flex items-center gap-3 mb-3">
-                                                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
-                                                                        <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
-                                                                    </div>
-                                                                    <div className="space-y-2">
-                                                                        <div className="loading-line" style={{height: '8px'}}></div>
-                                                                        <div className="loading-line" style={{height: '8px'}}></div>
-                                                                        <div className="loading-line" style={{height: '8px'}}></div>
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                <div>
-                                                                    <div className="flex justify-between items-center mb-2">
-                                                                        <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
-                                                                        <button
-                                                                            onClick={() => setSummaryHidden(!summaryHidden)}
-                                                                            className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
-                                                                        >
-                                                                            {summaryHidden ? 'Show' : 'Hide'}
-                                                                        </button>
-                                                                    </div>
-                                                                    {!summaryHidden && (
-                                                                        <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
-                                                                    )}
-                                                                </div>
-                                                            )}
+                                                    {isPriorityExpanded && (
+                                                        <div className="flex gap-2 ml-4">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleSummarizeEmail(email);
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-semibold text-white rounded-full"
+                                                                style={{background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'}}
+                                                            >
+                                                                Summarize
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteEmail(email.id, 'inbox');
+                                                                }}
+                                                                className="px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded-full"
+                                                            >
+                                                                Delete
+                                                            </button>
                                                         </div>
                                                     )}
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        ))}
                                     </div>
-
-                                    {/* INBOX SECTION TITLE */}
-                                    <div className="inbox-section-title">
-                                        <span>📬 Inbox</span>
-                                        <span className="text-sm text-gray-500" style={{fontWeight: '400'}}>
-                                            {regularEmails.length} {regularEmails.length === 1 ? 'email' : 'emails'}
-                                        </span>
-                                    </div>
-                                </>
+                                </div>
                             )}
 
-                            {/* REGULAR INBOX EMAILS */}
-                            <div className="space-y-3">
-                                {regularEmails.length > 0 ? (
-                                    regularEmails.map((email, index) => (
+                            {/* Inbox Section Title - Only show when emails are stacked */}
+                            {priorityEmails.length > 2 && autoPrioritize && (
+                                <div className="inbox-section-title" style={{
+                                    marginTop: '32px',
+                                    marginBottom: '16px',
+                                    paddingBottom: '12px',
+                                    borderBottom: '2px solid rgba(99, 102, 241, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <h3 className="text-xl font-bold text-gray-700" style={{color: darkMode ? '#e5e5e5' : '#374151'}}>
+                                        📬 Inbox
+                                    </h3>
+                                    <span className="text-sm text-gray-500" style={{color: darkMode ? '#a0a0a0' : '#6b7280'}}>
+                                        {gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).length} emails
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className="space-y-3" style={{
+                                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                transform: isPriorityExpanded ? 'translateY(0)' : 'translateY(0)'
+                            }}>
+                                {gmailEmails.length > 0 ? (
+                                    gmailEmails.filter(email => (autoPrioritize && priorityEmails.length > 2) ? !priorityEmails.find(p => p.id === email.id) : true).map((email, index) => (
                                         <div
                                             key={email.id}
                                             data-email-id={email.id}
                                             onClick={() => {
                                                 setViewingEmail(email);
+                                                // Mark email as read when clicked
                                                 if (unreadEmails.has(email.id)) {
                                                     setUnreadEmails(prev => {
                                                         const updated = new Set(prev);
@@ -2233,13 +3173,17 @@
                                                     });
                                                 }
                                             }}
-                                            className={`modern-email-item email-ladder-animation ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                            className={`modern-email-item email-ladder-animation ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
                                             style={{animationDelay: `${index * 0.05}s`}}
                                         >
+                                            {/* Unread Label */}
                                             {unreadEmails.has(email.id) && (
-                                                <div className="unread-label">UNREAD</div>
+                                                <div className="unread-label">
+                                                    UNREAD
+                                                </div>
                                             )}
 
+                                            {/* Checkbox for Selection */}
                                             <div
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -2274,7 +3218,9 @@
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setViewingEmail(email);
-                                                        setTimeout(() => setEmailReply(''), 300);
+                                                        setTimeout(() => {
+                                                            setEmailReply('');
+                                                        }, 300);
                                                     }}
                                                     className="email-hover-btn"
                                                 >
@@ -2302,9 +3248,10 @@
                                                     <span className="text-xs text-gray-500">{email.date}</span>
                                                 </div>
                                                 <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
-                                                <div className="text-sm text-gray-600">{email.snippet}</div>
+                                                <div className="text-sm text-gray-600 email-content-formatted">{email.snippet}</div>
                                             </div>
 
+                                            {/* Summarize Popup */}
                                             {summarizingEmail === email.id && (
                                                 <div className="summary-popup" onClick={(e) => e.stopPropagation()}>
                                                     {isSummarizing ? (
@@ -2313,6 +3260,7 @@
                                                                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
                                                                 <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
                                                             </div>
+                                                            {/* Wave loading animation */}
                                                             <div className="space-y-2">
                                                                 <div className="loading-line" style={{height: '8px'}}></div>
                                                                 <div className="loading-line" style={{height: '8px'}}></div>
@@ -2324,14 +3272,20 @@
                                                             <div className="flex justify-between items-center mb-2">
                                                                 <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
                                                                 <button
-                                                                    onClick={() => setSummaryHidden(!summaryHidden)}
+                                                                    onClick={() => {
+                                                                        if (summaryHidden) {
+                                                                            setSummaryHidden(false);
+                                                                        } else {
+                                                                            setSummaryHidden(true);
+                                                                        }
+                                                                    }}
                                                                     className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
                                                                 >
                                                                     {summaryHidden ? 'Show' : 'Hide'}
                                                                 </button>
                                                             </div>
                                                             {!summaryHidden && (
-                                                                <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                                <p id={`summary-text-${email.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
                                                             )}
                                                         </div>
                                                     )}
@@ -2340,12 +3294,10 @@
                                         </div>
                                     ))
                                 ) : (
-                                    gmailEmails.length === 0 && priorityEmails.length === 0 && (
-                                        <div className="text-center py-12 text-gray-500">
-                                            <div className="text-6xl mb-4">📭</div>
-                                            <p>No emails in inbox</p>
-                                        </div>
-                                    )
+                                    <div className="text-center py-12 text-gray-500">
+                                        <div className="text-6xl mb-4">📭</div>
+                                        <p>No emails in inbox</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -2357,6 +3309,7 @@
                 return (
                     <div className="space-y-6">
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
+                            {/* Header with Actions */}
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-3xl font-bold text-gray-800">📤 Sent</h2>
                                 <div className="flex gap-3">
@@ -2390,6 +3343,7 @@
                                             className="email-item email-ladder-animation glass-dark px-6 py-4 rounded-2xl relative hover:shadow-lg transition-all"
                                             style={{animationDelay: `${index * 0.05}s`}}
                                         >
+                                            {/* Checkbox for Selection */}
                                             <div
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -2405,6 +3359,7 @@
                                                 {selectedEmails.includes(email.id) && <span style={{color: 'white', fontSize: '12px'}}>✓</span>}
                                             </div>
 
+                                            {/* Delete Button on Hover */}
                                             <div className="email-hover-buttons">
                                                 <button
                                                     onClick={(e) => {
@@ -2428,7 +3383,7 @@
                                                     <span className="text-xs text-gray-500">{email.date}</span>
                                                 </div>
                                                 <div className="text-base font-semibold text-gray-700 mb-2">{email.subject}</div>
-                                                <div className="text-sm text-gray-600">{email.snippet}</div>
+                                                <div className="text-sm text-gray-600 email-content-formatted">{email.snippet}</div>
                                             </div>
                                         </div>
                                     ))
@@ -2445,145 +3400,180 @@
             };
 
             const renderWriterContent = () => {
-                return (
-                    <div className="space-y-6 fade-in">
-                        <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
-                            <span className="text-xl">✉️</span>
-                            <span className="text-sm font-semibold text-gray-700">Email Rewriter</span>
-                        </div>
+                switch(activeTab) {
+                    case 'email':
+                        return (
+                            <div className="space-y-6 fade-in">
+                                {/* Current Tool Indicator */}
+                                <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
+                                    <span className="text-xl">✉️</span>
+                                    <span className="text-sm font-semibold text-gray-700">Email Rewriter</span>
+                                </div>
 
-                        <div className="relative">
-                            <div className="flex items-center justify-between mb-3">
-                                <label className="text-sm font-medium text-gray-700 flex items-center">
-                                    <span className="text-lg mr-2">✍️</span>
-                                    Paste your email content
-                                </label>
-                                <label className="px-4 py-2 glass-effect rounded-full text-gray-700 text-xs font-medium hover:bg-white/90 transition-all cursor-pointer border border-indigo-300">
-                                    <span>📎 Upload File</span>
-                                    <input type="file" accept=".txt,.eml" onChange={handleFileUpload} className="hidden" />
-                                </label>
-                            </div>
+                                {/* File Upload or Text Area */}
+                                <div className="relative">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center">
+                                            <span className="text-lg mr-2">✍️</span>
+                                            Paste your email content
+                                        </label>
+                                        <label className="px-4 py-2 glass-effect rounded-full text-gray-700 text-xs font-medium hover:bg-white/90 transition-all cursor-pointer border border-indigo-300">
+                                            <span>📎 Upload File</span>
+                                            <input type="file" accept=".txt,.eml" onChange={handleFileUpload} className="hidden" />
+                                        </label>
+                                    </div>
 
-                            {uploadedFile ? (
-                                <div className="glass-dark rounded-2xl p-4 mb-4">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-3xl">📄</span>
-                                            <div>
-                                                <div className="text-sm font-semibold text-gray-800">{uploadedFile.name}</div>
-                                                <div className="text-xs text-gray-600">{(uploadedFile.size / 1024).toFixed(2)} KB</div>
+                                    {uploadedFile ? (
+                                        <div className="glass-dark rounded-2xl p-4 mb-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-3xl">📄</span>
+                                                    <div>
+                                                        <div className="text-sm font-semibold text-gray-800">{uploadedFile.name}</div>
+                                                        <div className="text-xs text-gray-600">{(uploadedFile.size / 1024).toFixed(2)} KB</div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setViewingFile(uploadedFile)}
+                                                        className="px-3 py-1 glass-effect rounded-full text-xs text-gray-700 hover:bg-white/90"
+                                                    >
+                                                        👁️ View
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setUploadedFile(null)}
+                                                        className="px-3 py-1 glass-effect rounded-full text-xs text-red-600 hover:bg-white/90"
+                                                    >
+                                                        ✕ Remove
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-2">
+                                    ) : (
+                                        <textarea
+                                            value={emailText}
+                                            onChange={(e) => setEmailText(e.target.value)}
+                                            className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
+                                            placeholder="Type or paste your email content here and watch the magic happen..."
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Custom Transformation + Suggestions */}
+                                <div className="pt-4 border-t border-gray-300 space-y-4">
+                                    {/* General Suggestions */}
+                                    {showSuggestions && (
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700 flex items-center mb-2">
+                                                <span className="text-lg mr-2">💡</span>
+                                                Quick Actions
+                                            </label>
+                                            <div className="suggestions-container flex gap-2 overflow-x-auto pb-2">
+                                                {generalSuggestions.map((suggestion) => (
+                                                    <button
+                                                        key={suggestion.id}
+                                                        onClick={() => setCustomPrompt(suggestion.prompt)}
+                                                        className="suggestion-pill glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all text-gray-800 border border-green-300 hover:border-green-500"
+                                                    >
+                                                        {suggestion.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Tone Suggestions */}
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center">
+                                            <span className="text-lg mr-2">🎨</span>
+                                            Tone Styles
+                                        </label>
+                                        {showSuggestions && (
+                                            <div className="suggestions-container flex gap-2 overflow-x-auto" style={{marginLeft: '-20px'}}>
+                                                {emailStyles.map((style) => (
+                                                    <button
+                                                        key={style.id}
+                                                        onClick={() => handleStyleClick(style.id)}
+                                                        className={`suggestion-pill glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all ${
+                                                            selectedTone === style.id
+                                                                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
+                                                                : 'text-gray-800 border border-indigo-300'
+                                                        }`}
+                                                    >
+                                                        {style.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Selected Tone Indicator */}
+                                    {selectedTone && (
+                                        <div className="suggestions-container glass-dark rounded-xl p-3 flex items-center gap-3">
+                                            <span className="text-2xl">{emailStyles.find(s => s.id === selectedTone)?.label}</span>
+                                            <div className="flex-1">
+                                                <div className="text-xs text-gray-600 mb-1">Selected Tone</div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-1 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full"></div>
+                                                    <span className="text-xs text-gray-700">Connected to prompt</span>
+                                                </div>
+                                            </div>
                                             <button
-                                                onClick={() => setViewingFile(uploadedFile)}
-                                                className="px-3 py-1 glass-effect rounded-full text-xs text-gray-700 hover:bg-white/90"
+                                                onClick={() => setSelectedTone(null)}
+                                                className="text-gray-500 hover:text-red-600"
                                             >
-                                                👁️ View
-                                            </button>
-                                            <button
-                                                onClick={() => setUploadedFile(null)}
-                                                className="px-3 py-1 glass-effect rounded-full text-xs text-red-600 hover:bg-white/90"
-                                            >
-                                                ✕ Remove
+                                                ✕
                                             </button>
                                         </div>
+                                    )}
+
+                                    <div className="flex gap-3">
+                                        <input
+                                            type="text"
+                                            value={customPrompt}
+                                            onChange={(e) => setCustomPrompt(e.target.value)}
+                                            className="flex-1 px-5 py-3 glass-effect border border-indigo-300 rounded-full text-gray-800 placeholder-gray-500"
+                                            placeholder="e.g., 'Make it more casual' or 'Add urgency'"
+                                            onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
+                                        />
+                                        <button
+                                            onClick={handleGenerate}
+                                            disabled={(!emailText && !uploadedFile) || (!selectedTone && !customPrompt)}
+                                            className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            ✨ Generate
+                                        </button>
                                     </div>
                                 </div>
-                            ) : (
-                                <textarea
-                                    value={emailText}
-                                    onChange={(e) => setEmailText(e.target.value)}
-                                    className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
-                                    placeholder="Type or paste your email content here..."
-                                />
-                            )}
-                        </div>
-
-                        <div className="pt-4 border-t border-gray-300 space-y-4">
-                            {showSuggestions && (
-                                <div>
-                                    <label className="text-sm font-medium text-gray-700 flex items-center mb-2">
-                                        <span className="text-lg mr-2">💡</span>
-                                        Quick Actions
-                                    </label>
-                                    <div className="flex gap-2 overflow-x-auto pb-2">
-                                        {generalSuggestions.map((suggestion) => (
-                                            <button
-                                                key={suggestion.id}
-                                                onClick={() => setCustomPrompt(suggestion.prompt)}
-                                                className="glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all text-gray-800 border border-green-300 hover:border-green-500"
-                                            >
-                                                {suggestion.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-gray-700 flex items-center">
-                                    <span className="text-lg mr-2">🎨</span>
-                                    Tone Styles
-                                </label>
-                                {showSuggestions && (
-                                    <div className="flex gap-2 overflow-x-auto">
-                                        {emailStyles.map((style) => (
-                                            <button
-                                                key={style.id}
-                                                onClick={() => handleStyleClick(style.id)}
-                                                className={`glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all ${
-                                                    selectedTone === style.id
-                                                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
-                                                        : 'text-gray-800 border border-indigo-300'
-                                                }`}
-                                            >
-                                                {style.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
-
-                            {selectedTone && (
-                                <div className="glass-dark rounded-xl p-3 flex items-center gap-3">
-                                    <span className="text-2xl">{emailStyles.find(s => s.id === selectedTone)?.label}</span>
-                                    <div className="flex-1">
-                                        <div className="text-xs text-gray-600 mb-1">Selected Tone</div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-1 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full"></div>
-                                            <span className="text-xs text-gray-700">Connected to prompt</span>
-                                        </div>
+                        );
+                    
+                    default:
+                        return (
+                            <div className="space-y-6 fade-in">
+                                <div className="relative">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center">
+                                            <span className="text-lg mr-2">📄</span>
+                                            Enter your text
+                                        </label>
                                     </div>
-                                    <button
-                                        onClick={() => setSelectedTone(null)}
-                                        className="text-gray-500 hover:text-red-600"
-                                    >
-                                        ✕
-                                    </button>
+                                    <textarea
+                                        value={emailText}
+                                        onChange={(e) => setEmailText(e.target.value)}
+                                        className="w-full h-64 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
+                                        placeholder="Type or paste your content here..."
+                                    />
                                 </div>
-                            )}
-
-                            <div className="flex gap-3">
-                                <input
-                                    type="text"
-                                    value={customPrompt}
-                                    onChange={(e) => setCustomPrompt(e.target.value)}
-                                    className="flex-1 px-5 py-3 glass-effect border border-indigo-300 rounded-full text-gray-800 placeholder-gray-500"
-                                    placeholder="e.g., 'Make it more casual' or 'Add urgency'"
-                                    onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
-                                />
                                 <button
-                                    onClick={handleGenerate}
-                                    disabled={(!emailText && !uploadedFile) || (!selectedTone && !customPrompt)}
-                                    className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={handleToolProcess}
+                                    className="w-full px-8 py-4 glass-effect rounded-full text-gray-800 font-semibold text-lg hover:bg-white/90 transition-all oval-button border-2 border-indigo-400"
                                 >
-                                    ✨ Generate
+                                    🚀 Process with AI
                                 </button>
                             </div>
-                        </div>
-                    </div>
-                );
+                        );
+                }
             };
 
             const renderResultsContent = () => {
@@ -2608,10 +3598,12 @@
                     );
                 }
 
+                // Show result
                 if (result) {
                     return (
                         <div className="result-container px-6 py-4 relative">
                             <div className="relative">
+                                {/* Action buttons at top-right */}
                                 <div className="action-buttons">
                                     <button
                                         onClick={() => navigator.clipboard.writeText(result)}
@@ -2645,9 +3637,11 @@
 
             return (
                 <div className="min-h-screen relative">
+                    {/* Email Viewer Modal - iOS Style */}
                     {viewingEmail && (
                         <div className="email-viewer-overlay" onClick={() => setViewingEmail(null)}>
                             <div className="email-viewer-container" onClick={(e) => e.stopPropagation()}>
+                                {/* Header */}
                                 <div className="p-6 border-b border-gray-200 flex items-center justify-between">
                                     <button
                                         onClick={() => setViewingEmail(null)}
@@ -2678,6 +3672,7 @@
                                     </div>
                                 </div>
 
+                                {/* Email Content */}
                                 <div className="flex-1 overflow-y-auto p-6">
                                     <div className="mb-4">
                                         <h2 className="text-2xl font-bold text-gray-800 mb-3">{viewingEmail.subject}</h2>
@@ -2689,9 +3684,10 @@
                                         </div>
                                     </div>
                                     <div className="prose max-w-none">
-                                        <p className="text-gray-700 leading-relaxed">{viewingEmail.snippet}</p>
+                                        <p className="text-gray-700 leading-relaxed email-content-formatted">{viewingEmail.snippet}</p>
                                     </div>
 
+                                    {/* Summarize Popup in Viewer */}
                                     {summarizingEmail === viewingEmail.id && (
                                         <div className="summary-popup mt-4" style={{position: 'relative', top: 0, marginTop: '16px'}}>
                                             {isSummarizing ? (
@@ -2700,6 +3696,7 @@
                                                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
                                                         <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
                                                     </div>
+                                                    {/* Wave loading animation */}
                                                     <div className="space-y-2">
                                                         <div className="loading-line" style={{height: '8px'}}></div>
                                                         <div className="loading-line" style={{height: '8px'}}></div>
@@ -2711,23 +3708,31 @@
                                                     <div className="flex justify-between items-center mb-2">
                                                         <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
                                                         <button
-                                                            onClick={() => setSummaryHidden(!summaryHidden)}
+                                                            onClick={() => {
+                                                                if (summaryHidden) {
+                                                                    setSummaryHidden(false);
+                                                                } else {
+                                                                    setSummaryHidden(true);
+                                                                }
+                                                            }}
                                                             className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
                                                         >
                                                             {summaryHidden ? 'Show' : 'Hide'}
                                                         </button>
                                                     </div>
                                                     {!summaryHidden && (
-                                                        <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                        <p id={`summary-text-${viewingEmail.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
                                                     )}
                                                 </div>
                                             )}
                                         </div>
                                     )}
 
+                                    {/* Reply Section */}
                                     <div id="reply-section" className="mt-8 pt-6 border-t border-gray-300">
                                         <h3 className="text-lg font-bold text-gray-800 mb-4">✍️ Write Reply</h3>
 
+                                        {/* Textarea Container with Floating Send Button */}
                                         <div className="relative mb-4">
                                             <textarea
                                                 value={emailReply}
@@ -2736,12 +3741,12 @@
                                                 placeholder="Type your reply here..."
                                             />
 
+                                            {/* Floating Send Button */}
                                             {emailReply && emailReply.trim().length > 0 && (
                                                 <button
                                                     onClick={handleSendEmail}
                                                     disabled={isSending}
-                                                    className="send-button-float"
-                                                    style={{opacity: isSending ? 0.7 : 1, cursor: isSending ? 'not-allowed' : 'pointer'}}
+                                                    className={isSending ? 'send-button-float send-button-sending' : 'send-button-float'}
                                                 >
                                                     {isSending ? (
                                                         <>
@@ -2758,13 +3763,14 @@
                                             )}
                                         </div>
 
+                                        {/* AI Transformation Container */}
                                         <div className="ai-transform-container">
                                             <input
                                                 type="text"
                                                 value={replyPrompt}
                                                 onChange={(e) => setReplyPrompt(e.target.value)}
                                                 className="ai-transform-input"
-                                                placeholder="✨ Rewrite with AI (e.g., 'Make it more professional')"
+                                                placeholder="✨ Rewrite with AI (e.g., 'Make it more professional', 'Add email structure')"
                                                 onKeyPress={(e) => {
                                                     if (e.key === 'Enter' && replyPrompt && emailReply) {
                                                         handleRewriteReply();
@@ -2785,62 +3791,63 @@
                         </div>
                     )}
 
-                    {/* MOBILE NAV - ONLY SHOWS ON MOBILE */}
-                    <button className="mobile-nav-toggle" onClick={() => setMobileNavOpen(!mobileNavOpen)}>
-                        {mobileNavOpen ? '✕' : '☰'}
-                    </button>
+                    {/* File Viewer Modal */}
+                    {viewingFile && (
+                        <div className="file-viewer-modal" onClick={() => setViewingFile(null)}>
+                            <div className="file-viewer-content" onClick={(e) => e.stopPropagation()}>
+                                <div className="p-6 border-b border-gray-200">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-xl font-bold text-gray-800">
+                                            {viewingFile.name || 'Viewing Content'}
+                                        </h2>
+                                        <button
+                                            onClick={() => setViewingFile(null)}
+                                            className="text-gray-500 hover:text-gray-700 text-2xl"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                    {viewingFile.timestamp && (
+                                        <p className="text-sm text-gray-500 mt-1">{viewingFile.timestamp}</p>
+                                    )}
+                                </div>
+                                <div className="p-6 overflow-y-auto max-h-[60vh]">
+                                    <pre className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-base">
+                                        {viewingFile.content}
+                                    </pre>
+                                </div>
+                                <div className="p-6 border-t border-gray-200 flex gap-3">
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(viewingFile.content);
+                                            alert('Copied to clipboard!');
+                                        }}
+                                        className="flex-1 px-6 py-3 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-indigo-400"
+                                    >
+                                        📋 Copy
+                                    </button>
+                                    <button
+                                        onClick={() => setViewingFile(null)}
+                                        className="px-6 py-3 glass-effect rounded-full text-gray-800 font-semibold hover:bg-white/90 transition-all oval-button border-2 border-gray-300"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
-                    <div className={`mobile-nav-menu ${mobileNavOpen ? 'open' : ''}`}>
-                        <button
-                            onClick={() => { setCurrentPage('home'); setMobileNavOpen(false); }}
-                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
-                                currentPage === 'home'
-                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                                    : 'glass-dark text-gray-700 hover:bg-white/70'
-                            }`}
-                        >
-                            Home
-                        </button>
-                        {emailConnected && (
-                            <>
-                                <button
-                                    onClick={() => { setCurrentPage('inbox'); setMobileNavOpen(false); }}
-                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
-                                        currentPage === 'inbox'
-                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                                            : 'glass-dark text-gray-700 hover:bg-white/70'
-                                    }`}
-                                >
-                                    Inbox {newEmailCount > 0 && `(${newEmailCount})`}
-                                </button>
-                                <button
-                                    onClick={() => { setCurrentPage('sent'); setMobileNavOpen(false); }}
-                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
-                                        currentPage === 'sent'
-                                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                                            : 'glass-dark text-gray-700 hover:bg-white/70'
-                                    }`}
-                                >
-                                    Sent
-                                </button>
-                            </>
-                        )}
-                        <button
-                            onClick={() => { setCurrentPage('settings'); setMobileNavOpen(false); }}
-                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
-                                currentPage === 'settings'
-                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                                    : 'glass-dark text-gray-700 hover:bg-white/70'
-                            }`}
-                        >
-                            Settings
-                        </button>
-                    </div>
+                    {/* AI Floating Particles */}
+                    <div className="ai-particle" style={{top: '20%', left: '10%', animationDelay: '0s'}}></div>
+                    <div className="ai-particle" style={{top: '40%', right: '15%', animationDelay: '3s'}}></div>
+                    <div className="ai-particle" style={{bottom: '30%', left: '20%', animationDelay: '6s'}}></div>
+                    <div className="ai-particle" style={{top: '60%', right: '25%', animationDelay: '9s'}}></div>
+                    <div className="ai-particle" style={{bottom: '20%', right: '10%', animationDelay: '12s'}}></div>
 
-                    {/* DESKTOP NAV - ONLY AT TOP */}
+                    {/* Sticky Header */}
                     <header className="sticky-header">
                         <div className="container mx-auto px-4 py-4">
-                            <div className="desktop-nav flex justify-center items-center gap-4">
+                            <div className="flex justify-center items-center gap-4">
                                 <button
                                     onClick={() => setCurrentPage('home')}
                                     className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
@@ -2859,10 +3866,12 @@
                                                 currentPage === 'inbox'
                                                     ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-indigo-600'
                                                     : 'glass-dark text-gray-700 hover:bg-white/70'
-                                            }`}
-                                            style={{position: 'relative'}}
+                                            } ${showInboxExpand ? 'inbox-button-expanded' : ''}`}
+                                            style={{position: 'relative', transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'}}
                                         >
-                                            Inbox
+                                            <span className={showInboxExpand ? 'inbox-text-transition' : ''}>
+                                                {showInboxExpand ? '🔔 New Email!' : 'Inbox'}
+                                            </span>
                                             {newEmailCount > 0 && (
                                                 <span className="new-email-badge">
                                                     {newEmailCount}
@@ -2896,11 +3905,38 @@
                     </header>
 
                     <div className="page-container relative z-10 container mx-auto px-4 py-8 max-w-8xl">
+
                         {currentPage === 'settings' ? renderSettings() :
                          currentPage === 'inbox' ? renderInbox() :
                          currentPage === 'sent' ? renderSent() : (
                             <>
-                                <div className="rounded-3xl p-8 relative">
+                                {/* Animated Welcome Text */}
+                                {showWelcomeAnimation && currentPage === 'home' && (
+                                    <div className={`welcome-text-container ${!showWelcomeAnimation ? 'fade-out' : ''}`}>
+                                        <div className="welcome-text" key={currentWelcomeMessage}>
+                                            {welcomeMessages[currentWelcomeMessage].split(' ').map((word, i) => (
+                                                <span key={`${currentWelcomeMessage}-${i}`} style={{animationDelay: `${i * 0.08}s`}}>
+                                                    {word}
+                                                </span>
+                                            ))}
+                                            {userName && (
+                                                <>
+                                                    <span style={{animationDelay: `${welcomeMessages[currentWelcomeMessage].split(' ').length * 0.08}s`}}>
+                                                        ,
+                                                    </span>
+                                                    <span style={{animationDelay: `${(welcomeMessages[currentWelcomeMessage].split(' ').length + 1) * 0.08}s`}}>
+                                                        {userName}!
+                                                    </span>
+                                                </>
+                                            )}
+                                            <span className="typing-cursor" style={{animationDelay: `${(welcomeMessages[currentWelcomeMessage].split(' ').length + (userName ? 2 : 0)) * 0.08}s`}}></span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Main Center Container with Tabs */}
+                                <div className="rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
+                                    {/* Tab Switches */}
                                     <div className="flex justify-center mb-8">
                                         <div className="tab-container tab-button-container">
                                             <div 
@@ -2931,6 +3967,7 @@
                                         </div>
                                     </div>
 
+                                    {/* Content Area */}
                                     <div className="min-h-[500px]">
                                         {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
                                     </div>
@@ -2939,6 +3976,7 @@
                         )}
                     </div>
 
+                    {/* Undo Delete Button */}
                     {showUndoDelete && (
                         <button
                             onClick={handleUndoDelete}
@@ -2949,15 +3987,9 @@
                         </button>
                     )}
 
+                    {/* Envelope Flying Animation */}
                     {showEnvelope && (
-                        <div style={{
-                            position: 'fixed',
-                            bottom: '20px',
-                            right: '20px',
-                            fontSize: '48px',
-                            zIndex: 10000,
-                            animation: 'envelope-fly 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
-                        }}>
+                        <div className="envelope-animation">
                             📧
                         </div>
                     )}
