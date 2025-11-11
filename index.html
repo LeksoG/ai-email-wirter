@@ -238,11 +238,7 @@
 
         .unified-button:hover::before {
             opacity: 1;
-            animation: outline-sweep 0.6s ease-in-out forwards;
-        }
-
-        .unified-button:not(:hover)::before {
-            animation: outline-sweep-out 0.6s ease-in-out forwards;
+            animation: outline-sweep 0.6s ease-in-out;
         }
 
         @keyframes outline-sweep {
@@ -255,20 +251,6 @@
             }
             100% {
                 background-position: -200% 0;
-                opacity: 1;
-            }
-        }
-
-        @keyframes outline-sweep-out {
-            0% {
-                background-position: -200% 0;
-                opacity: 1;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                background-position: -400% 0;
                 opacity: 0;
             }
         }
@@ -334,6 +316,212 @@
                 box-shadow: 0 0 30px rgba(255, 255, 255, 1),
                            0 0 60px rgba(255, 255, 255, 0.7),
                            0 0 90px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        /* Glassy Nav Container */
+        .nav-container {
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.7) 0%,
+                rgba(249, 250, 251, 0.6) 100%
+            );
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            padding: 8px 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            display: inline-flex;
+            gap: 8px;
+        }
+
+        body.dark-mode .nav-container {
+            background: linear-gradient(135deg,
+                rgba(20, 20, 20, 0.7) 0%,
+                rgba(30, 30, 30, 0.6) 100%
+            );
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Search Bar Transform */
+        .nav-search-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 16px;
+            opacity: 0;
+            transform: translateX(-100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .nav-search-bar.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .nav-search-input {
+            width: 100%;
+            padding: 10px 20px;
+            border: 2px solid white;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .nav-search-input {
+            background: rgba(40, 40, 40, 0.9);
+            color: #e5e5e5;
+        }
+
+        .nav-search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 16px;
+            right: 16px;
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid white;
+            border-radius: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-mode .nav-search-suggestions {
+            background: rgba(30, 30, 30, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .search-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-suggestion-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            padding-left: 20px;
+        }
+
+        body.dark-mode .search-suggestion-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .search-suggestion-item:hover {
+            background: rgba(100, 100, 100, 0.3);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .sticky-header {
+                padding-top: 8px;
+            }
+
+            .nav-container {
+                padding: 6px 12px;
+                gap: 6px;
+                max-width: 95%;
+                margin: 0 auto;
+            }
+
+            .nav-tab {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
+            .modern-email-item,
+            .priority-email-stacked {
+                margin: 8px 12px;
+                padding: 12px;
+            }
+
+            .email-hover-buttons {
+                position: static;
+                display: flex;
+                margin-top: 8px;
+                justify-content: flex-end;
+            }
+
+            .glass-effect,
+            .glass-dark {
+                margin: 8px 12px;
+                padding: 16px;
+            }
+
+            .custom-textarea {
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+
+            /* Settings toggles */
+            .settings-panel {
+                padding: 12px;
+            }
+
+            .setting-preview-container {
+                padding: 12px;
+            }
+
+            /* Make toggles fit perfectly */
+            input[type="checkbox"] {
+                transform: scale(1.2);
+            }
+
+            /* Mobile search bar */
+            .nav-search-bar {
+                padding: 6px 12px;
+            }
+
+            .nav-search-input {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+
+            /* Welcome text smaller on mobile */
+            .welcome-text {
+                font-size: 1.3rem;
+            }
+
+            /* Smaller buttons on mobile */
+            .oval-button {
+                font-size: 13px;
+                padding: 8px 16px !important;
+            }
+
+            /* Email content */
+            .email-content-formatted {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-tab {
+                font-size: 11px;
+                padding: 5px 10px;
+            }
+
+            .sticky-header {
+                padding-top: 6px;
+            }
+
+            .welcome-text {
+                font-size: 1.1rem;
+            }
+
+            .page-container {
+                padding: 12px 8px;
             }
         }
 
@@ -1638,9 +1826,37 @@
         .priority-preview-card {
             padding: 16px;
             border-radius: 16px;
-            border: 2px solid;
+            border: 2px solid white;
             transition: all 0.3s;
             position: relative;
+            cursor: pointer;
+        }
+
+        .priority-preview-card::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(90deg,
+                white,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.3),
+                white
+            );
+            background-size: 200% 100%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .priority-preview-card:hover::before {
+            opacity: 1;
+            animation: outline-sweep 0.6s ease-in-out;
         }
 
         .priority-preview-off {
@@ -1994,11 +2210,17 @@
             const [currentWelcomeMessage, setCurrentWelcomeMessage] = useState(0);
             const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
             const [showIndicator, setShowIndicator] = useState(false);
+            const [showSearchBar, setShowSearchBar] = useState(false);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [searchResults, setSearchResults] = useState([]);
+            const [touchStartX, setTouchStartX] = useState(0);
+            const [touchEndX, setTouchEndX] = useState(0);
 
             // Audio references for notifications
             const audioRef = useRef(null);
             const sendAudioRef = useRef(null);
             const carouselRef = useRef(null);
+            const navRef = useRef(null);
 
             // Initialize app with console logging
             useEffect(() => {
@@ -2368,6 +2590,63 @@
                 carousel.addEventListener('wheel', handleWheel, { passive: false });
                 return () => carousel.removeEventListener('wheel', handleWheel);
             }, [showSuggestions]);
+
+            // Swipe gesture for search on mobile
+            useEffect(() => {
+                const nav = navRef.current;
+                if (!nav || currentPage !== 'inbox') return;
+
+                const handleTouchStart = (e) => {
+                    setTouchStartX(e.touches[0].clientX);
+                };
+
+                const handleTouchMove = (e) => {
+                    setTouchEndX(e.touches[0].clientX);
+                };
+
+                const handleTouchEnd = () => {
+                    const swipeDistance = touchStartX - touchEndX;
+                    const threshold = 50;
+
+                    if (Math.abs(swipeDistance) > threshold) {
+                        if (swipeDistance > 0) {
+                            // Swipe left - show search
+                            setShowSearchBar(true);
+                        } else {
+                            // Swipe right - hide search
+                            setShowSearchBar(false);
+                            setSearchQuery('');
+                            setSearchResults([]);
+                        }
+                    }
+                };
+
+                nav.addEventListener('touchstart', handleTouchStart);
+                nav.addEventListener('touchmove', handleTouchMove);
+                nav.addEventListener('touchend', handleTouchEnd);
+
+                return () => {
+                    nav.removeEventListener('touchstart', handleTouchStart);
+                    nav.removeEventListener('touchmove', handleTouchMove);
+                    nav.removeEventListener('touchend', handleTouchEnd);
+                };
+            }, [touchStartX, touchEndX, currentPage]);
+
+            // Search emails
+            useEffect(() => {
+                if (searchQuery.length === 0) {
+                    setSearchResults([]);
+                    return;
+                }
+
+                const results = gmailEmails.filter(email =>
+                    email.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    email.from.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    email.snippet.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+
+                setSearchResults(results.slice(0, 5)); // Show top 5 results
+            }, [searchQuery, gmailEmails]);
 
             const handleGmailConnect = async () => {
                 try {
@@ -3018,7 +3297,7 @@
                                                     setUserEmail('');
                                                     console.log('📧 Gmail disconnected');
                                                 }}
-                                                className="text-xs text-red-600 hover:text-red-700"
+                                                className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
                                             >
                                                 Disconnect
                                             </button>
@@ -3957,7 +4236,7 @@
                                 <div className="p-6 border-b border-gray-200 flex items-center justify-between">
                                     <button
                                         onClick={() => setViewingEmail(null)}
-                                        className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all border border-indigo-300 flex items-center gap-2"
+                                        className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all unified-button border-2 border-white flex items-center gap-2"
                                     >
                                         <span>←</span>
                                         <span>Back</span>
@@ -3974,7 +4253,7 @@
                                                 setEmailReply('');
                                                 document.getElementById('reply-section')?.scrollIntoView({ behavior: 'smooth' });
                                             }}
-                                            className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all border border-indigo-300"
+                                            className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all unified-button border-2 border-white"
                                         >
                                             Reply
                                         </button>
@@ -4156,17 +4435,19 @@
                     {/* Sticky Header */}
                     <header className="sticky-header">
                         <div className="container mx-auto px-4 py-4">
-                            <div className="flex justify-center items-center gap-4">
-                                <button
-                                    onClick={() => setCurrentPage('home')}
-                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
-                                        currentPage === 'home'
-                                            ? 'active text-gray-800'
-                                            : 'glass-dark text-gray-700 hover:bg-white/70'
-                                    }`}
-                                >
-                                    Home
-                                </button>
+                            <div className="flex justify-center items-center" style={{position: 'relative'}}>
+                                {/* Navigation Bar */}
+                                <div className={`nav-container ${showSearchBar ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} style={{transition: 'opacity 0.3s ease'}} ref={navRef}>
+                                    <button
+                                        onClick={() => setCurrentPage('home')}
+                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
+                                            currentPage === 'home'
+                                                ? 'active text-gray-800'
+                                                : 'glass-dark text-gray-700 hover:bg-white/70'
+                                        }`}
+                                    >
+                                        Home
+                                    </button>
                                 {emailConnected && (
                                     <>
                                         <button
@@ -4199,16 +4480,64 @@
                                         </button>
                                     </>
                                 )}
-                                <button
-                                    onClick={() => setCurrentPage('settings')}
-                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
-                                        currentPage === 'settings'
-                                            ? 'active text-gray-800'
-                                            : 'glass-dark text-gray-700 hover:bg-white/70'
-                                    }`}
-                                >
-                                    Settings
-                                </button>
+                                    <button
+                                        onClick={() => setCurrentPage('settings')}
+                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
+                                            currentPage === 'settings'
+                                                ? 'active text-gray-800'
+                                                : 'glass-dark text-gray-700 hover:bg-white/70'
+                                        }`}
+                                    >
+                                        Settings
+                                    </button>
+                                </div>
+
+                                {/* Search Bar (appears on swipe) */}
+                                {currentPage === 'inbox' && (
+                                    <div className={`nav-search-bar ${showSearchBar ? 'active' : ''}`} style={{position: 'absolute', width: '100%', maxWidth: '600px'}}>
+                                        <div className="nav-container" style={{width: '100%'}}>
+                                            <input
+                                                type="text"
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                placeholder="🔍 Search emails..."
+                                                className="nav-search-input unified-button"
+                                                autoFocus={showSearchBar}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    setShowSearchBar(false);
+                                                    setSearchQuery('');
+                                                    setSearchResults([]);
+                                                }}
+                                                className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all unified-button border-2 border-white"
+                                                style={{marginLeft: '8px', whiteSpace: 'nowrap'}}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                        {searchResults.length > 0 && (
+                                            <div className="nav-search-suggestions">
+                                                {searchResults.map((email) => (
+                                                    <div
+                                                        key={email.id}
+                                                        className="search-suggestion-item"
+                                                        onClick={() => {
+                                                            setViewingEmail(email);
+                                                            setShowSearchBar(false);
+                                                            setSearchQuery('');
+                                                            setSearchResults([]);
+                                                        }}
+                                                    >
+                                                        <div className="font-semibold text-sm text-gray-800">{email.subject}</div>
+                                                        <div className="text-xs text-gray-600 mt-1">From: {email.from}</div>
+                                                        <div className="text-xs text-gray-500 mt-1">{email.snippet.substring(0, 80)}...</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </header>
