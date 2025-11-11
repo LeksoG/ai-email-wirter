@@ -273,6 +273,70 @@
             }
         }
 
+        /* Navigation tab with underline glow */
+        .nav-tab {
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .nav-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6),
+                        0 0 40px rgba(0, 0, 0, 0.4),
+                        0 0 60px rgba(0, 0, 0, 0.2);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode .nav-tab::after {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+                        0 0 40px rgba(255, 255, 255, 0.5),
+                        0 0 60px rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-tab.active::after {
+            width: 80%;
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.6),
+                           0 0 40px rgba(0, 0, 0, 0.4),
+                           0 0 60px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.8),
+                           0 0 60px rgba(0, 0, 0, 0.6),
+                           0 0 90px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        body.dark-mode .nav-tab.active::after {
+            animation: glow-pulse-dark 2s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse-dark {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+                           0 0 40px rgba(255, 255, 255, 0.5),
+                           0 0 60px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 255, 255, 1),
+                           0 0 60px rgba(255, 255, 255, 0.7),
+                           0 0 90px rgba(255, 255, 255, 0.5);
+            }
+        }
+
         .tool-card {
             transition: all 0.3s ease;
         }
@@ -314,12 +378,19 @@
 
         .tab-slider {
             position: absolute;
-            background: #3B82F6;
+            background: transparent;
             border-radius: 50px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
-            border: 2px solid white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            border-bottom: 3px solid rgba(0, 0, 0, 0.8);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6),
+                        0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .tab-slider {
+            border-bottom: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.8),
+                        0 8px 40px rgba(255, 255, 255, 0.5);
         }
 
         /* Loading Lines Animation - Gemini Style */
@@ -603,15 +674,20 @@
             top: 50%;
             transform: translateY(-50%);
             padding: 8px 20px;
-            background: #3B82F6;
-            color: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.85) 100%);
+            color: #1f2937;
             border: 2px solid white;
             border-radius: 50px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .ai-transform-button {
+            background: linear-gradient(135deg, rgba(60, 60, 60, 0.9) 0%, rgba(50, 50, 50, 0.85) 100%);
+            color: #e5e5e5;
         }
 
         .ai-transform-button:hover {
@@ -1190,9 +1266,13 @@
         }
 
         .email-checkbox.checked {
-            background: #3B82F6;
-            border-color: #3B82F6;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.85) 100%);
+            border-color: #10b981;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        body.dark-mode .email-checkbox.checked {
+            background: linear-gradient(135deg, rgba(60, 60, 60, 0.9) 0%, rgba(50, 50, 50, 0.85) 100%);
         }
 
         .email-checkbox:hover {
@@ -1219,13 +1299,13 @@
         }
 
         .priority-header {
-            background: #3B82F6;
-            color: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.85) 100%);
+            color: #1f2937;
             padding: 16px 24px;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1233,6 +1313,11 @@
             position: relative;
             z-index: 10;
             border: 2px solid white;
+        }
+
+        body.dark-mode .priority-header {
+            background: linear-gradient(135deg, rgba(40, 40, 40, 0.9) 0%, rgba(30, 30, 30, 0.85) 100%);
+            color: #e5e5e5;
         }
 
         .priority-header:hover {
@@ -2261,7 +2346,7 @@
             // Add mouse wheel scroll for carousel
             useEffect(() => {
                 const carousel = carouselRef.current;
-                if (!carousel) return;
+                if (!carousel || !showSuggestions) return;
 
                 const handleWheel = (e) => {
                     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
@@ -2282,7 +2367,7 @@
 
                 carousel.addEventListener('wheel', handleWheel, { passive: false });
                 return () => carousel.removeEventListener('wheel', handleWheel);
-            }, []);
+            }, [showSuggestions]);
 
             const handleGmailConnect = async () => {
                 try {
@@ -2904,10 +2989,9 @@
                                     {!emailConnected ? (
                                         <button
                                             onClick={handleGmailConnect}
-                                            className="w-full px-6 py-3 text-white rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white"
-                                            style={{background: '#3B82F6'}}
+                                            className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
                                         >
-                                            <svg className="gmail-icon gmail-connecting" viewBox="0 0 24 24" fill="white">
+                                            <svg className="gmail-icon gmail-connecting" viewBox="0 0 24 24" fill="#4285F4">
                                                 <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                             </svg>
                                             Connect Gmail
@@ -3242,15 +3326,7 @@
                                                 <button
                                                     onClick={() => handlePrioritizeEmails()}
                                                     disabled={isPrioritizing}
-                                                    className="oval-button px-4 py-2 text-sm font-semibold text-white"
-                                                    style={{
-                                                        background: isPrioritizing
-                                                            ? 'rgba(59, 130, 246, 0.5)'
-                                                            : '#3B82F6',
-                                                        cursor: isPrioritizing ? 'not-allowed' : 'pointer',
-                                                        border: '2px solid white'
-                                                    }}
-                                                    className={!isPrioritizing ? 'unified-button' : ''}
+                                                    className={`oval-button px-4 py-2 text-sm font-semibold glass-effect border-2 border-white unified-button text-gray-800 ${isPrioritizing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 >
                                                     {isPrioritizing ? '🤖 Prioritizing...' : '✨ Prioritize Emails'}
                                                 </button>
@@ -3337,8 +3413,7 @@
                                                                     e.stopPropagation();
                                                                     handleSummarizeEmail(email);
                                                                 }}
-                                                                className="px-3 py-1 text-xs font-semibold text-white rounded-full unified-button"
-                                                                style={{background: '#3B82F6', border: '2px solid white'}}
+                                                                className="px-3 py-1 text-xs font-semibold rounded-full unified-button border-2 border-white glass-effect text-gray-800"
                                                             >
                                                                 Summarize
                                                             </button>
@@ -3432,12 +3507,7 @@
                                                         e.stopPropagation();
                                                         handleSummarizeEmail(email);
                                                     }}
-                                                    className="email-hover-btn unified-button"
-                                                    style={{
-                                                        background: '#3B82F6',
-                                                        color: 'white',
-                                                        border: '2px solid white'
-                                                    }}
+                                                    className="email-hover-btn unified-button border-2 border-white glass-effect text-gray-800"
                                                 >
                                                     Summarize
                                                 </button>
@@ -3644,7 +3714,7 @@
                                             <span className="text-lg mr-2">✍️</span>
                                             Paste your email content
                                         </label>
-                                        <label className="px-4 py-2 glass-effect rounded-full text-gray-700 text-xs font-medium hover:bg-white/90 transition-all cursor-pointer border border-indigo-300">
+                                        <label className="px-4 py-2 glass-effect rounded-full text-gray-700 text-xs font-medium hover:bg-white/90 transition-all cursor-pointer border-2 border-white unified-button">
                                             <span>📎 Upload File</span>
                                             <input type="file" accept=".txt,.eml" onChange={handleFileUpload} className="hidden" />
                                         </label>
@@ -3680,7 +3750,7 @@
                                         <textarea
                                             value={emailText}
                                             onChange={(e) => setEmailText(e.target.value)}
-                                            className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
+                                            className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
                                             placeholder="Type or paste your email content here and watch the magic happen..."
                                         />
                                     )}
@@ -3736,12 +3806,11 @@
                                                     <button
                                                         key={style.id}
                                                         onClick={() => handleStyleClick(style.id)}
-                                                        className={`suggestion-pill glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all ${
+                                                        className={`suggestion-pill glass-effect font-medium hover:bg-white/90 oval-button px-4 py-1.5 rounded-full text-xs transition-all nav-tab ${
                                                             selectedTone === style.id
-                                                                ? 'text-white border-2 border-white unified-button'
+                                                                ? 'active text-gray-800 border-2 border-gray-300'
                                                                 : 'text-gray-800 border border-indigo-300'
                                                         }`}
-                                                        style={selectedTone === style.id ? {background: '#3B82F6'} : {}}
                                                     >
                                                         {style.label}
                                                     </button>
@@ -3775,14 +3844,14 @@
                                             type="text"
                                             value={customPrompt}
                                             onChange={(e) => setCustomPrompt(e.target.value)}
-                                            className="flex-1 px-5 py-3 glass-effect border border-indigo-300 rounded-full text-gray-800 placeholder-gray-500"
+                                            className="flex-1 px-5 py-3 glass-effect border-2 border-white rounded-full text-gray-800 placeholder-gray-500 unified-button"
                                             placeholder="e.g., 'Make it more casual' or 'Add urgency'"
                                             onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
                                         />
                                         <button
                                             onClick={handleGenerate}
                                             disabled={(!emailText && !uploadedFile) || (!selectedTone && !customPrompt)}
-                                            className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-white unified-button disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             ✨ Generate
                                         </button>
@@ -3804,13 +3873,13 @@
                                     <textarea
                                         value={emailText}
                                         onChange={(e) => setEmailText(e.target.value)}
-                                        className="w-full h-64 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
+                                        className="w-full h-64 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
                                         placeholder="Type or paste your content here..."
                                     />
                                 </div>
                                 <button
                                     onClick={handleToolProcess}
-                                    className="w-full px-8 py-4 glass-effect rounded-full text-gray-800 font-semibold text-lg hover:bg-white/90 transition-all oval-button border-2 border-indigo-400"
+                                    className="w-full px-8 py-4 glass-effect rounded-full text-gray-800 font-semibold text-lg hover:bg-white/90 transition-all oval-button border-2 border-white unified-button"
                                 >
                                     🚀 Process with AI
                                 </button>
@@ -3896,11 +3965,7 @@
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => handleSummarizeEmail(viewingEmail)}
-                                            className="px-4 py-2 rounded-full text-white text-sm font-medium hover:opacity-90 transition-all unified-button"
-                                            style={{
-                                                background: '#3B82F6',
-                                                border: '2px solid white'
-                                            }}
+                                            className="px-4 py-2 rounded-full text-gray-800 text-sm font-medium hover:opacity-90 transition-all unified-button border-2 border-white glass-effect"
                                         >
                                             Summarize
                                         </button>
@@ -4094,12 +4159,11 @@
                             <div className="flex justify-center items-center gap-4">
                                 <button
                                     onClick={() => setCurrentPage('home')}
-                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
                                         currentPage === 'home'
-                                            ? 'text-white border-2 border-white unified-button'
+                                            ? 'active text-gray-800'
                                             : 'glass-dark text-gray-700 hover:bg-white/70'
                                     }`}
-                                    style={currentPage === 'home' ? {background: '#3B82F6'} : {}}
                                 >
                                     Home
                                 </button>
@@ -4107,12 +4171,12 @@
                                     <>
                                         <button
                                             onClick={() => setCurrentPage('inbox')}
-                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
                                                 currentPage === 'inbox'
-                                                    ? 'text-white border-2 border-white unified-button'
+                                                    ? 'active text-gray-800'
                                                     : 'glass-dark text-gray-700 hover:bg-white/70'
                                             } ${showInboxExpand ? 'inbox-button-expanded' : ''}`}
-                                            style={{position: 'relative', transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)', ...(currentPage === 'inbox' ? {background: '#3B82F6'} : {})}}
+                                            style={{position: 'relative', transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'}}
                                         >
                                             <span className={showInboxExpand ? 'inbox-text-transition' : ''}>
                                                 {showInboxExpand ? '🔔 New Email!' : 'Inbox'}
@@ -4125,12 +4189,11 @@
                                         </button>
                                         <button
                                             onClick={() => setCurrentPage('sent')}
-                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
                                                 currentPage === 'sent'
-                                                    ? 'text-white border-2 border-white unified-button'
+                                                    ? 'active text-gray-800'
                                                     : 'glass-dark text-gray-700 hover:bg-white/70'
                                             }`}
-                                            style={currentPage === 'sent' ? {background: '#3B82F6'} : {}}
                                         >
                                             Sent
                                         </button>
@@ -4138,12 +4201,11 @@
                                 )}
                                 <button
                                     onClick={() => setCurrentPage('settings')}
-                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button ${
+                                    className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
                                         currentPage === 'settings'
-                                            ? 'text-white border-2 border-white unified-button'
+                                            ? 'active text-gray-800'
                                             : 'glass-dark text-gray-700 hover:bg-white/70'
                                     }`}
-                                    style={currentPage === 'settings' ? {background: '#3B82F6'} : {}}
                                 >
                                     Settings
                                 </button>
