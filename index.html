@@ -534,6 +534,46 @@
             box-shadow: 0 15px 35px rgba(99, 102, 241, 0.15);
         }
 
+        /* Email delete animation */
+        .email-deleting {
+            animation: slide-fade-out 0.4s ease-out forwards;
+        }
+
+        @keyframes slide-fade-out {
+            0% {
+                opacity: 1;
+                transform: translateX(0);
+                max-height: 200px;
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateX(-30px);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-100%);
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+        }
+
+        /* Refresh button animation */
+        .refresh-spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         textarea:focus, input:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
@@ -2215,6 +2255,9 @@
             const [searchResults, setSearchResults] = useState([]);
             const [touchStartX, setTouchStartX] = useState(0);
             const [touchEndX, setTouchEndX] = useState(0);
+            const [isRefreshing, setIsRefreshing] = useState(false);
+            const [deletedEmails, setDeletedEmails] = useState([]);
+            const [deletingEmailId, setDeletingEmailId] = useState(null);
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -2373,26 +2416,6 @@
                     handlePrioritizeEmails();
                 }
             }, [autoPrioritize, gmailEmails.length, currentPage]);
-
-            // Live Gmail sync - Poll for new emails every 6 seconds (works on all tabs)
-            useEffect(() => {
-                if (!emailConnected) return;
-
-                const pollInterval = setInterval(async () => {
-                    try {
-                        const savedTokens = localStorage.getItem('gmailTokens');
-                        if (savedTokens) {
-                            const tokens = JSON.parse(savedTokens);
-                            console.log('🔄 Checking for new emails...');
-                            await fetchGmailEmails(tokens.access_token);
-                        }
-                    } catch (error) {
-                        console.error('❌ Error polling for new emails:', error);
-                    }
-                }, 6000); // Poll every 6 seconds
-
-                return () => clearInterval(pollInterval);
-            }, [emailConnected]);
 
             // Reset new email count when user views inbox
             useEffect(() => {
@@ -2790,10 +2813,10 @@
                         };
                     });
 
-                    // Detect new emails and filter out locally deleted ones
+                    // Detect new emails and filter out deleted ones
                     setGmailEmails(prevEmails => {
-                        // Filter out locally deleted emails
-                        const filteredEmails = formattedEmails.filter(e => !locallyDeletedEmailIds.has(e.id));
+                        // Filter out deleted emails (permanently deleted unless undone)
+                        const filteredEmails = formattedEmails.filter(e => !deletedEmails.includes(e.id));
 
                         const prevEmailIds = new Set(prevEmails.map(e => e.id));
                         const newEmails = filteredEmails.filter(e => !prevEmailIds.has(e.id));
@@ -3361,53 +3384,61 @@
                 setDeletedEmail({ email: emailToDelete, type });
                 setShowUndoDelete(true);
 
-                // Track locally deleted email ID
-                if (type === 'inbox') {
-                    setLocallyDeletedEmailIds(prev => {
-                        const updated = new Set(prev);
-                        updated.add(emailId);
-                        return updated;
-                    });
-                }
+                // Add to permanent deleted list
+                setDeletedEmails(prev => [...prev, emailId]);
+
+                // Set deleting animation
+                setDeletingEmailId(emailId);
 
                 // Delete with animation
-                const emailElement = document.querySelector(`[data-email-id="${emailId}"]`);
-                if (emailElement) {
-                    emailElement.classList.add('email-delete-fade');
-                    setTimeout(() => {
-                        if (type === 'inbox') {
-                            setGmailEmails(prev => prev.filter(e => e.id !== emailId));
-                        } else {
-                            setSentEmails(prev => prev.filter(e => e.id !== emailId));
-                        }
-                        console.log(`🗑️ Deleted ${type} email:`, emailId);
-                    }, 500);
-                } else {
+                setTimeout(() => {
                     if (type === 'inbox') {
                         setGmailEmails(prev => prev.filter(e => e.id !== emailId));
                     } else {
                         setSentEmails(prev => prev.filter(e => e.id !== emailId));
                     }
-                }
+                    setDeletingEmailId(null);
+                    console.log(`🗑️ Deleted ${type} email:`, emailId);
+                }, 400); // Match animation duration
             };
 
             const handleUndoDelete = () => {
                 if (deletedEmail) {
                     playNotificationSound();
+
+                    // Remove from deleted emails list
+                    setDeletedEmails(prev => prev.filter(id => id !== deletedEmail.email.id));
+
                     if (deletedEmail.type === 'inbox') {
                         setGmailEmails(prev => [deletedEmail.email, ...prev]);
-                        // Remove from locally deleted IDs
-                        setLocallyDeletedEmailIds(prev => {
-                            const updated = new Set(prev);
-                            updated.delete(deletedEmail.email.id);
-                            return updated;
-                        });
                     } else {
                         setSentEmails(prev => [deletedEmail.email, ...prev]);
                     }
                     setShowUndoDelete(false);
                     setDeletedEmail(null);
                     console.log('↩️ Undid delete');
+                }
+            };
+
+            const handleRefreshEmails = async () => {
+                if (isRefreshing) return;
+
+                setIsRefreshing(true);
+                playNotificationSound();
+
+                try {
+                    const savedTokens = localStorage.getItem('gmailTokens');
+                    if (savedTokens) {
+                        const tokens = JSON.parse(savedTokens);
+                        console.log('🔄 Refreshing emails...');
+                        await fetchGmailEmails(tokens.access_token);
+                        await fetchSentEmails(tokens.access_token);
+                        console.log('✅ Emails refreshed!');
+                    }
+                } catch (error) {
+                    console.error('❌ Error refreshing emails:', error);
+                } finally {
+                    setTimeout(() => setIsRefreshing(false), 1000); // Keep spinning for smooth UX
                 }
             };
 
@@ -3599,6 +3630,17 @@
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-3xl font-bold text-gray-800">📥 Inbox</h2>
                                 <div className="flex gap-3">
+                                    <button
+                                        onClick={handleRefreshEmails}
+                                        disabled={isRefreshing}
+                                        className={`oval-button px-4 py-2 text-sm font-semibold glass-effect border-2 border-white unified-button text-gray-800 ${isRefreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        title="Refresh emails"
+                                    >
+                                        <span className={isRefreshing ? 'refresh-spinning' : ''} style={{display: 'inline-block'}}>
+                                            🔄
+                                        </span>
+                                        {isRefreshing ? ' Refreshing...' : ' Refresh'}
+                                    </button>
                                     {gmailEmails.length > 0 && (
                                         <>
                                             {!autoPrioritize && (
@@ -3669,7 +3711,7 @@
                                                         });
                                                     }
                                                 }}
-                                                className={`priority-email-stacked cursor-pointer ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                className={`priority-email-stacked cursor-pointer ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'email-deleting' : ''}`}
                                             >
                                                 {/* Unread Label for Priority Emails */}
                                                 {unreadEmails.has(email.id) && isPriorityExpanded && (
@@ -3754,7 +3796,7 @@
                                                     });
                                                 }
                                             }}
-                                            className={`modern-email-item email-ladder-animation ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                            className={`modern-email-item email-ladder-animation ${emailsPrioritized && index < 3 ? 'email-slide-up' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'email-deleting' : ''}`}
                                             style={{animationDelay: `${index * 0.05}s`}}
                                         >
                                             {/* Unread Label */}
