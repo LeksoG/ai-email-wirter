@@ -2775,6 +2775,18 @@
         body.dark-mode .outlook-coming-soon-subtitle {
             color: #9ca3af;
         }
+
+        /* Wave animation for summary text */
+        @keyframes fadeInWord {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -4561,7 +4573,19 @@
                                                                 </button>
                                                             </div>
                                                             {!summaryHidden && (
-                                                                <p id={`summary-text-${email.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                                <p id={`summary-text-${email.id}`} className="text-sm text-gray-700 leading-relaxed">
+                                                                    {summaryText.split(' ').map((word, i) => (
+                                                                        <span key={i} style={{
+                                                                            display: 'inline-block',
+                                                                            animation: 'fadeInWord 0.3s ease-out',
+                                                                            animationDelay: `${i * 0.05}s`,
+                                                                            animationFillMode: 'backwards',
+                                                                            marginRight: '0.25em'
+                                                                        }}>
+                                                                            {word}
+                                                                        </span>
+                                                                    ))}
+                                                                </p>
                                                             )}
                                                         </div>
                                                     )}
@@ -5034,7 +5058,19 @@
                                                         </button>
                                                     </div>
                                                     {!summaryHidden && (
-                                                        <p id={`summary-text-${viewingEmail.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                        <p id={`summary-text-${viewingEmail.id}`} className="text-sm text-gray-700 leading-relaxed">
+                                                            {summaryText.split(' ').map((word, i) => (
+                                                                <span key={i} style={{
+                                                                    display: 'inline-block',
+                                                                    animation: 'fadeInWord 0.3s ease-out',
+                                                                    animationDelay: `${i * 0.05}s`,
+                                                                    animationFillMode: 'backwards',
+                                                                    marginRight: '0.25em'
+                                                                }}>
+                                                                    {word}
+                                                                </span>
+                                                            ))}
+                                                        </p>
                                                     )}
                                                 </div>
                                             )}
@@ -5556,7 +5592,19 @@
                                                                         </button>
                                                                     </div>
                                                                     {!summaryHidden && (
-                                                                        <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                                                            {summaryText.split(' ').map((word, i) => (
+                                                                                <span key={i} style={{
+                                                                                    display: 'inline-block',
+                                                                                    animation: 'fadeInWord 0.3s ease-out',
+                                                                                    animationDelay: `${i * 0.05}s`,
+                                                                                    animationFillMode: 'backwards',
+                                                                                    marginRight: '0.25em'
+                                                                                }}>
+                                                                                    {word}
+                                                                                </span>
+                                                                            ))}
+                                                                        </p>
                                                                     )}
                                                                 </div>
                                                             )}
