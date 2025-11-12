@@ -2468,6 +2468,13 @@
             background: rgba(99, 102, 241, 0.1);
         }
 
+        /* Hide provider tabs on mobile */
+        @media (max-width: 1024px) {
+            .provider-tabs-container {
+                display: none;
+            }
+        }
+
         /* Inbox Search Bar */
         .inbox-search-bar {
             width: 100%;
@@ -2540,6 +2547,21 @@
 
         .inbox-search-suggestion-item:hover {
             background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Mobile optimizations for search suggestions */
+        @media (max-width: 1024px) {
+            .inbox-search-suggestions {
+                left: 12px;
+                right: 12px;
+                max-height: 40vh;
+                border-radius: 12px;
+                font-size: 14px;
+            }
+
+            .inbox-search-suggestion-item {
+                padding: 12px 14px;
+            }
         }
 
         /* Delete Button on Hover */
@@ -2930,31 +2952,36 @@
 
         .hamburger-btn {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 90px;
+            left: 24px;
             width: 44px;
             height: 44px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(99, 102, 241, 0.3);
+            border: 2px solid rgba(0, 0, 0, 0.1);
             display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 998;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
         }
 
         body.dark-mode .hamburger-btn {
-            background: rgba(30, 30, 30, 0.9);
-            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(20, 20, 20, 0.95);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .hamburger-btn:hover {
             transform: scale(1.05);
-            border-color: rgba(99, 102, 241, 0.5);
+            border-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .hamburger-btn:hover {
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
         .hamburger-icon {
@@ -2966,13 +2993,13 @@
         .hamburger-line {
             width: 20px;
             height: 2px;
-            background: #4f46e5;
+            background: #1f2937;
             border-radius: 2px;
             transition: all 0.3s ease;
         }
 
         body.dark-mode .hamburger-line {
-            background: #818cf8;
+            background: #f3f4f6;
         }
 
         @media (max-width: 1024px) {
@@ -3081,6 +3108,9 @@
             const [bottomNotificationText, setBottomNotificationText] = useState('');
             const [mobileInboxOpen, setMobileInboxOpen] = useState(false);
             const [prioritizedCollapsed, setPrioritizedCollapsed] = useState(false);
+            const [touchStartX, setTouchStartX] = useState(0);
+            const [touchCurrentX, setTouchCurrentX] = useState(0);
+            const [isSwiping, setIsSwiping] = useState(false);
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -3219,6 +3249,17 @@
                 const savedAutoPrioritize = localStorage.getItem('autoPrioritize');
                 if (savedAutoPrioritize === 'true') {
                     setAutoPrioritize(true);
+                }
+
+                // Load deleted sent emails
+                const savedDeletedSentEmails = localStorage.getItem('deletedSentEmails');
+                if (savedDeletedSentEmails) {
+                    try {
+                        const deletedIds = JSON.parse(savedDeletedSentEmails);
+                        setDeletedEmails(deletedIds);
+                    } catch (e) {
+                        console.error('Error loading deleted sent emails:', e);
+                    }
                 }
             }, []);
 
@@ -4262,7 +4303,17 @@
                 setShowUndoDelete(true);
 
                 // Add to permanent deleted list
-                setDeletedEmails(prev => [...prev, emailId]);
+                setDeletedEmails(prev => {
+                    const updated = [...prev, emailId];
+                    // Persist deleted sent emails to localStorage
+                    if (type === 'sent') {
+                        const deletedSentIds = sentEmails
+                            .filter(e => updated.includes(e.id))
+                            .map(e => e.id);
+                        localStorage.setItem('deletedSentEmails', JSON.stringify(deletedSentIds));
+                    }
+                    return updated;
+                });
 
                 // Set deleting animation
                 setDeletingEmailId(emailId);
@@ -4284,7 +4335,16 @@
                     playNotificationSound();
 
                     // Remove from deleted emails list
-                    setDeletedEmails(prev => prev.filter(id => id !== deletedEmail.email.id));
+                    setDeletedEmails(prev => {
+                        const updated = prev.filter(id => id !== deletedEmail.email.id);
+                        // Update localStorage for sent emails
+                        if (deletedEmail.type === 'sent') {
+                            localStorage.setItem('deletedSentEmails', JSON.stringify(updated.filter(id =>
+                                sentEmails.some(e => e.id === id)
+                            )));
+                        }
+                        return updated;
+                    });
 
                     if (deletedEmail.type === 'inbox') {
                         setGmailEmails(prev => [deletedEmail.email, ...prev]);
@@ -4295,6 +4355,14 @@
                     setDeletedEmail(null);
                     console.log('↩️ Undid delete');
                 }
+            };
+
+            // Helper function to get first N words from text
+            const getFirstWords = (text, wordCount = 10) => {
+                if (!text) return '';
+                const words = text.trim().split(/\s+/);
+                if (words.length <= wordCount) return text;
+                return words.slice(0, wordCount).join(' ') + '...';
             };
 
             const handleRefreshEmails = async () => {
@@ -4820,7 +4888,7 @@
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-3xl font-bold text-gray-800">📤 Sent</h2>
                                 <div className="flex gap-3">
-                                    {sentEmails.length > 0 && (
+                                    {sentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 && (
                                         <>
                                             {selectedEmails.length > 0 && (
                                                 <button
@@ -4842,8 +4910,8 @@
                             </div>
 
                             <div className="space-y-3">
-                                {sentEmails.length > 0 ? (
-                                    sentEmails.map((email, index) => (
+                                {sentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
+                                    sentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
                                         <div
                                             key={email.id}
                                             data-email-id={email.id}
@@ -5206,9 +5274,40 @@
                             ></div>
 
                             {/* Mobile Inbox Drawer */}
-                            <div className={`mobile-inbox-drawer ${mobileInboxOpen ? 'active' : ''}`}>
+                            <div
+                                className={`mobile-inbox-drawer ${mobileInboxOpen ? 'active' : ''}`}
+                                style={isSwiping && touchCurrentX < touchStartX ? {
+                                    transform: `translateX(${Math.min(0, touchCurrentX - touchStartX)}px)`,
+                                    transition: 'none'
+                                } : {}}
+                                onTouchStart={(e) => {
+                                    if (mobileInboxOpen) {
+                                        setTouchStartX(e.touches[0].clientX);
+                                        setTouchCurrentX(e.touches[0].clientX);
+                                        setIsSwiping(true);
+                                    }
+                                }}
+                                onTouchMove={(e) => {
+                                    if (isSwiping && mobileInboxOpen) {
+                                        setTouchCurrentX(e.touches[0].clientX);
+                                    }
+                                }}
+                                onTouchEnd={() => {
+                                    if (isSwiping) {
+                                        const swipeDistance = touchStartX - touchCurrentX;
+                                        if (swipeDistance > 80) {
+                                            setMobileInboxOpen(false);
+                                        }
+                                        setIsSwiping(false);
+                                        setTouchStartX(0);
+                                        setTouchCurrentX(0);
+                                    }
+                                }}
+                            >
                                 <div className="mobile-inbox-header">
-                                    <h2 className="text-xl font-bold text-gray-800">📥 Inbox</h2>
+                                    <h2 className="text-xl font-bold text-gray-800">
+                                        {activeProvider === 'gmail' ? '📧 Gmail' : '📧 Outlook'}
+                                    </h2>
                                     <button
                                         className="mobile-close-btn"
                                         onClick={() => setMobileInboxOpen(false)}
@@ -5219,6 +5318,18 @@
 
                                 {/* Mobile Inbox Content - same as desktop */}
                                 <div style={{padding: '20px'}}>
+                                    {/* Prioritize Button */}
+                                    {gmailEmails.length > 0 && (
+                                        <button
+                                            onClick={() => handlePrioritizeEmails()}
+                                            disabled={isPrioritizing}
+                                            className={`oval-button px-4 py-2 text-sm font-semibold glass-effect border-2 border-white unified-button text-gray-800 ${isPrioritizing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            style={{width: '100%', marginBottom: '12px'}}
+                                        >
+                                            {isPrioritizing ? '🤖 Prioritizing...' : '✨ Prioritize'}
+                                        </button>
+                                    )}
+
                                     {/* Search Bar */}
                                     <div style={{position: 'relative', marginBottom: '16px'}}>
                                         <input
@@ -5271,7 +5382,7 @@
                                                 >
                                                     <div className="text-xs font-bold text-gray-800 mb-1 truncate">⚡ {email.from}</div>
                                                     <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
-                                                    <div className="text-xs text-gray-600 truncate">{email.snippet.substring(0, 60)}...</div>
+                                                    <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
                                                     <div className="text-xs text-gray-400 mt-1">{email.date}</div>
                                                 </div>
                                             ))}
@@ -5291,7 +5402,7 @@
                                         >
                                             <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
                                             <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
-                                            <div className="text-xs text-gray-600 truncate">{email.snippet.substring(0, 60)}...</div>
+                                            <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
                                             <div className="text-xs text-gray-400 mt-1">{email.date}</div>
                                         </div>
                                     ))}
@@ -5646,7 +5757,9 @@
                                             {/* Header with Title and Prioritize Button */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
-                                                    <h2 className="text-2xl font-bold text-gray-800">📥 Inbox</h2>
+                                                    <h2 className="text-2xl font-bold text-gray-800">
+                                                        {activeProvider === 'gmail' ? '📧 Gmail' : '📧 Outlook'}
+                                                    </h2>
                                                 </div>
                                                 <div className="inbox-header-right">
                                                     {gmailEmails.length > 0 && (
@@ -5797,7 +5910,7 @@
                                                             >
                                                                 <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
                                                                 <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
-                                                                <div className="text-xs text-gray-600 truncate">{email.snippet.substring(0, 60)}...</div>
+                                                                <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
                                                                 <div className="text-xs text-gray-400 mt-1">{email.date}</div>
 
                                                                 {/* Delete Button on Hover */}
