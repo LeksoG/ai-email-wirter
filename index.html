@@ -5940,7 +5940,13 @@
 
                                                 {/* Regular Email List */}
                                                 <div className={`space-y-2 ${activeProvider === 'outlook' ? 'outlook-slide-enter' : 'gmail-slide-enter'}`}>
-                                                    {inboxViewMode === 'sent' ? (
+                                                    {inboxViewMode === 'tabs' ? (
+                                                        <div className="text-center py-12 text-gray-500">
+                                                            <div className="text-5xl mb-4">📮</div>
+                                                            <p className="text-lg font-semibold mb-2">Select a Provider</p>
+                                                            <p className="text-sm">Choose Gmail or Outlook below to view your emails</p>
+                                                        </div>
+                                                    ) : inboxViewMode === 'sent' ? (
                                                         // Sent emails view
                                                         sentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
                                                             sentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
