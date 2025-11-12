@@ -3274,11 +3274,27 @@
                 // Check for OAuth callback with tokens
                 const urlParams = new URLSearchParams(window.location.search);
                 const tokensParam = urlParams.get('tokens');
+                const provider = urlParams.get('provider'); // Add this line
 
                 if (tokensParam) {
                     try {
                         const tokens = JSON.parse(decodeURIComponent(tokensParam));
                         console.log('🎉 OAuth tokens received!');
+
+                        // Determine which provider
+        if (provider === 'outlook') {
+            // Store Outlook tokens
+            localStorage.setItem('outlookTokens', JSON.stringify(tokens));
+            localStorage.setItem('outlookConnected', 'true');
+            localStorage.removeItem('oauth_in_progress');
+            
+            setOutlookConnected(true);
+            
+            // Fetch Outlook user info and emails
+            fetchOutlookUserInfo(tokens.access_token);
+            fetchOutlookEmails(tokens.access_token);
+            
+        } else {
 
                         // Store tokens in localStorage
                         localStorage.setItem('gmailTokens', JSON.stringify(tokens));
@@ -3317,6 +3333,44 @@
                         console.error('❌ Error processing OAuth tokens:', error);
                     }
                 }
+
+                const fetchOutlookUserInfo = async (accessToken) => {
+    try {
+        const response = await fetch('https://graph.microsoft.com/v1.0/me', {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        const userInfo = await response.json();
+        console.log('👤 Outlook User:', userInfo.mail || userInfo.userPrincipalName);
+        // Store user info as needed
+    } catch (error) {
+        console.error('Error fetching Outlook user info:', error);
+    }
+};
+
+const fetchOutlookEmails = async (accessToken) => {
+    try {
+        console.log('📬 Fetching Outlook inbox...');
+        
+        const response = await fetch('/api/outlook-inbox', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to fetch Outlook emails');
+        }
+        
+        setOutlookEmails(data.emails);
+        console.log(`✅ Loaded ${data.emails.length} Outlook emails`);
+    } catch (error) {
+        console.error('❌ Error fetching Outlook emails:', error);
+    }
+};
 
                 // Load email connection from localStorage
                 const savedConnection = localStorage.getItem('emailConnected');
@@ -3706,6 +3760,27 @@
                     console.error('Please check: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set in Vercel');
                 }
             };
+
+            const handleOutlookConnect = async () => {
+    try {
+        console.log('🔐 Initiating Outlook OAuth...');
+        
+        const response = await fetch('/api/outlook-auth');
+        
+        if (!response.ok) {
+            throw new Error('Failed to initiate OAuth');
+        }
+        
+        const data = await response.json();
+        console.log('📮 Redirecting to Microsoft OAuth...');
+        
+        localStorage.setItem('oauth_in_progress', 'outlook');
+        window.location.href = data.authUrl;
+    } catch (error) {
+        console.error('❌ Outlook OAuth error:', error);
+        alert('Failed to connect Outlook. Please check console.');
+    }
+};
 
             const isTokenExpired = (expiryDate) => {
                 if (!expiryDate) return true;
@@ -4350,14 +4425,8 @@
 
                                     {!outlookConnected ? (
                                         <button
-                                            onClick={() => {
-                                                // Show bottom notification
-                                                setBottomNotificationText('📮 Outlook connection feature coming soon!');
-                                                setShowBottomNotification(true);
-                                                setTimeout(() => {
-                                                    setShowBottomNotification(false);
-                                                }, 3000);
-                                            }}
+                                            onClick={handleOutlookConnect}
+                                            
                                             className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
                                         >
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="#0078D4">
