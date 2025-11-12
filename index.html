@@ -2190,13 +2190,15 @@
         .desktop-inbox-layout {
             display: flex;
             gap: 20px;
-            height: calc(100vh - 100px);
+            height: calc(100vh - 80px);
             position: relative;
-            margin-left: -80px;
+            margin-left: -120px;
+            align-items: center;
         }
 
         .inbox-sidebar {
             width: 480px;
+            height: calc(100vh - 120px);
             flex-shrink: 0;
             overflow: hidden;
             display: flex;
@@ -2476,12 +2478,28 @@
             font-size: 13px;
             transition: all 0.3s ease;
             margin-bottom: 12px;
+            color: #374151;
+        }
+
+        body.dark-mode .inbox-search-bar {
+            background: rgba(40, 40, 40, 0.7);
+            border-color: rgba(99, 102, 241, 0.5);
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .inbox-search-bar::placeholder {
+            color: #9ca3af;
         }
 
         .inbox-search-bar:focus {
             outline: none;
             border-color: rgba(99, 102, 241, 0.5);
             background: rgba(255, 255, 255, 0.9);
+        }
+
+        body.dark-mode .inbox-search-bar:focus {
+            background: rgba(50, 50, 50, 0.9);
+            border-color: rgba(99, 102, 241, 0.7);
         }
 
         .inbox-search-suggestions {
@@ -2527,14 +2545,13 @@
         /* Delete Button on Hover */
         .email-delete-btn {
             position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 6px 16px;
+            right: 8px;
+            top: 8px;
+            padding: 4px 10px;
             border-radius: 50px;
             background: rgba(239, 68, 68, 0.9);
             color: white;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
             opacity: 0;
             pointer-events: none;
@@ -2550,7 +2567,7 @@
 
         .email-delete-btn:hover {
             background: rgba(220, 38, 38, 1);
-            transform: translateY(-50%) scale(1.05);
+            transform: scale(1.05);
         }
 
         /* Email Deleting Animation */
@@ -2787,6 +2804,194 @@
                 transform: translateY(0);
             }
         }
+
+        /* Prioritized Emails Section */
+        .prioritized-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .prioritized-section-header {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .prioritized-section-header:hover {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        body.dark-mode .prioritized-section-header:hover {
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        .prioritized-section-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark-mode .prioritized-section-title {
+            color: #818cf8;
+        }
+
+        .prioritized-collapse-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .prioritized-collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        /* Mobile Swipe Inbox */
+        .mobile-inbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-inbox-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .mobile-inbox-drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 85%;
+            max-width: 400px;
+            height: 100%;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.95) 0%,
+                rgba(249, 250, 251, 0.9) 100%
+            );
+            backdrop-filter: blur(30px);
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-mode .mobile-inbox-drawer {
+            background: rgba(20, 20, 20, 0.95);
+        }
+
+        .mobile-inbox-drawer.active {
+            transform: translateX(0);
+        }
+
+        .mobile-inbox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .mobile-inbox-header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 998;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .hamburger-btn {
+            background: rgba(30, 30, 30, 0.9);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .hamburger-btn:hover {
+            transform: scale(1.05);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .hamburger-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background: #4f46e5;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .hamburger-line {
+            background: #818cf8;
+        }
+
+        @media (max-width: 1024px) {
+            .desktop-inbox-layout {
+                margin-left: 0;
+            }
+
+            .inbox-sidebar {
+                display: none;
+            }
+
+            .hamburger-btn {
+                display: flex;
+            }
+
+            .email-content-area {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2874,6 +3079,8 @@
             const [droppedEmailFile, setDroppedEmailFile] = useState(null);
             const [showBottomNotification, setShowBottomNotification] = useState(false);
             const [bottomNotificationText, setBottomNotificationText] = useState('');
+            const [mobileInboxOpen, setMobileInboxOpen] = useState(false);
+            const [prioritizedCollapsed, setPrioritizedCollapsed] = useState(false);
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -4976,6 +5183,123 @@
 
             return (
                 <div className="min-h-screen relative">
+                    {/* Hamburger Button for Mobile */}
+                    {emailConnected && (
+                        <button
+                            className="hamburger-btn"
+                            onClick={() => setMobileInboxOpen(!mobileInboxOpen)}
+                        >
+                            <div className="hamburger-icon">
+                                <div className="hamburger-line"></div>
+                                <div className="hamburger-line"></div>
+                                <div className="hamburger-line"></div>
+                            </div>
+                        </button>
+                    )}
+
+                    {/* Mobile Inbox Overlay */}
+                    {emailConnected && (
+                        <>
+                            <div
+                                className={`mobile-inbox-overlay ${mobileInboxOpen ? 'active' : ''}`}
+                                onClick={() => setMobileInboxOpen(false)}
+                            ></div>
+
+                            {/* Mobile Inbox Drawer */}
+                            <div className={`mobile-inbox-drawer ${mobileInboxOpen ? 'active' : ''}`}>
+                                <div className="mobile-inbox-header">
+                                    <h2 className="text-xl font-bold text-gray-800">📥 Inbox</h2>
+                                    <button
+                                        className="mobile-close-btn"
+                                        onClick={() => setMobileInboxOpen(false)}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+
+                                {/* Mobile Inbox Content - same as desktop */}
+                                <div style={{padding: '20px'}}>
+                                    {/* Search Bar */}
+                                    <div style={{position: 'relative', marginBottom: '16px'}}>
+                                        <input
+                                            type="text"
+                                            value={inboxSearchQuery}
+                                            onChange={(e) => {
+                                                setInboxSearchQuery(e.target.value);
+                                                if (e.target.value) {
+                                                    const results = gmailEmails.filter(email =>
+                                                        email.subject.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                                        email.from.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                                        email.snippet.toLowerCase().includes(e.target.value.toLowerCase())
+                                                    ).slice(0, 5);
+                                                    setInboxSearchResults(results);
+                                                    setShowInboxSearchSuggestions(true);
+                                                } else {
+                                                    setShowInboxSearchSuggestions(false);
+                                                }
+                                            }}
+                                            placeholder="🔍 Search emails..."
+                                            className="inbox-search-bar unified-button border-2 border-white"
+                                        />
+                                    </div>
+
+                                    {/* Priority Emails */}
+                                    {autoPrioritize && priorityEmails.length > 0 && (
+                                        <div style={{marginBottom: '16px'}}>
+                                            <div
+                                                className="prioritized-section-header"
+                                                onClick={() => setPrioritizedCollapsed(!prioritizedCollapsed)}
+                                            >
+                                                <div className="prioritized-section-title">
+                                                    <span>⚡</span>
+                                                    <span>Prioritized Emails</span>
+                                                    <span className="text-xs">({priorityEmails.length})</span>
+                                                </div>
+                                                <div className={`prioritized-collapse-icon ${prioritizedCollapsed ? 'collapsed' : ''}`}>
+                                                    ▼
+                                                </div>
+                                            </div>
+                                            {!prioritizedCollapsed && priorityEmails.map(email => (
+                                                <div
+                                                    key={email.id}
+                                                    onClick={() => {
+                                                        setViewingEmail(email);
+                                                        setMobileInboxOpen(false);
+                                                    }}
+                                                    className="sidebar-email-item unified-button border-2 border-white"
+                                                    style={{marginBottom: '8px'}}
+                                                >
+                                                    <div className="text-xs font-bold text-gray-800 mb-1 truncate">⚡ {email.from}</div>
+                                                    <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                                    <div className="text-xs text-gray-600 truncate">{email.snippet.substring(0, 60)}...</div>
+                                                    <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Regular Emails */}
+                                    {gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map(email => (
+                                        <div
+                                            key={email.id}
+                                            onClick={() => {
+                                                setViewingEmail(email);
+                                                setMobileInboxOpen(false);
+                                            }}
+                                            className="sidebar-email-item unified-button border-2 border-white"
+                                            style={{marginBottom: '8px'}}
+                                        >
+                                            <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
+                                            <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                            <div className="text-xs text-gray-600 truncate">{email.snippet.substring(0, 60)}...</div>
+                                            <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </>
+                    )}
+
                     {/* Email Viewer Modal - iOS Style */}
                     {/* Old email viewer overlay - now only used for Sent page */}
                     {viewingEmail && !emailConnected && (
@@ -5381,40 +5705,59 @@
 
                                             {/* Email List Area with Fade Effect */}
                                             <div className="inbox-scroll-area">
-                                                {/* Priority Stack - iOS Style */}
+                                                {/* Prioritized Emails Section */}
                                                 {autoPrioritize && priorityEmails.length > 0 && (
                                                     <div className="priority-stack-container">
+                                                        {/* Collapsible Header */}
                                                         <div
-                                                            className={`priority-stack ${priorityStackExpanded ? 'expanded' : ''}`}
-                                                            onClick={() => setPriorityStackExpanded(!priorityStackExpanded)}
-                                                            style={{height: priorityStackExpanded ? 'auto' : '80px', marginBottom: priorityStackExpanded ? '12px' : '20px'}}
+                                                            className="prioritized-section-header"
+                                                            onClick={() => setPrioritizedCollapsed(!prioritizedCollapsed)}
                                                         >
-                                                            {priorityEmails.slice(0, 3).map((email, index) => (
-                                                                <div
-                                                                    key={email.id}
-                                                                    className="priority-stack-item"
-                                                                    onClick={(e) => {
-                                                                        if (priorityStackExpanded) {
-                                                                            e.stopPropagation();
-                                                                            setViewingEmail(email);
-                                                                        }
-                                                                    }}
-                                                                    style={{cursor: priorityStackExpanded ? 'pointer' : 'default'}}
-                                                                >
-                                                                    <div className="flex items-center justify-between">
-                                                                        <div className="flex-1 pr-2">
-                                                                            <div className="text-xs font-bold text-gray-800 mb-1 truncate">⚡ {email.from}</div>
-                                                                            <div className="text-sm font-semibold text-gray-700 truncate">{email.subject}</div>
-                                                                        </div>
-                                                                        {index === 0 && !priorityStackExpanded && priorityEmails.length > 1 && (
-                                                                            <div className="text-xs bg-indigo-600 text-white px-2 py-1 rounded-full font-bold">
-                                                                                +{priorityEmails.length - 1}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            ))}
+                                                            <div className="prioritized-section-title">
+                                                                <span>⚡</span>
+                                                                <span>Prioritized Emails</span>
+                                                                <span className="text-xs">({priorityEmails.length})</span>
+                                                            </div>
+                                                            <div className={`prioritized-collapse-icon ${prioritizedCollapsed ? 'collapsed' : ''}`}>
+                                                                ▼
+                                                            </div>
                                                         </div>
+
+                                                        {/* Priority Stack */}
+                                                        {!prioritizedCollapsed && (
+                                                            <div
+                                                                className={`priority-stack ${priorityStackExpanded ? 'expanded' : ''}`}
+                                                                onClick={() => setPriorityStackExpanded(!priorityStackExpanded)}
+                                                                style={{height: priorityStackExpanded ? 'auto' : '80px', marginBottom: priorityStackExpanded ? '12px' : '20px'}}
+                                                            >
+                                                                {priorityEmails.slice(0, 3).map((email, index) => (
+                                                                    <div
+                                                                        key={email.id}
+                                                                        className="priority-stack-item"
+                                                                        onClick={(e) => {
+                                                                            if (priorityStackExpanded) {
+                                                                                e.stopPropagation();
+                                                                                setViewingEmail(email);
+                                                                                setMobileInboxOpen(false);
+                                                                            }
+                                                                        }}
+                                                                        style={{cursor: priorityStackExpanded ? 'pointer' : 'default'}}
+                                                                    >
+                                                                        <div className="flex items-center justify-between">
+                                                                            <div className="flex-1 pr-2">
+                                                                                <div className="text-xs font-bold text-gray-800 mb-1 truncate">⚡ {email.from}</div>
+                                                                                <div className="text-sm font-semibold text-gray-700 truncate">{email.subject}</div>
+                                                                            </div>
+                                                                            {index === 0 && !priorityStackExpanded && priorityEmails.length > 1 && (
+                                                                                <div className="text-xs bg-indigo-600 text-white px-2 py-1 rounded-full font-bold">
+                                                                                    +{priorityEmails.length - 1}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
 
