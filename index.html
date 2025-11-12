@@ -2190,9 +2190,9 @@
         .desktop-inbox-layout {
             display: flex;
             gap: 20px;
-            height: calc(100vh - 150px);
+            height: calc(100vh - 100px);
             position: relative;
-            margin-left: -40px;
+            margin-left: -80px;
         }
 
         .inbox-sidebar {
@@ -2500,11 +2500,20 @@
             z-index: 10;
         }
 
+        body.dark-mode .inbox-search-suggestions {
+            background: rgba(30, 30, 30, 0.95);
+            border: 2px solid rgba(99, 102, 241, 0.5);
+        }
+
         .inbox-search-suggestion-item {
             padding: 10px 16px;
             cursor: pointer;
             transition: all 0.2s ease;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .inbox-search-suggestion-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .inbox-search-suggestion-item:last-child {
@@ -2542,6 +2551,22 @@
         .email-delete-btn:hover {
             background: rgba(220, 38, 38, 1);
             transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Email Deleting Animation */
+        .email-deleting {
+            animation: slideOutLeft 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        @keyframes slideOutLeft {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-120%);
+                opacity: 0;
+            }
         }
 
         /* Drag and Drop Styles */
@@ -2592,6 +2617,175 @@
         .inbox-header-right {
             display: flex;
             gap: 8px;
+        }
+
+        /* Priority Stack Positioning Fix */
+        .priority-stack-container {
+            margin-top: 12px;
+            margin-bottom: 16px;
+        }
+
+        body.dark-mode .priority-stack-item {
+            background: rgba(40, 40, 40, 0.95);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+        }
+
+        /* Email File Attachment Display */
+        .email-file-attachment {
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.dark-mode .email-file-attachment {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .email-file-attachment:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .email-file-icon {
+            font-size: 32px;
+        }
+
+        .email-file-info {
+            flex: 1;
+        }
+
+        .email-file-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        body.dark-mode .email-file-title {
+            color: #e5e5e5;
+        }
+
+        .email-file-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        body.dark-mode .email-file-subtitle {
+            color: #9ca3af;
+        }
+
+        /* Bottom Notification */
+        .bottom-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(99, 102, 241, 0.95);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideUpNotification 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes slideUpNotification {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Outlook Slide Transition */
+        .outlook-slide-enter {
+            animation: slideInFromRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gmail-slide-enter {
+            animation: slideInFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .outlook-coming-soon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .outlook-coming-soon-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .outlook-coming-soon-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .outlook-coming-soon-text {
+            color: #e5e5e5;
+        }
+
+        .outlook-coming-soon-subtitle {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        body.dark-mode .outlook-coming-soon-subtitle {
+            color: #9ca3af;
+        }
+
+        /* Wave animation for summary text */
+        @keyframes fadeInWord {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -2677,6 +2871,9 @@
             const [priorityStackExpanded, setPriorityStackExpanded] = useState(false);
             const [draggedEmail, setDraggedEmail] = useState(null);
             const [isDraggingOver, setIsDraggingOver] = useState(false);
+            const [droppedEmailFile, setDroppedEmailFile] = useState(null);
+            const [showBottomNotification, setShowBottomNotification] = useState(false);
+            const [bottomNotificationText, setBottomNotificationText] = useState('');
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -3759,10 +3956,12 @@
                                     {!outlookConnected ? (
                                         <button
                                             onClick={() => {
-                                                // TODO: Implement Outlook OAuth
-                                                alert('Outlook connection coming soon! For now, this is a demonstration.');
-                                                setOutlookConnected(true);
-                                                localStorage.setItem('outlookConnected', 'true');
+                                                // Show bottom notification
+                                                setBottomNotificationText('📮 Outlook connection feature coming soon!');
+                                                setShowBottomNotification(true);
+                                                setTimeout(() => {
+                                                    setShowBottomNotification(false);
+                                                }, 3000);
                                             }}
                                             className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
                                         >
@@ -4374,7 +4573,19 @@
                                                                 </button>
                                                             </div>
                                                             {!summaryHidden && (
-                                                                <p id={`summary-text-${email.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                                <p id={`summary-text-${email.id}`} className="text-sm text-gray-700 leading-relaxed">
+                                                                    {summaryText.split(' ').map((word, i) => (
+                                                                        <span key={i} style={{
+                                                                            display: 'inline-block',
+                                                                            animation: 'fadeInWord 0.3s ease-out',
+                                                                            animationDelay: `${i * 0.05}s`,
+                                                                            animationFillMode: 'backwards',
+                                                                            marginRight: '0.25em'
+                                                                        }}>
+                                                                            {word}
+                                                                        </span>
+                                                                    ))}
+                                                                </p>
                                                             )}
                                                         </div>
                                                     )}
@@ -4512,7 +4723,30 @@
                                         </label>
                                     </div>
 
-                                    {uploadedFile ? (
+                                    {droppedEmailFile ? (
+                                        <div
+                                            className="email-file-attachment"
+                                            onClick={() => {
+                                                setViewingEmail(droppedEmailFile);
+                                                setDroppedEmailFile(null);
+                                            }}
+                                        >
+                                            <div className="email-file-icon">📧</div>
+                                            <div className="email-file-info">
+                                                <div className="email-file-title">{droppedEmailFile.subject}</div>
+                                                <div className="email-file-subtitle">From: {droppedEmailFile.from} • Click to view full email</div>
+                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setDroppedEmailFile(null);
+                                                }}
+                                                className="px-3 py-1 glass-effect rounded-full text-xs text-red-600 hover:bg-white/90 unified-button border-2 border-white"
+                                            >
+                                                ✕ Remove
+                                            </button>
+                                        </div>
+                                    ) : uploadedFile ? (
                                         <div className="glass-dark rounded-2xl p-4 mb-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
@@ -4544,6 +4778,7 @@
                                             onChange={(e) => setEmailText(e.target.value)}
                                             className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
                                             placeholder="Type or paste your email content here and watch the magic happen..."
+                                            disabled={droppedEmailFile !== null}
                                         />
                                     )}
                                 </div>
@@ -4823,7 +5058,19 @@
                                                         </button>
                                                     </div>
                                                     {!summaryHidden && (
-                                                        <p id={`summary-text-${viewingEmail.id}`} className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                        <p id={`summary-text-${viewingEmail.id}`} className="text-sm text-gray-700 leading-relaxed">
+                                                            {summaryText.split(' ').map((word, i) => (
+                                                                <span key={i} style={{
+                                                                    display: 'inline-block',
+                                                                    animation: 'fadeInWord 0.3s ease-out',
+                                                                    animationDelay: `${i * 0.05}s`,
+                                                                    animationFillMode: 'backwards',
+                                                                    marginRight: '0.25em'
+                                                                }}>
+                                                                    {word}
+                                                                </span>
+                                                            ))}
+                                                        </p>
                                                     )}
                                                 </div>
                                             )}
@@ -5172,8 +5419,14 @@
                                                 )}
 
                                                 {/* Regular Email List */}
-                                                <div className="space-y-2">
-                                                    {gmailEmails.length > 0 ? (
+                                                <div className={`space-y-2 ${activeProvider === 'outlook' ? 'outlook-slide-enter' : 'gmail-slide-enter'}`}>
+                                                    {activeProvider === 'outlook' ? (
+                                                        <div className="outlook-coming-soon">
+                                                            <div className="outlook-coming-soon-icon">📮</div>
+                                                            <div className="outlook-coming-soon-text">Outlook Coming Soon</div>
+                                                            <div className="outlook-coming-soon-subtitle">Connect in Settings to display your Outlook emails</div>
+                                                        </div>
+                                                    ) : gmailEmails.length > 0 ? (
                                                         gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map((email, index) => (
                                                             <div
                                                                 key={email.id}
@@ -5196,7 +5449,7 @@
                                                                         });
                                                                     }
                                                                 }}
-                                                                className={`sidebar-email-item unified-button border-2 border-white ${viewingEmail && viewingEmail.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                                className={`sidebar-email-item unified-button border-2 border-white ${deletingEmailId === email.id ? 'email-deleting' : ''} ${viewingEmail && viewingEmail.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
                                                                 style={{position: 'relative'}}
                                                             >
                                                                 <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
@@ -5209,7 +5462,11 @@
                                                                     className="email-delete-btn"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        handleDeleteEmail(email.id, 'inbox');
+                                                                        setDeletingEmailId(email.id);
+                                                                        setTimeout(() => {
+                                                                            handleDeleteEmail(email.id, 'inbox');
+                                                                            setDeletingEmailId(null);
+                                                                        }, 400);
                                                                     }}
                                                                 >
                                                                     🗑️ Delete
@@ -5257,7 +5514,7 @@
                                                 e.preventDefault();
                                                 setIsDraggingOver(false);
                                                 if (draggedEmail) {
-                                                    setEmailText(draggedEmail.snippet);
+                                                    setDroppedEmailFile(draggedEmail);
                                                     setViewingEmail(null);
                                                 }
                                             }}
@@ -5335,7 +5592,19 @@
                                                                         </button>
                                                                     </div>
                                                                     {!summaryHidden && (
-                                                                        <p className="text-sm text-gray-700 leading-relaxed">{summaryText}</p>
+                                                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                                                            {summaryText.split(' ').map((word, i) => (
+                                                                                <span key={i} style={{
+                                                                                    display: 'inline-block',
+                                                                                    animation: 'fadeInWord 0.3s ease-out',
+                                                                                    animationDelay: `${i * 0.05}s`,
+                                                                                    animationFillMode: 'backwards',
+                                                                                    marginRight: '0.25em'
+                                                                                }}>
+                                                                                    {word}
+                                                                                </span>
+                                                                            ))}
+                                                                        </p>
                                                                     )}
                                                                 </div>
                                                             )}
@@ -5498,6 +5767,13 @@
                     {showEnvelope && (
                         <div className="envelope-animation">
                             📧
+                        </div>
+                    )}
+
+                    {/* Bottom Notification */}
+                    {showBottomNotification && (
+                        <div className="bottom-notification">
+                            {bottomNotificationText}
                         </div>
                     )}
                 </div>
