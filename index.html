@@ -3165,6 +3165,414 @@
                 width: 100%;
             }
         }
+
+        /* Version Modal Styles */
+.version-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modal-overlay-fade 0.4s ease-out;
+    padding: 20px;
+}
+
+@keyframes modal-overlay-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.version-modal-container {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(249, 250, 251, 0.95) 100%
+    );
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 32px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 100px rgba(99, 102, 241, 0.2);
+    animation: modal-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+body.dark-mode .version-modal-container {
+    background: linear-gradient(135deg,
+        rgba(20, 20, 20, 0.98) 0%,
+        rgba(30, 30, 30, 0.95) 100%
+    );
+    border: 2px solid rgba(99, 102, 241, 0.5);
+}
+
+@keyframes modal-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header */
+.version-modal-header {
+    padding: 32px 32px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.15);
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.1) 0%,
+        rgba(139, 92, 246, 0.05) 100%
+    );
+}
+
+.version-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 18px;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    animation: badge-glow 2s ease-in-out infinite;
+}
+
+@keyframes badge-glow {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    }
+    50% {
+        box-shadow: 0 6px 30px rgba(99, 102, 241, 0.6);
+    }
+}
+
+.version-icon {
+    font-size: 24px;
+    animation: rocket-float 2s ease-in-out infinite;
+}
+
+@keyframes rocket-float {
+    0%, 100% {
+        transform: translateY(0) rotate(-5deg);
+    }
+    50% {
+        transform: translateY(-5px) rotate(5deg);
+    }
+}
+
+.version-number {
+    font-size: 16px;
+}
+
+.version-close-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    color: #374151;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.dark-mode .version-close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e5e5;
+}
+
+.version-close-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Content */
+.version-modal-content {
+    padding: 32px;
+    max-height: calc(90vh - 200px);
+    overflow-y: auto;
+}
+
+.version-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.version-modal-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.version-modal-content::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 10px;
+}
+
+.version-modal-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 32px;
+    background: linear-gradient(135deg, #4f46e5, #9333ea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark-mode .version-modal-title {
+    background: linear-gradient(135deg, #a5b4fc, #d8b4fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Sections */
+.version-section {
+    margin-bottom: 32px;
+    animation: section-fade-in 0.6s ease-out backwards;
+}
+
+.version-section.major-update {
+    animation-delay: 0.2s;
+}
+
+.version-section.minor-updates {
+    animation-delay: 0.4s;
+}
+
+@keyframes section-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.version-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.version-section-icon {
+    font-size: 24px;
+}
+
+.version-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #374151;
+}
+
+body.dark-mode .version-section-title {
+    color: #e5e5e5;
+}
+
+/* Major Update Item */
+.version-update-item {
+    display: flex;
+    gap: 20px;
+    padding: 24px;
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.1) 0%,
+        rgba(139, 92, 246, 0.15) 100%
+    );
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .version-update-item {
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.15) 0%,
+        rgba(139, 92, 246, 0.2) 100%
+    );
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.version-update-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.update-icon {
+    font-size: 48px;
+    flex-shrink: 0;
+    animation: icon-bounce 2s ease-in-out infinite;
+}
+
+@keyframes icon-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.update-content {
+    flex: 1;
+}
+
+.update-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4f46e5;
+    margin-bottom: 8px;
+}
+
+body.dark-mode .update-title {
+    color: #818cf8;
+}
+
+.update-description {
+    font-size: 15px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+body.dark-mode .update-description {
+    color: #9ca3af;
+}
+
+/* Minor Updates List */
+.version-update-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.version-update-item-small {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 12px;
+    font-size: 15px;
+    color: #374151;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .version-update-item-small {
+    background: rgba(40, 40, 40, 0.5);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #e5e5e5;
+}
+
+.version-update-item-small:hover {
+    background: rgba(99, 102, 241, 0.05);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateX(5px);
+}
+
+.update-bullet {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Footer */
+.version-modal-footer {
+    padding: 24px 32px;
+    border-top: 2px solid rgba(99, 102, 241, 0.15);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.version-cta-btn {
+    width: 100%;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.version-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+}
+
+.version-cta-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .version-modal-container {
+        border-radius: 24px;
+        max-height: 95vh;
+    }
+
+    .version-modal-header {
+        padding: 24px 20px 20px;
+    }
+
+    .version-badge {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+
+    .version-modal-content {
+        padding: 24px 20px;
+    }
+
+    .version-modal-title {
+        font-size: 28px;
+        margin-bottom: 24px;
+    }
+
+    .version-update-item {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .update-icon {
+        font-size: 40px;
+    }
+
+    .update-title {
+        font-size: 18px;
+    }
+
+    .version-modal-footer {
+        padding: 20px;
+    }
+
+    .version-cta-btn {
+        font-size: 16px;
+        padding: 14px 28px;
+    }
+}
     </style>
 </head>
 <body>
@@ -3257,6 +3665,10 @@
             const [touchCurrentX, setTouchCurrentX] = useState(0);
             const [isSwiping, setIsSwiping] = useState(false);
             const [inboxViewMode, setInboxViewMode] = useState('tabs'); // 'tabs', 'received', 'sent'
+
+            // 👇 ADD THESE TWO LINES HERE 👇
+const [showVersionModal, setShowVersionModal] = useState(false);
+const CURRENT_VERSION = '3.0';
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -3407,6 +3819,25 @@ const fetchOutlookEmails = async (accessToken) => {
                     }
                 }
 
+                // Load Outlook connection
+const savedOutlookConnection = localStorage.getItem('outlookConnected');
+const savedOutlookTokens = localStorage.getItem('outlookTokens');
+
+if (savedOutlookConnection === 'true' && savedOutlookTokens) {
+    setOutlookConnected(true);
+    
+    // Fetch Outlook emails with saved tokens
+    try {
+        const tokens = JSON.parse(savedOutlookTokens);
+        fetchOutlookEmails(tokens.access_token);
+    } catch (error) {
+        console.error('❌ Error loading saved Outlook tokens:', error);
+        localStorage.removeItem('outlookTokens');
+        localStorage.removeItem('outlookConnected');
+        setOutlookConnected(false);
+    }
+}
+
                 // Load dark mode preference
                 const savedDarkMode = localStorage.getItem('darkMode');
                 if (savedDarkMode === 'true') {
@@ -3478,6 +3909,18 @@ const fetchOutlookEmails = async (accessToken) => {
                     handlePrioritizeEmails();
                 }
             }, [autoPrioritize, gmailEmails.length, currentPage]);
+
+            // Check for version updates
+useEffect(() => {
+    const lastSeenVersion = localStorage.getItem('lastSeenVersion');
+    if (lastSeenVersion !== CURRENT_VERSION) {
+        // Delay showing modal slightly for smooth experience
+        setTimeout(() => {
+            setShowVersionModal(true);
+        }, 1000);
+    }
+}, []);
+
 
             // Reset new email count when user views inbox
             useEffect(() => {
@@ -3604,6 +4047,12 @@ const fetchOutlookEmails = async (accessToken) => {
                     setIsSending(false);
                 }
             };
+
+            // 👇 ADD HANDLER HERE 👇
+const handleCloseVersionModal = () => {
+    setShowVersionModal(false);
+    localStorage.setItem('lastSeenVersion', CURRENT_VERSION);
+};
 
             const emailStyles = [
                 { id: 'professional', label: '💼 Professional' },
@@ -3970,6 +4419,42 @@ const fetchOutlookEmails = async (accessToken) => {
                         console.error('Error details:', data.details);
                         throw new Error(data.message || 'Failed to fetch sent emails');
                     }
+
+                    const fetchOutlookEmails = async (accessToken) => {
+    try {
+        console.log('📬 Fetching Outlook inbox...');
+        
+        const response = await fetch('/api/outlook-inbox', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to fetch Outlook emails');
+        }
+        
+        // Format emails for display
+        const formattedEmails = data.emails.map(function(email) {
+            return {
+                id: email.id,
+                from: email.from,
+                subject: email.subject,
+                snippet: email.snippet,
+                date: email.date,
+                threadId: email.threadId,
+                internalDate: new Date(email.date).getTime()
+            };
+        });
+        
+        setOutlookEmails(formattedEmails);
+        console.log('✅ Loaded ' + formattedEmails.length + ' Outlook emails');
+    } catch (error) {
+        console.error('❌ Error fetching Outlook emails:', error);
+    }
+};
 
                     // Transform Gmail API response to our format
                     const formattedEmails = data.emails.map(email => {
@@ -4446,11 +4931,13 @@ const fetchOutlookEmails = async (accessToken) => {
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    setOutlookConnected(false);
-                                                    localStorage.removeItem('outlookConnected');
-                                                    setOutlookEmails([]);
-                                                    console.log('📮 Outlook disconnected');
-                                                }}
+                                                    onClick={() => {
+    setOutlookConnected(false);
+    localStorage.removeItem('outlookConnected');
+    localStorage.removeItem('outlookTokens');
+    setOutlookEmails([]);
+    console.log('📮 Outlook disconnected');
+}}
                                                 className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
                                             >
                                                 Disconnect
@@ -6114,141 +6601,77 @@ const fetchOutlookEmails = async (accessToken) => {
                                                             <p className="text-sm">Choose Gmail or Outlook below to view your emails</p>
                                                         </div>
                                                     ) : inboxViewMode === 'sent' ? (
-                                                        // Sent emails view
                                                         activeProvider === 'outlook' ? (
-                                                            <div className="outlook-coming-soon">
-                                                                <div className="outlook-coming-soon-icon">📮</div>
-                                                                <div className="outlook-coming-soon-text">Outlook Sent Emails Coming Soon</div>
-                                                                <div className="outlook-coming-soon-subtitle">Connect Outlook in Settings to view sent emails</div>
-                                                            </div>
-                                                        ) : sentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
-                                                            sentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
-                                                                <div
-                                                                    key={email.id}
-                                                                    onClick={() => setViewingEmail(email)}
-                                                                    className={`sidebar-email-item unified-button border-2 border-white ${deletingEmailId === email.id ? 'email-deleting' : ''} ${viewingEmail && viewingEmail.id === email.id ? 'active' : ''}`}
-                                                                    style={{position: 'relative', paddingLeft: '36px'}}
-                                                                >
-                                                                    {/* Checkbox for Selection */}
-                                                                    <div
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            toggleEmailSelection(email.id);
-                                                                        }}
-                                                                        className={`email-checkbox ${selectedEmails.includes(email.id) ? 'checked' : ''}`}
-                                                                        style={{
-                                                                            position: 'absolute',
-                                                                            left: '8px',
-                                                                            top: '12px'
-                                                                        }}
-                                                                    >
-                                                                        {selectedEmails.includes(email.id) && <span style={{color: '#10b981', fontSize: '12px'}}>✓</span>}
-                                                                    </div>
+    outlookEmails.length > 0 ? (
+        outlookEmails.map(function(email, index) {
+            return (
+                <div
+                    key={email.id}
+                    draggable
+                    onDragStart={function(e) {
+                        setDraggedEmail(email);
+                        e.currentTarget.classList.add('dragging');
+                    }}
+                    onDragEnd={function(e) {
+                        setDraggedEmail(null);
+                        e.currentTarget.classList.remove('dragging');
+                    }}
+                    onClick={function() {
+                        setViewingEmail(email);
+                        if (unreadEmails.has(email.id)) {
+                            setUnreadEmails(function(prev) {
+                                var updated = new Set(prev);
+                                updated.delete(email.id);
+                                return updated;
+                            });
+                        }
+                    }}
+                    className={'sidebar-email-item unified-button border-2 border-white ' + (deletingEmailId === email.id ? 'email-deleting' : '') + ' ' + (viewingEmail && viewingEmail.id === email.id ? 'active' : '') + ' ' + (unreadEmails.has(email.id) ? 'unread-email' : '')}
+                    style={{position: 'relative', paddingLeft: '36px'}}
+                >
+                    <div
+                        onClick={function(e) {
+                            e.stopPropagation();
+                            toggleEmailSelection(email.id);
+                        }}
+                        className={'email-checkbox ' + (selectedEmails.includes(email.id) ? 'checked' : '')}
+                        style={{
+                            position: 'absolute',
+                            left: '8px',
+                            top: '12px'
+                        }}
+                    >
+                        {selectedEmails.includes(email.id) && <span style={{color: '#10b981', fontSize: '12px'}}>✓</span>}
+                    </div>
 
-                                                                    <div className="text-xs font-bold text-gray-800 mb-1 truncate">To: {email.to}</div>
-                                                                    <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
-                                                                    <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
-                                                                    <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                    <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
+                    <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                    <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
+                    <div className="text-xs text-gray-400 mt-1">{email.date}</div>
 
-                                                                    {/* Delete Button on Hover */}
-                                                                    <button
-                                                                        className="email-delete-btn"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setDeletingEmailId(email.id);
-                                                                            setTimeout(() => {
-                                                                                handleDeleteEmail(email.id, 'sent');
-                                                                                setDeletingEmailId(null);
-                                                                            }, 400);
-                                                                        }}
-                                                                    >
-                                                                        🗑️ Delete
-                                                                    </button>
-                                                                </div>
-                                                            ))
-                                                        ) : (
-                                                            <div className="text-center py-8 text-gray-500">
-                                                                <div className="text-4xl mb-2">📭</div>
-                                                                <p className="text-sm">No sent emails</p>
-                                                            </div>
-                                                        )
-                                                    ) : activeProvider === 'outlook' ? (
-                                                        <div className="outlook-coming-soon">
-                                                            <div className="outlook-coming-soon-icon">📮</div>
-                                                            <div className="outlook-coming-soon-text">Outlook Coming Soon</div>
-                                                            <div className="outlook-coming-soon-subtitle">Connect in Settings to display your Outlook emails</div>
-                                                        </div>
-                                                    ) : gmailEmails.length > 0 ? (
-                                                        gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map((email, index) => (
-                                                            <div
-                                                                key={email.id}
-                                                                draggable
-                                                                onDragStart={(e) => {
-                                                                    setDraggedEmail(email);
-                                                                    e.currentTarget.classList.add('dragging');
-                                                                }}
-                                                                onDragEnd={(e) => {
-                                                                    setDraggedEmail(null);
-                                                                    e.currentTarget.classList.remove('dragging');
-                                                                }}
-                                                                onClick={() => {
-                                                                    setViewingEmail(email);
-                                                                    if (unreadEmails.has(email.id)) {
-                                                                        setUnreadEmails(prev => {
-                                                                            const updated = new Set(prev);
-                                                                            updated.delete(email.id);
-                                                                            return updated;
-                                                                        });
-                                                                    }
-                                                                }}
-                                                                className={`sidebar-email-item unified-button border-2 border-white ${deletingEmailId === email.id ? 'email-deleting' : ''} ${viewingEmail && viewingEmail.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
-                                                                style={{position: 'relative', paddingLeft: '36px'}}
-                                                            >
-                                                                {/* Checkbox for Selection */}
-                                                                <div
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        toggleEmailSelection(email.id);
-                                                                    }}
-                                                                    className={`email-checkbox ${selectedEmails.includes(email.id) ? 'checked' : ''}`}
-                                                                    style={{
-                                                                        position: 'absolute',
-                                                                        left: '8px',
-                                                                        top: '12px'
-                                                                    }}
-                                                                >
-                                                                    {selectedEmails.includes(email.id) && <span style={{color: '#10b981', fontSize: '12px'}}>✓</span>}
-                                                                </div>
-
-                                                                <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
-                                                                <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
-                                                                <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
-                                                                <div className="text-xs text-gray-400 mt-1">{email.date}</div>
-
-                                                                {/* Delete Button on Hover */}
-                                                                <button
-                                                                    className="email-delete-btn"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setDeletingEmailId(email.id);
-                                                                        setTimeout(() => {
-                                                                            handleDeleteEmail(email.id, 'inbox');
-                                                                            setDeletingEmailId(null);
-                                                                        }, 400);
-                                                                    }}
-                                                                >
-                                                                    🗑️ Delete
-                                                                </button>
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-8 text-gray-500">
-                                                            <div className="text-4xl mb-2">📭</div>
-                                                            <p className="text-sm">No emails</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                    <button
+                        className="email-delete-btn"
+                        onClick={function(e) {
+                            e.stopPropagation();
+                            setDeletingEmailId(email.id);
+                            setTimeout(function() {
+                                handleDeleteEmail(email.id, 'inbox');
+                                setDeletingEmailId(null);
+                            }, 400);
+                        }}
+                    >
+                        🗑️ Delete
+                    </button>
+                </div>
+            );
+        })
+    ) : (
+        <div className="text-center py-8 text-gray-500">
+            <div className="text-4xl mb-2">📭</div>
+            <p className="text-sm">No Outlook emails</p>
+        </div>
+    )
+)
 
                                             {/* Provider Tabs or View Toggle at Bottom */}
                                             {inboxViewMode === 'tabs' ? (
@@ -6576,6 +6999,79 @@ const fetchOutlookEmails = async (accessToken) => {
                             {bottomNotificationText}
                         </div>
                     )}
+
+                                {/* Version Update Modal */}
+{showVersionModal && (
+    <div className="version-modal-overlay" onClick={handleCloseVersionModal}>
+        <div className="version-modal-container" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="version-modal-header">
+                <div className="version-badge">
+                    <span className="version-icon">🚀</span>
+                    <span className="version-number">Version {CURRENT_VERSION}</span>
+                </div>
+                <button onClick={handleCloseVersionModal} className="version-close-btn">
+                    ✕
+                </button>
+            </div>
+
+            {/* Content */}
+            <div className="version-modal-content">
+                <h2 className="version-modal-title">What's New</h2>
+                
+                {/* Major Updates */}
+                <div className="version-section major-update">
+                    <div className="version-section-header">
+                        <span className="version-section-icon">⭐</span>
+                        <h3 className="version-section-title">Major Update</h3>
+                    </div>
+                    <div className="version-update-item">
+                        <div className="update-icon">📮</div>
+                        <div className="update-content">
+                            <div className="update-title">Outlook Connection</div>
+                            <div className="update-description">
+                                Connect your Outlook account alongside Gmail! Access all your emails from both providers in one place.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Minor Updates */}
+                <div className="version-section minor-updates">
+                    <div className="version-section-header">
+                        <span className="version-section-icon">✨</span>
+                        <h3 className="version-section-title">Improvements & Refinements</h3>
+                    </div>
+                    <div className="version-update-list">
+                        <div className="version-update-item-small">
+                            <span className="update-bullet">🎨</span>
+                            <span>Refreshed UI design with smoother animations</span>
+                        </div>
+                        <div className="version-update-item-small">
+                            <span className="update-bullet">⚡</span>
+                            <span>Enhanced performance and faster load times</span>
+                        </div>
+                        <div className="version-update-item-small">
+                            <span className="update-bullet">🔧</span>
+                            <span>Bug fixes and stability improvements</span>
+                        </div>
+                        <div className="version-update-item-small">
+                            <span className="update-bullet">📱</span>
+                            <span>Better mobile responsiveness</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Footer */}
+            <div className="version-modal-footer">
+                <button onClick={handleCloseVersionModal} className="version-cta-btn">
+                    Got it! Let's go 🎉
+                </button>
+            </div>
+        </div>
+    </div>
+)}
                 </div>
             );
         };
