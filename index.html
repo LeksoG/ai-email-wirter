@@ -2190,14 +2190,17 @@
         .desktop-inbox-layout {
             display: flex;
             gap: 20px;
-            height: calc(100vh - 200px);
+            height: calc(100vh - 150px);
             position: relative;
+            margin-left: -40px;
         }
 
         .inbox-sidebar {
-            width: 400px;
+            width: 480px;
             flex-shrink: 0;
-            overflow-y: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.9) 0%,
                 rgba(249, 250, 251, 0.85) 100%
@@ -2217,21 +2220,30 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .inbox-sidebar::-webkit-scrollbar {
+        .inbox-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            margin: 0 -10px;
+            padding: 0 10px;
+            mask-image: linear-gradient(to bottom, black calc(100% - 60px), transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 60px), transparent 100%);
+        }
+
+        .inbox-scroll-area::-webkit-scrollbar {
             width: 8px;
         }
 
-        .inbox-sidebar::-webkit-scrollbar-track {
+        .inbox-scroll-area::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.05);
             border-radius: 10px;
         }
 
-        .inbox-sidebar::-webkit-scrollbar-thumb {
+        .inbox-scroll-area::-webkit-scrollbar-thumb {
             background: rgba(99, 102, 241, 0.3);
             border-radius: 10px;
         }
 
-        .inbox-sidebar::-webkit-scrollbar-thumb:hover {
+        .inbox-scroll-area::-webkit-scrollbar-thumb:hover {
             background: rgba(99, 102, 241, 0.5);
         }
 
@@ -2249,10 +2261,9 @@
                         inset 0 1px 0 rgba(255, 255, 255, 0.8);
             border-radius: 24px;
             padding: 24px;
-            opacity: 0;
-            transform: translateX(50px);
+            opacity: 1;
+            transform: translateX(0);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: none;
         }
 
         body.dark-mode .email-content-area {
@@ -2260,10 +2271,9 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .email-content-area.active {
+        .email-content-area.viewing-email {
             opacity: 1;
             transform: translateX(0);
-            pointer-events: all;
         }
 
         .email-content-area::-webkit-scrollbar {
@@ -2374,6 +2384,215 @@
             display: flex;
             gap: 8px;
         }
+
+        /* iOS-style Priority Email Stacking */
+        .priority-stack-container {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .priority-stack {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .priority-stack-item {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 12px;
+            position: absolute;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .priority-stack-item:nth-child(1) {
+            position: relative;
+            z-index: 3;
+            top: 0;
+        }
+
+        .priority-stack-item:nth-child(2) {
+            z-index: 2;
+            top: 4px;
+            transform: scale(0.98);
+            opacity: 0.7;
+        }
+
+        .priority-stack-item:nth-child(3) {
+            z-index: 1;
+            top: 8px;
+            transform: scale(0.96);
+            opacity: 0.5;
+        }
+
+        .priority-stack.expanded .priority-stack-item {
+            position: relative;
+            top: 0 !important;
+            transform: scale(1) !important;
+            opacity: 1 !important;
+            margin-bottom: 8px;
+        }
+
+        /* Provider Tabs at Bottom */
+        .provider-tabs-container {
+            margin-top: auto;
+            padding-top: 16px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .provider-tab {
+            flex: 1;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .provider-tab.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .provider-tab:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Inbox Search Bar */
+        .inbox-search-bar {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 50px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .inbox-search-bar:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .inbox-search-suggestions {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            top: 100%;
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        .inbox-search-suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .inbox-search-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .inbox-search-suggestion-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Delete Button on Hover */
+        .email-delete-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .sidebar-email-item:hover .email-delete-btn {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .email-delete-btn:hover {
+            background: rgba(220, 38, 38, 1);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Drag and Drop Styles */
+        .dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .drag-over {
+            border: 2px dashed rgba(99, 102, 241, 0.5) !important;
+            background: rgba(99, 102, 241, 0.05) !important;
+        }
+
+        .email-content-area.drop-zone {
+            position: relative;
+        }
+
+        .email-content-area.drop-zone::after {
+            content: '📧 Drop email here to use with AI Writer';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(99, 102, 241, 0.7);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .email-content-area.drag-over::after {
+            opacity: 1;
+        }
+
+        /* Inbox Header Layout */
+        .inbox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .inbox-header-left {
+            flex: 1;
+        }
+
+        .inbox-header-right {
+            display: flex;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -2447,6 +2666,17 @@
             const [isRefreshing, setIsRefreshing] = useState(false);
             const [deletedEmails, setDeletedEmails] = useState([]);
             const [deletingEmailId, setDeletingEmailId] = useState(null);
+
+            // New state variables for enhanced features
+            const [activeProvider, setActiveProvider] = useState('gmail');
+            const [outlookConnected, setOutlookConnected] = useState(false);
+            const [outlookEmails, setOutlookEmails] = useState([]);
+            const [inboxSearchQuery, setInboxSearchQuery] = useState('');
+            const [inboxSearchResults, setInboxSearchResults] = useState([]);
+            const [showInboxSearchSuggestions, setShowInboxSearchSuggestions] = useState(false);
+            const [priorityStackExpanded, setPriorityStackExpanded] = useState(false);
+            const [draggedEmail, setDraggedEmail] = useState(null);
+            const [isDraggingOver, setIsDraggingOver] = useState(false);
 
             // Audio references for notifications
             const audioRef = useRef(null);
@@ -3508,6 +3738,58 @@
                                                     setSentEmails([]);
                                                     setUserEmail('');
                                                     console.log('📧 Gmail disconnected');
+                                                }}
+                                                className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
+                                            >
+                                                Disconnect
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Outlook Connection */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                        📮 Outlook Connection
+                                    </label>
+                                    <p className="text-xs text-gray-600 mb-4">
+                                        Connect your Outlook to access and transform your messages
+                                    </p>
+
+                                    {!outlookConnected ? (
+                                        <button
+                                            onClick={() => {
+                                                // TODO: Implement Outlook OAuth
+                                                alert('Outlook connection coming soon! For now, this is a demonstration.');
+                                                setOutlookConnected(true);
+                                                localStorage.setItem('outlookConnected', 'true');
+                                            }}
+                                            className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
+                                        >
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#0078D4">
+                                                <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                                <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#0078D4"/>
+                                            </svg>
+                                            Connect Outlook
+                                        </button>
+                                    ) : (
+                                        <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                            <div className="flex items-center gap-3">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#10b981">
+                                                    <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                                    <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#10b981"/>
+                                                </svg>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-medium text-gray-700">Connected to Outlook</span>
+                                                    <span className="text-xs text-gray-600 mt-1">outlook@example.com</span>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setOutlookConnected(false);
+                                                    localStorage.removeItem('outlookConnected');
+                                                    setOutlookEmails([]);
+                                                    console.log('📮 Outlook disconnected');
                                                 }}
                                                 className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
                                             >
@@ -4790,66 +5072,196 @@
                                     <div className="desktop-inbox-layout">
                                         {/* Left Sidebar - Inbox */}
                                         <div className="inbox-sidebar">
-                                            <div className="mb-4">
-                                                <h2 className="text-2xl font-bold text-gray-800 mb-4">📥 Inbox</h2>
-                                                <div className="flex gap-2 mb-4">
-                                                    <button
-                                                        onClick={handleRefreshEmails}
-                                                        disabled={isRefreshing}
-                                                        className={`oval-button px-3 py-1 text-xs font-semibold glass-effect border-2 border-white unified-button text-gray-800 ${isRefreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                        title="Refresh emails"
-                                                    >
-                                                        <span className={isRefreshing ? 'refresh-spinning' : ''} style={{display: 'inline-block'}}>
-                                                            🔄
-                                                        </span>
-                                                    </button>
-                                                    {gmailEmails.length > 0 && !autoPrioritize && (
+                                            {/* Header with Title and Prioritize Button */}
+                                            <div className="inbox-header">
+                                                <div className="inbox-header-left">
+                                                    <h2 className="text-2xl font-bold text-gray-800">📥 Inbox</h2>
+                                                </div>
+                                                <div className="inbox-header-right">
+                                                    {gmailEmails.length > 0 && (
                                                         <button
                                                             onClick={() => handlePrioritizeEmails()}
                                                             disabled={isPrioritizing}
-                                                            className={`oval-button px-3 py-1 text-xs font-semibold glass-effect border-2 border-white unified-button text-gray-800 ${isPrioritizing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                            className={`oval-button px-4 py-2 text-sm font-semibold glass-effect border-2 border-white unified-button text-gray-800 ${isPrioritizing ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                         >
-                                                            {isPrioritizing ? '🤖 ...' : '✨'}
+                                                            {isPrioritizing ? '🤖 Prioritizing...' : '✨ Prioritize'}
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            {/* Email List */}
-                                            <div className="space-y-2">
-                                                {gmailEmails.length > 0 ? (
-                                                    gmailEmails.map((email, index) => (
-                                                        <div
-                                                            key={email.id}
-                                                            onClick={() => {
-                                                                setViewingEmail(email);
-                                                                if (unreadEmails.has(email.id)) {
-                                                                    setUnreadEmails(prev => {
-                                                                        const updated = new Set(prev);
-                                                                        updated.delete(email.id);
-                                                                        return updated;
-                                                                    });
-                                                                }
-                                                            }}
-                                                            className={`sidebar-email-item ${viewingEmail && viewingEmail.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
-                                                        >
-                                                            <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
-                                                            <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
-                                                            <div className="text-xs text-gray-600 truncate">{email.snippet.substring(0, 60)}...</div>
-                                                            <div className="text-xs text-gray-400 mt-1">{email.date}</div>
-                                                        </div>
-                                                    ))
-                                                ) : (
-                                                    <div className="text-center py-8 text-gray-500">
-                                                        <div className="text-4xl mb-2">📭</div>
-                                                        <p className="text-sm">No emails</p>
+                                            {/* Search Bar */}
+                                            <div style={{position: 'relative'}}>
+                                                <input
+                                                    type="text"
+                                                    value={inboxSearchQuery}
+                                                    onChange={(e) => {
+                                                        setInboxSearchQuery(e.target.value);
+                                                        if (e.target.value) {
+                                                            const results = gmailEmails.filter(email =>
+                                                                email.subject.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                                                email.from.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                                                email.snippet.toLowerCase().includes(e.target.value.toLowerCase())
+                                                            ).slice(0, 5);
+                                                            setInboxSearchResults(results);
+                                                            setShowInboxSearchSuggestions(true);
+                                                        } else {
+                                                            setShowInboxSearchSuggestions(false);
+                                                        }
+                                                    }}
+                                                    placeholder="🔍 Search emails..."
+                                                    className="inbox-search-bar unified-button border-2 border-white"
+                                                />
+                                                {showInboxSearchSuggestions && inboxSearchResults.length > 0 && (
+                                                    <div className="inbox-search-suggestions">
+                                                        {inboxSearchResults.map(email => (
+                                                            <div
+                                                                key={email.id}
+                                                                className="inbox-search-suggestion-item"
+                                                                onClick={() => {
+                                                                    setViewingEmail(email);
+                                                                    setInboxSearchQuery('');
+                                                                    setShowInboxSearchSuggestions(false);
+                                                                }}
+                                                            >
+                                                                <div className="text-xs font-bold text-gray-800">{email.from}</div>
+                                                                <div className="text-sm font-semibold text-gray-700">{email.subject}</div>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 )}
+                                            </div>
+
+                                            {/* Email List Area with Fade Effect */}
+                                            <div className="inbox-scroll-area">
+                                                {/* Priority Stack - iOS Style */}
+                                                {autoPrioritize && priorityEmails.length > 0 && (
+                                                    <div className="priority-stack-container">
+                                                        <div
+                                                            className={`priority-stack ${priorityStackExpanded ? 'expanded' : ''}`}
+                                                            onClick={() => setPriorityStackExpanded(!priorityStackExpanded)}
+                                                            style={{height: priorityStackExpanded ? 'auto' : '80px', marginBottom: priorityStackExpanded ? '12px' : '20px'}}
+                                                        >
+                                                            {priorityEmails.slice(0, 3).map((email, index) => (
+                                                                <div
+                                                                    key={email.id}
+                                                                    className="priority-stack-item"
+                                                                    onClick={(e) => {
+                                                                        if (priorityStackExpanded) {
+                                                                            e.stopPropagation();
+                                                                            setViewingEmail(email);
+                                                                        }
+                                                                    }}
+                                                                    style={{cursor: priorityStackExpanded ? 'pointer' : 'default'}}
+                                                                >
+                                                                    <div className="flex items-center justify-between">
+                                                                        <div className="flex-1 pr-2">
+                                                                            <div className="text-xs font-bold text-gray-800 mb-1 truncate">⚡ {email.from}</div>
+                                                                            <div className="text-sm font-semibold text-gray-700 truncate">{email.subject}</div>
+                                                                        </div>
+                                                                        {index === 0 && !priorityStackExpanded && priorityEmails.length > 1 && (
+                                                                            <div className="text-xs bg-indigo-600 text-white px-2 py-1 rounded-full font-bold">
+                                                                                +{priorityEmails.length - 1}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Regular Email List */}
+                                                <div className="space-y-2">
+                                                    {gmailEmails.length > 0 ? (
+                                                        gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map((email, index) => (
+                                                            <div
+                                                                key={email.id}
+                                                                draggable
+                                                                onDragStart={(e) => {
+                                                                    setDraggedEmail(email);
+                                                                    e.currentTarget.classList.add('dragging');
+                                                                }}
+                                                                onDragEnd={(e) => {
+                                                                    setDraggedEmail(null);
+                                                                    e.currentTarget.classList.remove('dragging');
+                                                                }}
+                                                                onClick={() => {
+                                                                    setViewingEmail(email);
+                                                                    if (unreadEmails.has(email.id)) {
+                                                                        setUnreadEmails(prev => {
+                                                                            const updated = new Set(prev);
+                                                                            updated.delete(email.id);
+                                                                            return updated;
+                                                                        });
+                                                                    }
+                                                                }}
+                                                                className={`sidebar-email-item unified-button border-2 border-white ${viewingEmail && viewingEmail.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                                style={{position: 'relative'}}
+                                                            >
+                                                                <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
+                                                                <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                                                <div className="text-xs text-gray-600 truncate">{email.snippet.substring(0, 60)}...</div>
+                                                                <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+
+                                                                {/* Delete Button on Hover */}
+                                                                <button
+                                                                    className="email-delete-btn"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteEmail(email.id, 'inbox');
+                                                                    }}
+                                                                >
+                                                                    🗑️ Delete
+                                                                </button>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-center py-8 text-gray-500">
+                                                            <div className="text-4xl mb-2">📭</div>
+                                                            <p className="text-sm">No emails</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Provider Tabs at Bottom */}
+                                            <div className="provider-tabs-container">
+                                                <div
+                                                    className={`provider-tab unified-button ${activeProvider === 'gmail' ? 'active' : ''}`}
+                                                    onClick={() => setActiveProvider('gmail')}
+                                                >
+                                                    📧 Gmail
+                                                </div>
+                                                <div
+                                                    className={`provider-tab unified-button ${activeProvider === 'outlook' ? 'active' : ''}`}
+                                                    onClick={() => setActiveProvider('outlook')}
+                                                >
+                                                    📮 Outlook
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
-                                        <div className={`email-content-area ${viewingEmail ? 'active' : ''}`}>
+                                        <div
+                                            className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                setIsDraggingOver(true);
+                                            }}
+                                            onDragLeave={(e) => {
+                                                e.preventDefault();
+                                                setIsDraggingOver(false);
+                                            }}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                setIsDraggingOver(false);
+                                                if (draggedEmail) {
+                                                    setEmailText(draggedEmail.snippet);
+                                                    setViewingEmail(null);
+                                                }
+                                            }}
+                                        >
                                             {viewingEmail ? (
                                                 <>
                                                     {/* Email Viewer Header */}
@@ -4984,10 +5396,46 @@
                                                     </div>
                                                 </>
                                             ) : (
-                                                <div className="email-placeholder">
-                                                    <div className="email-placeholder-icon">📧</div>
-                                                    <div className="email-placeholder-text">Select an email to view</div>
-                                                </div>
+                                                <>
+                                                    {/* AI Writer as Default */}
+                                                    <div className="rounded-3xl p-4 relative">
+                                                        {/* Tab Switches */}
+                                                        <div className="flex justify-center mb-8">
+                                                            <div className="tab-container tab-button-container">
+                                                                <div
+                                                                    className="tab-slider"
+                                                                    style={{
+                                                                        width: '50%',
+                                                                        height: 'calc(100% - 12px)',
+                                                                        top: '6px',
+                                                                        left: activeView === 'writer' ? '6px' : 'calc(50% - 6px)',
+                                                                    }}
+                                                                ></div>
+                                                                <button
+                                                                    onClick={() => setActiveView('writer')}
+                                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
+                                                                        activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                                    }`}
+                                                                >
+                                                                    ✍️ AI Writer
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setActiveView('results')}
+                                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
+                                                                        activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                                    }`}
+                                                                >
+                                                                    ✨ Results
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Content Area */}
+                                                        <div className="min-h-[500px]">
+                                                            {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
+                                                        </div>
+                                                    </div>
+                                                </>
                                             )}
                                         </div>
                                     </div>
