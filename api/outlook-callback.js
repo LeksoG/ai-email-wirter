@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     try {
         const OUTLOOK_CLIENT_ID = process.env.OUTLOOK_CLIENT_ID;
         const OUTLOOK_CLIENT_SECRET = process.env.OUTLOOK_CLIENT_SECRET;
-        const REDIRECT_URI = process.env.OUTLOOK_REDIRECT_URI || `${process.env.VERCEL_URL}/api/outlook-callback`;
+        const REDIRECT_URI = process.env.OUTLOOK_REDIRECT_URI;
         
         const tokenResponse = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
             method: 'POST',
@@ -29,19 +29,10 @@ export default async function handler(req, res) {
         }
         
         const tokensParam = encodeURIComponent(JSON.stringify(tokens));
-        res.redirect(`/?tokens=${tokensParam}&provider=outlook`);
+        res.redirect('/?tokens=' + tokensParam + '&provider=outlook');
         
     } catch (error) {
         console.error('Outlook callback error:', error);
         res.redirect('/?error=outlook_auth_failed');
     }
 }
-```
-
-## 6. **Set Environment Variables in Vercel**
-
-Add these to your Vercel project settings:
-```
-OUTLOOK_CLIENT_ID=your_outlook_client_id
-OUTLOOK_CLIENT_SECRET=your_outlook_client_secret
-OUTLOOK_REDIRECT_URI=https://your-app.vercel.app/api/outlook-callback
