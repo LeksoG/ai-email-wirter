@@ -3271,67 +3271,65 @@
                 console.log('🔌 API endpoint:', '/api/transform');
 
                 // Check for OAuth callback with tokens
-                const urlParams = new URLSearchParams(window.location.search);
-                const tokensParam = urlParams.get('tokens');
-                const provider = urlParams.get('provider'); // Add this line
+const urlParams = new URLSearchParams(window.location.search);
+const tokensParam = urlParams.get('tokens');
+const provider = urlParams.get('provider');
 
-                if (tokensParam) {
-                    try {
-                        const tokens = JSON.parse(decodeURIComponent(tokensParam));
-                        console.log('🎉 OAuth tokens received!');
+if (tokensParam) {
+    try {
+        const tokens = JSON.parse(decodeURIComponent(tokensParam));
+        console.log('🎉 OAuth tokens received!');
 
-                        // Determine which provider
         if (provider === 'outlook') {
-            // Store Outlook tokens
+            // Outlook OAuth
             localStorage.setItem('outlookTokens', JSON.stringify(tokens));
             localStorage.setItem('outlookConnected', 'true');
             localStorage.removeItem('oauth_in_progress');
-            
             setOutlookConnected(true);
             
-            // Fetch Outlook user info and emails
-            fetchOutlookUserInfo(tokens.access_token);
+            // Fetch Outlook emails
             fetchOutlookEmails(tokens.access_token);
             
+            console.log('✅ Outlook connected!');
         } else {
+            // Gmail OAuth (existing code)
+            localStorage.setItem('gmailTokens', JSON.stringify(tokens));
+            localStorage.setItem('emailConnected', 'true');
+            localStorage.removeItem('oauth_in_progress');
+            setEmailConnected(true);
 
-                        // Store tokens in localStorage
-                        localStorage.setItem('gmailTokens', JSON.stringify(tokens));
-                        localStorage.setItem('emailConnected', 'true');
-                        localStorage.removeItem('oauth_in_progress');
-
-                        setEmailConnected(true);
-
-                        // Fetch user info to get email address and name
-                        fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                            headers: {
-                                Authorization: `Bearer ${tokens.access_token}`
-                            }
-                        })
-                        .then(res => res.json())
-                        .then(userInfo => {
-                            console.log('👤 User:', userInfo.email);
-                            setUserEmail(userInfo.email);
-                            localStorage.setItem('userEmail', userInfo.email);
-
-                            // Extract user's first name
-                            const name = userInfo.given_name || userInfo.name?.split(' ')[0] || 'there';
-                            setUserName(name);
-                            localStorage.setItem('userName', name);
-                            console.log('👋 Welcome', name);
-                        })
-                        .catch(err => console.error('Error fetching user info:', err));
-
-                        // Fetch emails
-                        fetchGmailEmails(tokens.access_token);
-                        fetchSentEmails(tokens.access_token);
-
-                        // Clean URL
-                        window.history.replaceState({}, '', '/');
-                    } catch (error) {
-                        console.error('❌ Error processing OAuth tokens:', error);
-                    }
+            // Fetch user info
+            fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                headers: {
+                    Authorization: 'Bearer ' + tokens.access_token
                 }
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(userInfo) {
+                console.log('👤 User:', userInfo.email);
+                setUserEmail(userInfo.email);
+                localStorage.setItem('userEmail', userInfo.email);
+
+                const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
+                setUserName(name);
+                localStorage.setItem('userName', name);
+                console.log('👋 Welcome', name);
+            })
+            .catch(function(err) { 
+                console.error('Error fetching user info:', err); 
+            });
+
+            // Fetch emails
+            fetchGmailEmails(tokens.access_token);
+            fetchSentEmails(tokens.access_token);
+        }
+
+        // Clean URL
+        window.history.replaceState({}, '', '/');
+    } catch (error) {
+        console.error('❌ Error processing OAuth tokens:', error);
+    }
+}
 
                 const fetchOutlookUserInfo = async (accessToken) => {
     try {
