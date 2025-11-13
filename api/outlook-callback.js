@@ -1,17 +1,26 @@
 export default async function handler(req, res) {
     console.log('📮 Outlook callback hit!');
-    console.log('📍 Request URL:', req.url);
-    console.log('📍 Query params:', req.query);
+    console.log('📍 Full query:', JSON.stringify(req.query));
     
-    const { code, error: authError } = req.query;
+    const { code, error: authError, error_description, error_uri } = req.query;
 
     if (authError) {
         console.error('❌ Auth error from Microsoft:', authError);
-        return res.redirect('/?error=outlook_auth_failed&details=' + encodeURIComponent(authError));
+        console.error('📋 Error description:', error_description);
+        console.error('🔗 Error URI:', error_uri);
+        
+        // Return detailed error
+        return res.redirect(
+            `/?error=outlook_auth_failed` +
+            `&error_type=${encodeURIComponent(authError)}` +
+            `&error_desc=${encodeURIComponent(error_description || 'No description')}` +
+            `&error_uri=${encodeURIComponent(error_uri || 'No URI')}`
+        );
     }
 
     if (!code) {
         console.error('❌ No authorization code provided');
+        console.log('📋 All query params:', req.query);
         return res.redirect('/?error=outlook_no_code');
     }
 
@@ -19,15 +28,12 @@ export default async function handler(req, res) {
         const clientId = process.env.OUTLOOK_CLIENT_ID;
         const clientSecret = process.env.OUTLOOK_CLIENT_SECRET;
         
-        // Use the same logic to generate redirect URI
         const host = req.headers.host;
         const protocol = req.headers['x-forwarded-proto'] || 'https';
         const redirectUri = `${protocol}://${host}/api/outlook-callback`;
 
         console.log('🔄 Exchanging code for tokens...');
-        console.log('🔗 Using redirect URI:', redirectUri);
-        console.log('🔑 Client ID present:', !!clientId);
-        console.log('🔐 Client Secret present:', !!clientSecret);
+        console.log('🔗 Redirect URI:', redirectUri);
 
         const tokenResponse = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
             method: 'POST',
@@ -46,8 +52,6 @@ export default async function handler(req, res) {
 
         const tokens = await tokenResponse.json();
 
-        console.log('📦 Token response status:', tokenResponse.status);
-
         if (!tokenResponse.ok) {
             console.error('❌ Token exchange failed:', tokens);
             return res.redirect('/?error=outlook_token_failed&details=' + encodeURIComponent(JSON.stringify(tokens)));
@@ -55,14 +59,10 @@ export default async function handler(req, res) {
 
         console.log('✅ Tokens received successfully');
 
-        // Redirect back with tokens
         const tokensParam = encodeURIComponent(JSON.stringify(tokens));
-        const redirectUrl = `/?tokens=${tokensParam}&provider=outlook`;
-        
-        console.log('🔄 Redirecting to app...');
-        res.redirect(redirectUrl);
+        res.redirect(`/?tokens=${tokensParam}&provider=outlook`);
     } catch (error) {
-        console.error('❌ Outlook callback error:', error);
+        console.error('❌ Callback error:', error);
         res.redirect('/?error=outlook_callback_exception&details=' + encodeURIComponent(error.message));
     }
 }
