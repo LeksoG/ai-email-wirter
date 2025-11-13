@@ -4106,87 +4106,139 @@ useEffect(() => {
                 }
             };
 
-            // Handle send email with animation
             const handleSendEmail = async () => {
-                if (!emailReply || !viewingEmail) return;
+    if (!emailReply || !viewingEmail) return;
 
-                setIsSending(true);
+    setIsSending(true);
 
-                try {
-                    // Get access token
-                    const savedTokens = localStorage.getItem('gmailTokens');
-                    if (!savedTokens) {
-                        alert('⚠️ Not connected to Gmail. Please connect your account in Settings.');
-                        setIsSending(false);
-                        return;
-                    }
+    try {
+        // Determine which provider this email is from
+        const isOutlookEmail = activeProvider === 'outlook';
+        
+        console.log('📧 Sending email reply...');
+        console.log('Provider:', isOutlookEmail ? 'Outlook' : 'Gmail');
+        console.log('Viewing email:', viewingEmail);
 
-                    const tokens = JSON.parse(savedTokens);
+        if (isOutlookEmail) {
+            // Send via Outlook
+            const savedTokens = localStorage.getItem('outlookTokens');
+            if (!savedTokens) {
+                alert('⚠️ Not connected to Outlook. Please connect your account in Settings.');
+                setIsSending(false);
+                return;
+            }
 
-                    // Extract email address from "Name <email@domain.com>" format
-                    const extractEmail = (fromString) => {
-                        const match = fromString.match(/<(.+?)>/);
-                        return match ? match[1] : fromString;
-                    };
+            const tokens = JSON.parse(savedTokens);
 
-                    const recipientEmail = extractEmail(viewingEmail.from);
-                    const originalSubject = viewingEmail.subject;
-                    const replySubject = originalSubject.startsWith('Re:') ? originalSubject : `Re: ${originalSubject}`;
-
-                    console.log('📤 Sending reply to:', recipientEmail);
-                    console.log('Subject:', replySubject);
-
-                    // Send the email via Gmail API
-                    const response = await fetch('/api/gmail-send', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            accessToken: tokens.access_token,
-                            to: recipientEmail,
-                            subject: replySubject,
-                            body: emailReply,
-                            threadId: viewingEmail.threadId,
-                            messageId: viewingEmail.id
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(data.message || 'Failed to send email');
-                    }
-
-                    // Success! Show animations
-                    setShowEnvelope(true);
-                    playSendSound();
-
-                    console.log('✅ Email sent successfully!');
-                    console.log('Message ID:', data.messageId);
-
-                    // Show success message
-                    setTimeout(() => {
-                        alert('✉️ Reply sent successfully!');
-
-                        // Clear fields and close modal
-                        setEmailReply('');
-                        setReplyPrompt('');
-                        setViewingEmail(null);
-                        setIsSending(false);
-
-                        // Remove envelope after animation
-                        setTimeout(() => {
-                            setShowEnvelope(false);
-                        }, 1500);
-                    }, 1000);
-
-                } catch (error) {
-                    console.error('❌ Error sending email:', error);
-                    alert(`❌ Failed to send email: ${error.message}`);
-                    setIsSending(false);
-                }
+            // Extract email address from "Name <email@domain.com>" format or use as-is
+            const extractEmail = (fromString) => {
+                const match = fromString.match(/<(.+?)>/);
+                return match ? match[1] : fromString;
             };
+
+            const recipientEmail = extractEmail(viewingEmail.from);
+            const originalSubject = viewingEmail.subject;
+            const replySubject = originalSubject.startsWith('Re:') ? originalSubject : `Re: ${originalSubject}`;
+
+            console.log('📮 Sending Outlook reply to:', recipientEmail);
+            console.log('Subject:', replySubject);
+
+            const response = await fetch('/api/outlook-send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    accessToken: tokens.access_token,
+                    to: recipientEmail,
+                    subject: replySubject,
+                    body: emailReply,
+                    messageId: viewingEmail.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to send email');
+            }
+
+            console.log('✅ Outlook email sent successfully!');
+            
+        } else {
+            // Send via Gmail
+            const savedTokens = localStorage.getItem('gmailTokens');
+            if (!savedTokens) {
+                alert('⚠️ Not connected to Gmail. Please connect your account in Settings.');
+                setIsSending(false);
+                return;
+            }
+
+            const tokens = JSON.parse(savedTokens);
+
+            // Extract email address
+            const extractEmail = (fromString) => {
+                const match = fromString.match(/<(.+?)>/);
+                return match ? match[1] : fromString;
+            };
+
+            const recipientEmail = extractEmail(viewingEmail.from);
+            const originalSubject = viewingEmail.subject;
+            const replySubject = originalSubject.startsWith('Re:') ? originalSubject : `Re: ${originalSubject}`;
+
+            console.log('📧 Sending Gmail reply to:', recipientEmail);
+            console.log('Subject:', replySubject);
+
+            const response = await fetch('/api/gmail-send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    accessToken: tokens.access_token,
+                    to: recipientEmail,
+                    subject: replySubject,
+                    body: emailReply,
+                    threadId: viewingEmail.threadId,
+                    messageId: viewingEmail.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to send email');
+            }
+
+            console.log('✅ Gmail email sent successfully!');
+        }
+
+        // Success! Show animations
+        setShowEnvelope(true);
+        playSendSound();
+
+        // Show success message
+        setTimeout(() => {
+            showNotification('✉️ Reply sent successfully!');
+
+            // Clear fields and close modal
+            setEmailReply('');
+            setReplyPrompt('');
+            setViewingEmail(null);
+            setIsSending(false);
+
+            // Remove envelope after animation
+            setTimeout(() => {
+                setShowEnvelope(false);
+            }, 1500);
+        }, 1000);
+
+    } catch (error) {
+        console.error('❌ Error sending email:', error);
+        showNotification('❌ Failed to send email: ' + error.message);
+        setIsSending(false);
+    }
+};
 
             const handleCloseVersionModal = () => {
                 setShowVersionModal(false);
