@@ -3762,34 +3762,85 @@ body.dark-mode .version-update-item-small {
 useEffect(() => {
     console.log('🚀 AI Email Writer initialized');
     
-    // Check for OAuth errors with full details
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-    
-    if (error) {
-    const errorType = urlParams.get('error_type');
-    const errorDesc = urlParams.get('error_desc');
-    const errorUri = urlParams.get('error_uri');
-    const rawError = urlParams.get('raw_error');
-    const details = urlParams.get('details');
-    
-    console.error('❌ OAuth Error:', error);
-    console.error('📋 Error Type:', errorType);
-    console.error('📋 Description:', errorDesc);
-    console.error('🔗 Error URI:', errorUri);
-    console.error('📋 Raw Error:', rawError);
-    console.error('📋 Details:', details);
-    
-    alert(
-        '❌ Outlook OAuth Error\n\n' +
-        'Error Type: ' + (errorType || 'N/A') + '\n' +
-        'Description: ' + (errorDesc || 'N/A') + '\n\n' +
-        'Raw error data:\n' + (rawError || details || 'N/A') + '\n\n' +
-        'Check browser console for full details.'
-    );
-    
-    window.history.replaceState({}, '', '/');
-    return;
+   // Check for OAuth callback with tokens
+const urlParams = new URLSearchParams(window.location.search);
+const tokensParam = urlParams.get('tokens');
+const provider = urlParams.get('provider');
+
+if (tokensParam) {
+    try {
+        const tokens = JSON.parse(decodeURIComponent(tokensParam));
+        console.log('🎉 OAuth tokens received for:', provider);
+        console.log('📦 Token data:', tokens);
+
+        if (provider === 'outlook') {
+            console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
+            
+            // Outlook OAuth - DO NOT CALL GMAIL
+            localStorage.setItem('outlookTokens', JSON.stringify(tokens));
+            localStorage.setItem('outlookConnected', 'true');
+            localStorage.removeItem('oauth_in_progress');
+            
+            console.log('💾 Saved Outlook tokens to localStorage');
+            console.log('🔄 Setting outlookConnected to TRUE');
+            
+            setOutlookConnected(true);
+            setActiveProvider('outlook'); // Set active provider to Outlook
+            
+            console.log('📧 Fetching OUTLOOK emails (NOT Gmail)...');
+            fetchOutlookEmails(tokens.access_token);
+            
+            console.log('✅ Outlook connection complete!');
+            
+            // Show success notification
+            setTimeout(() => {
+                alert('✅ Outlook connected successfully!');
+            }, 500);
+            
+        } else if (provider === 'gmail' || !provider) {
+            console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
+            
+            // Gmail OAuth
+            localStorage.setItem('gmailTokens', JSON.stringify(tokens));
+            localStorage.setItem('emailConnected', 'true');
+            localStorage.removeItem('oauth_in_progress');
+            setEmailConnected(true);
+
+            // Fetch user info
+            fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                headers: {
+                    Authorization: 'Bearer ' + tokens.access_token
+                }
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(userInfo) {
+                console.log('👤 User:', userInfo.email);
+                setUserEmail(userInfo.email);
+                localStorage.setItem('userEmail', userInfo.email);
+
+                const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
+                setUserName(name);
+                localStorage.setItem('userName', name);
+                console.log('👋 Welcome', name);
+            })
+            .catch(function(err) { 
+                console.error('Error fetching user info:', err); 
+            });
+
+            // Fetch GMAIL emails (NOT Outlook)
+            console.log('📧 Fetching GMAIL emails...');
+            fetchGmailEmails(tokens.access_token);
+            fetchSentEmails(tokens.access_token);
+            
+            console.log('✅ Gmail connection complete!');
+        }
+
+        // Clean URL
+        window.history.replaceState({}, '', '/');
+    } catch (error) {
+        console.error('❌ Error processing OAuth tokens:', error);
+        console.error('Token param was:', tokensParam);
+    }
 }
 
     // Load email connection from localStorage
@@ -3926,12 +3977,17 @@ useEffect(() => {
     }
 }, [autoPrioritize, gmailEmails.length, outlookEmails.length, currentPage, inboxViewMode, activeProvider]);
 
-            // Set default to tabs view when connected
+            // GOOD - checks which provider
 useEffect(() => {
-    if (emailConnected || outlookConnected) {
-        setInboxViewMode('tabs');
+    if (emailConnected && activeProvider === 'gmail') {
+        const tokens = JSON.parse(localStorage.getItem('gmailTokens'));
+        fetchGmailEmails(tokens.access_token);
+    } else if (outlookConnected && activeProvider === 'outlook') {
+        const tokens = JSON.parse(localStorage.getItem('outlookTokens'));
+        const parsed = JSON.parse(tokens);
+        fetchOutlookEmails(parsed.access_token);
     }
-}, [emailConnected, outlookConnected]);
+}, [emailConnected, outlookConnected, activeProvider]);
 
             // Check for version updates
             useEffect(() => {
