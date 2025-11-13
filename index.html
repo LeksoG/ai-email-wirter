@@ -6021,8 +6021,7 @@ body.dark-mode .version-update-item-small {
                                                             setInboxViewMode('tabs');
                                                             setPriorityEmails([]);
                                                             setViewingEmail(null);
-                                                        }
-                                                        }
+                                                        }}
                                                         title="Back to providers"
                                                     >
                                                         ←
@@ -6045,33 +6044,10 @@ body.dark-mode .version-update-item-small {
                                             )}
                                         </div>
 
-                                            {/* Provider Tabs at Bottom */}
-                                            {(emailConnected || outlookConnected) && (
-                                                <div className="provider-tabs-container">
-                                                    {emailConnected && (
-                                                        <div
-                                                            className={`provider-tab unified-button ${activeProvider === 'gmail' ? 'active' : ''}`}
-                                                            onClick={() => setActiveProvider('gmail')}
-                                                        >
-                                                            📧 Gmail
-                                                        </div>
-                                                    )}
-                                                    {outlookConnected && (
-                                                        <div
-                                                            className={`provider-tab unified-button ${activeProvider === 'outlook' ? 'active' : ''}`}
-                                                            onClick={() => setActiveProvider('outlook')}
-                                                        >
-                                                            📮 Outlook
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-    className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
-    onDragOver={(e) => {
+                                            className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+                                            onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
                                             }}
@@ -6086,8 +6062,8 @@ body.dark-mode .version-update-item-small {
                                                     setDroppedEmailFile(draggedEmail);
                                                     setViewingEmail(null);
                                                 }
-                                            }
-                                       </div>
+                                            }}
+                                        >
                 
                                             {viewingEmail ? (
                                                 <>
