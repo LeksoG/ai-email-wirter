@@ -3767,28 +3767,30 @@ useEffect(() => {
     const error = urlParams.get('error');
     
     if (error) {
-        const errorType = urlParams.get('error_type');
-        const errorDesc = urlParams.get('error_desc');
-        const errorUri = urlParams.get('error_uri');
-        const details = urlParams.get('details');
-        
-        console.error('❌ OAuth Error:', error);
-        console.error('📋 Error Type:', errorType);
-        console.error('📋 Description:', errorDesc);
-        console.error('🔗 Error URI:', errorUri);
-        console.error('📋 Details:', details);
-        
-        alert(
-            '❌ OAuth Error\n\n' +
-            'Error: ' + error + '\n' +
-            'Type: ' + (errorType || 'N/A') + '\n' +
-            'Description: ' + (errorDesc || 'N/A') + '\n\n' +
-            'Check browser console for full details.'
-        );
-        
-        window.history.replaceState({}, '', '/');
-        return;
-    }
+    const errorType = urlParams.get('error_type');
+    const errorDesc = urlParams.get('error_desc');
+    const errorUri = urlParams.get('error_uri');
+    const rawError = urlParams.get('raw_error');
+    const details = urlParams.get('details');
+    
+    console.error('❌ OAuth Error:', error);
+    console.error('📋 Error Type:', errorType);
+    console.error('📋 Description:', errorDesc);
+    console.error('🔗 Error URI:', errorUri);
+    console.error('📋 Raw Error:', rawError);
+    console.error('📋 Details:', details);
+    
+    alert(
+        '❌ Outlook OAuth Error\n\n' +
+        'Error Type: ' + (errorType || 'N/A') + '\n' +
+        'Description: ' + (errorDesc || 'N/A') + '\n\n' +
+        'Raw error data:\n' + (rawError || details || 'N/A') + '\n\n' +
+        'Check browser console for full details.'
+    );
+    
+    window.history.replaceState({}, '', '/');
+    return;
+}
 
     // Load email connection from localStorage
     const savedConnection = localStorage.getItem('emailConnected');
