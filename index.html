@@ -3758,137 +3758,144 @@ body.dark-mode .version-update-item-small {
             const carouselRef = useRef(null);
             const navRef = useRef(null);
 
-            // Initialize app with console logging
-            useEffect(() => {
-                console.log('🚀 AI Email Writer initialized');
-                console.log('📊 Initial state:', { activeTab, activeView, currentPage });
-                console.log('🔌 API endpoint:', '/api/transform');
+           // Initialize app with console logging
+useEffect(() => {
+    console.log('🚀 AI Email Writer initialized');
+    console.log('📊 Initial state:', { activeTab, activeView, currentPage });
+    console.log('🔌 API endpoint:', '/api/transform');
 
-                // Check for OAuth callback with tokens
-                const urlParams = new URLSearchParams(window.location.search);
-                const tokensParam = urlParams.get('tokens');
-                const provider = urlParams.get('provider');
+    // Check for OAuth callback with tokens
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokensParam = urlParams.get('tokens');
+    const provider = urlParams.get('provider');
 
-                if (tokensParam) {
-                    try {
-                        const tokens = JSON.parse(decodeURIComponent(tokensParam));
-                        console.log('🎉 OAuth tokens received!');
+    if (tokensParam) {
+        try {
+            const tokens = JSON.parse(decodeURIComponent(tokensParam));
+            console.log('🎉 OAuth tokens received for:', provider);
 
-                        if (provider === 'outlook') {
-                            // Outlook OAuth
-                            localStorage.setItem('outlookTokens', JSON.stringify(tokens));
-                            localStorage.setItem('outlookConnected', 'true');
-                            localStorage.removeItem('oauth_in_progress');
-                            setOutlookConnected(true);
-                            
-                            // Fetch Outlook emails
-                            fetchOutlookEmails(tokens.access_token);
-                            
-                            console.log('✅ Outlook connected!');
-                        } else {
-                            // Gmail OAuth (existing code)
-                            localStorage.setItem('gmailTokens', JSON.stringify(tokens));
-                            localStorage.setItem('emailConnected', 'true');
-                            localStorage.removeItem('oauth_in_progress');
-                            setEmailConnected(true);
+            if (provider === 'outlook') {
+                // Outlook OAuth
+                localStorage.setItem('outlookTokens', JSON.stringify(tokens));
+                localStorage.setItem('outlookConnected', 'true');
+                localStorage.removeItem('oauth_in_progress');
+                setOutlookConnected(true);
+                
+                // Fetch Outlook emails
+                fetchOutlookEmails(tokens.access_token);
+                
+                console.log('✅ Outlook connected!');
+                
+                // Show success notification
+                setTimeout(() => {
+                    alert('✅ Outlook connected successfully!');
+                }, 500);
+            } else {
+                // Gmail OAuth (existing code)
+                localStorage.setItem('gmailTokens', JSON.stringify(tokens));
+                localStorage.setItem('emailConnected', 'true');
+                localStorage.removeItem('oauth_in_progress');
+                setEmailConnected(true);
 
-                            // Fetch user info
-                            fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                                headers: {
-                                    Authorization: 'Bearer ' + tokens.access_token
-                                }
-                            })
-                            .then(function(res) { return res.json(); })
-                            .then(function(userInfo) {
-                                console.log('👤 User:', userInfo.email);
-                                setUserEmail(userInfo.email);
-                                localStorage.setItem('userEmail', userInfo.email);
-
-                                const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
-                                setUserName(name);
-                                localStorage.setItem('userName', name);
-                                console.log('👋 Welcome', name);
-                            })
-                            .catch(function(err) { 
-                                console.error('Error fetching user info:', err); 
-                            });
-
-                            // Fetch emails
-                            fetchGmailEmails(tokens.access_token);
-                            fetchSentEmails(tokens.access_token);
-                        }
-
-                        // Clean URL
-                        window.history.replaceState({}, '', '/');
-                    } catch (error) {
-                        console.error('❌ Error processing OAuth tokens:', error);
+                // Fetch user info
+                fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                    headers: {
+                        Authorization: 'Bearer ' + tokens.access_token
                     }
-                }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(userInfo) {
+                    console.log('👤 User:', userInfo.email);
+                    setUserEmail(userInfo.email);
+                    localStorage.setItem('userEmail', userInfo.email);
 
-                // Load email connection from localStorage
-                const savedConnection = localStorage.getItem('emailConnected');
-                const savedTokens = localStorage.getItem('gmailTokens');
-                const savedUserEmail = localStorage.getItem('userEmail');
-                const savedUserName = localStorage.getItem('userName');
-                const savedShowSuggestions = localStorage.getItem('showSuggestions');
+                    const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
+                    setUserName(name);
+                    localStorage.setItem('userName', name);
+                    console.log('👋 Welcome', name);
+                })
+                .catch(function(err) { 
+                    console.error('Error fetching user info:', err); 
+                });
 
-                if (savedUserEmail) {
-                    setUserEmail(savedUserEmail);
-                }
+                // Fetch emails
+                fetchGmailEmails(tokens.access_token);
+                fetchSentEmails(tokens.access_token);
+                
+                console.log('✅ Gmail connected!');
+            }
 
-                if (savedUserName) {
-                    setUserName(savedUserName);
-                }
+            // Clean URL
+            window.history.replaceState({}, '', '/');
+        } catch (error) {
+            console.error('❌ Error processing OAuth tokens:', error);
+        }
+    }
 
-                if (savedShowSuggestions !== null) {
-                    setShowSuggestionsEnabled(savedShowSuggestions === 'true');
-                }
+    // Load email connection from localStorage
+    const savedConnection = localStorage.getItem('emailConnected');
+    const savedTokens = localStorage.getItem('gmailTokens');
+    const savedUserEmail = localStorage.getItem('userEmail');
+    const savedUserName = localStorage.getItem('userName');
+    const savedShowSuggestions = localStorage.getItem('showSuggestions');
 
-                if (savedConnection === 'true' && savedTokens) {
-                    setEmailConnected(true);
+    if (savedUserEmail) {
+        setUserEmail(savedUserEmail);
+    }
 
-                    // Fetch emails with saved tokens
-                    try {
-                        const tokens = JSON.parse(savedTokens);
-                        fetchGmailEmails(tokens.access_token);
-                        fetchSentEmails(tokens.access_token);
-                    } catch (error) {
-                        console.error('❌ Error loading saved tokens:', error);
-                        // Clear invalid tokens
-                        localStorage.removeItem('gmailTokens');
-                        localStorage.removeItem('emailConnected');
-                        localStorage.removeItem('userEmail');
-                        setEmailConnected(false);
-                        setUserEmail('');
-                    }
-                }
+    if (savedUserName) {
+        setUserName(savedUserName);
+    }
 
-                // Load Outlook connection
-                const savedOutlookConnection = localStorage.getItem('outlookConnected');
-                const savedOutlookTokens = localStorage.getItem('outlookTokens');
+    if (savedShowSuggestions !== null) {
+        setShowSuggestionsEnabled(savedShowSuggestions === 'true');
+    }
 
-                if (savedOutlookConnection === 'true' && savedOutlookTokens) {
-                    setOutlookConnected(true);
-                    
-                    // Fetch Outlook emails with saved tokens
-                    try {
-                        const tokens = JSON.parse(savedOutlookTokens);
-                        fetchOutlookEmails(tokens.access_token);
-                    } catch (error) {
-                        console.error('❌ Error loading saved Outlook tokens:', error);
-                        localStorage.removeItem('outlookTokens');
-                        localStorage.removeItem('outlookConnected');
-                        setOutlookConnected(false);
-                    }
-                }
+    if (savedConnection === 'true' && savedTokens) {
+        setEmailConnected(true);
 
-                // Load dark mode preference
-                const savedDarkMode = localStorage.getItem('darkMode');
-                if (savedDarkMode === 'true') {
-                    setDarkMode(true);
-                    document.body.classList.add('dark-mode');
-                }
-            }, []);
+        // Fetch emails with saved tokens
+        try {
+            const tokens = JSON.parse(savedTokens);
+            fetchGmailEmails(tokens.access_token);
+            fetchSentEmails(tokens.access_token);
+        } catch (error) {
+            console.error('❌ Error loading saved tokens:', error);
+            // Clear invalid tokens
+            localStorage.removeItem('gmailTokens');
+            localStorage.removeItem('emailConnected');
+            localStorage.removeItem('userEmail');
+            setEmailConnected(false);
+            setUserEmail('');
+        }
+    }
+
+    // Load Outlook connection
+    const savedOutlookConnection = localStorage.getItem('outlookConnected');
+    const savedOutlookTokens = localStorage.getItem('outlookTokens');
+
+    if (savedOutlookConnection === 'true' && savedOutlookTokens) {
+        setOutlookConnected(true);
+        
+        // Fetch Outlook emails with saved tokens
+        try {
+            const tokens = JSON.parse(savedOutlookTokens);
+            fetchOutlookEmails(tokens.access_token);
+        } catch (error) {
+            console.error('❌ Error loading saved Outlook tokens:', error);
+            localStorage.removeItem('outlookTokens');
+            localStorage.removeItem('outlookConnected');
+            setOutlookConnected(false);
+        }
+    }
+
+    // Load dark mode preference
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+        setDarkMode(true);
+        document.body.classList.add('dark-mode');
+    }
+}, []);
 
             // Update dark mode
             useEffect(() => {
@@ -5221,103 +5228,100 @@ useEffect(() => {
                                     </div>
                                 </div>
 
-                                {/* Email Connection Section */}
+                                {/* Email Connections Section */}
                                 <div className="pt-6 border-t border-gray-300">
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                        📧 Email Connection
+                                        📧 Email Connections
                                     </label>
                                     <p className="text-xs text-gray-600 mb-4">
-                                        Connect your Gmail to access and transform your messages
+                                        Connect your email accounts to access and transform your messages
                                     </p>
 
-                                    {!emailConnected ? (
-                                        <button
-                                            onClick={handleGmailConnect}
-                                            className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
-                                        >
-                                            <svg className="gmail-icon gmail-connecting" viewBox="0 0 24 24" fill="#4285F4">
-                                                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
-                                            </svg>
-                                            Connect Gmail
-                                        </button>
-                                    ) : (
-                                        <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
-                                            <div className="flex items-center gap-3">
-                                                <svg className="gmail-icon gmail-connected" viewBox="0 0 24 24" fill="#10b981">
+                                    {/* Gmail Connection */}
+                                    <div className="mb-4">
+                                        <div className="text-xs font-semibold text-gray-600 mb-2">Gmail</div>
+                                        {!emailConnected ? (
+                                            <button
+                                                onClick={handleGmailConnect}
+                                                className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
+                                            >
+                                                <svg className="gmail-icon gmail-connecting" viewBox="0 0 24 24" fill="#4285F4">
                                                     <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                                 </svg>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium text-gray-700">Connected to Gmail</span>
-                                                    {userEmail && <span className="text-xs text-gray-600 mt-1">{userEmail}</span>}
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    setEmailConnected(false);
-                                                    localStorage.removeItem('emailConnected');
-                                                    localStorage.removeItem('gmailTokens');
-                                                    localStorage.removeItem('userEmail');
-                                                    setGmailEmails([]);
-                                                    setSentEmails([]);
-                                                    setUserEmail('');
-                                                    console.log('📧 Gmail disconnected');
-                                                }}
-                                                className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
-                                            >
-                                                Disconnect
+                                                Connect Gmail
                                             </button>
-                                        </div>
-                                    )}
-                                </div>
+                                        ) : (
+                                            <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                                <div className="flex items-center gap-3">
+                                                    <svg className="gmail-icon gmail-connected" viewBox="0 0 24 24" fill="#10b981">
+                                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                                                    </svg>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium text-gray-700">Connected to Gmail</span>
+                                                        {userEmail && <span className="text-xs text-gray-600 mt-1">{userEmail}</span>}
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        setEmailConnected(false);
+                                                        localStorage.removeItem('emailConnected');
+                                                        localStorage.removeItem('gmailTokens');
+                                                        localStorage.removeItem('userEmail');
+                                                        setGmailEmails([]);
+                                                        setSentEmails([]);
+                                                        setUserEmail('');
+                                                        console.log('📧 Gmail disconnected');
+                                                    }}
+                                                    className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
+                                                >
+                                                    Disconnect
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                {/* Outlook Connection */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                        📮 Outlook Connection
-                                    </label>
-                                    <p className="text-xs text-gray-600 mb-4">
-                                        Connect your Outlook to access and transform your messages
-                                    </p>
-
-                                    {!outlookConnected ? (
-                                        <button
-                                            onClick={handleOutlookConnect}
-                                            className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
-                                        >
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#0078D4">
-                                                <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                                <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#0078D4"/>
-                                            </svg>
-                                            Connect Outlook
-                                        </button>
-                                    ) : (
-                                        <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
-                                            <div className="flex items-center gap-3">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#10b981">
+                                    {/* Outlook Connection */}
+                                    <div>
+                                        <div className="text-xs font-semibold text-gray-600 mb-2">Outlook</div>
+                                        {!outlookConnected ? (
+                                            <button
+                                                onClick={handleOutlookConnect}
+                                                className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
+                                            >
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#0078D4">
                                                     <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                                    <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#10b981"/>
+                                                    <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#0078D4"/>
                                                 </svg>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium text-gray-700">Connected to Outlook</span>
-                                                    <span className="text-xs text-gray-600 mt-1">outlook@example.com</span>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    setOutlookConnected(false);
-                                                    localStorage.removeItem('outlookConnected');
-                                                    localStorage.removeItem('outlookTokens');
-                                                    setOutlookEmails([]);
-                                                    console.log('📮 Outlook disconnected');
-                                                }}
-                                                className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
-                                            >
-                                                Disconnect
+                                                Connect Outlook
                                             </button>
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                                <div className="flex items-center gap-3">
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#10b981">
+                                                        <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#10b981"/>
+                                                    </svg>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium text-gray-700">Connected to Outlook</span>
+                                                        <span className="text-xs text-gray-600 mt-1">Account connected</span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        setOutlookConnected(false);
+                                                        localStorage.removeItem('outlookConnected');
+                                                        localStorage.removeItem('outlookTokens');
+                                                        setOutlookEmails([]);
+                                                        console.log('📮 Outlook disconnected');
+                                                    }}
+                                                    className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
+                                                >
+                                                    Disconnect
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 );
