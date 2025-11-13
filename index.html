@@ -5559,7 +5559,7 @@ body.dark-mode .version-update-item-small {
                     <div className="page-container relative z-10 container mx-auto px-4 py-8 max-w-8xl">
                         {currentPage === 'settings' ? renderSettings() : (
                             <>
-                                {/* Animated Welcome Text */}
+                               {/* Animated Welcome Text */}
                                 {showWelcomeAnimation && currentPage === 'home' && !emailConnected && (
                                     <div className={`welcome-text-container ${!showWelcomeAnimation ? 'fade-out' : ''}`}>
                                         <div className="welcome-text" key={currentWelcomeMessage}>
@@ -5583,44 +5583,551 @@ body.dark-mode .version-update-item-small {
                                     </div>
                                 )}
 
-                                {/* Main content area */}
-                                <div className="rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
-                                    {/* Tab Switches */}
-                                    <div className="flex justify-center mb-8">
-                                        <div className="tab-container tab-button-container">
-                                            <div
-                                                className="tab-slider"
-                                                style={{
-                                                    width: '50%',
-                                                    height: 'calc(100% - 12px)',
-                                                    top: '6px',
-                                                    left: activeView === 'writer' ? '6px' : 'calc(50% - 6px)',
-                                                }}
-                                            ></div>
-                                            <button
-                                                onClick={() => setActiveView('writer')}
-                                                className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                    activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
-                                                }`}
-                                            >
-                                                ✍️ AI Writer
-                                            </button>
-                                            <button
-                                                onClick={() => setActiveView('results')}
-                                                className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                    activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
-                                                }`}
-                                            >
-                                                ✨ Results
-                                            </button>
+                                {/* Desktop Layout: Inbox Sidebar + Content Area */}
+                                {emailConnected ? (
+                                    <div className="desktop-inbox-layout">
+                                        {/* Left Sidebar - Inbox */}
+                                        <div className="inbox-sidebar">
+                                            {/* Header with Title and Buttons */}
+                                            <div className="inbox-header">
+                                                <div className="inbox-header-left">
+                                                    <h2 className="text-2xl font-bold text-gray-800">
+                                                        {activeProvider === 'gmail' ? '📧 Gmail' : '📮 Outlook'}
+                                                    </h2>
+                                                </div>
+                                                <div className="inbox-header-right">
+                                                    {inboxViewMode === 'received' && gmailEmails.length > 0 && !autoPrioritize && (
+                                                        <button
+                                                            onClick={() => handlePrioritizeEmails()}
+                                                            disabled={isPrioritizing}
+                                                            className={`oval-button px-4 py-2 text-sm font-semibold glass-effect border-2 border-white unified-button text-gray-800 ${isPrioritizing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        >
+                                                            {isPrioritizing ? '🤖 Prioritizing...' : '✨ Prioritize'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Prioritizing Glow Notification */}
+                                            {isPrioritizing && (
+                                                <div className="prioritizing-glow-container">
+                                                    <div className="prioritizing-glow-oval">
+                                                        <span className="prioritizing-icon">⚡</span>
+                                                        <span>Analyzing emails...</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Search Bar */}
+                                            <div style={{position: 'relative'}}>
+                                                <input
+                                                    type="text"
+                                                    value={inboxSearchQuery}
+                                                    onChange={(e) => {
+                                                        setInboxSearchQuery(e.target.value);
+                                                        if (e.target.value) {
+                                                            const currentEmails = activeProvider === 'outlook' ? outlookEmails : gmailEmails;
+                                                            const results = currentEmails.filter(email =>
+                                                                email.subject.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                                                email.from.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                                                                email.snippet.toLowerCase().includes(e.target.value.toLowerCase())
+                                                            ).slice(0, 5);
+                                                            setInboxSearchResults(results);
+                                                            setShowInboxSearchSuggestions(true);
+                                                        } else {
+                                                            setShowInboxSearchSuggestions(false);
+                                                        }
+                                                    }}
+                                                    placeholder="🔍 Search emails..."
+                                                    className="inbox-search-bar unified-button border-2 border-white"
+                                                />
+                                                {showInboxSearchSuggestions && inboxSearchResults.length > 0 && (
+                                                    <div className="inbox-search-suggestions">
+                                                        {inboxSearchResults.map(email => (
+                                                            <div
+                                                                key={email.id}
+                                                                className="inbox-search-suggestion-item"
+                                                                onClick={() => {
+                                                                    setViewingEmail(email);
+                                                                    setInboxSearchQuery('');
+                                                                    setShowInboxSearchSuggestions(false);
+                                                                }}
+                                                            >
+                                                                <div className="text-xs font-bold text-gray-800">{email.from}</div>
+                                                                <div className="text-sm font-semibold text-gray-700">{email.subject}</div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Email List Area with Fade Effect */}
+                                            <div className="inbox-scroll-area">
+                                                {/* Prioritized Emails Section */}
+                                                {autoPrioritize && priorityEmails.length > 0 && inboxViewMode === 'received' && (
+                                                    <div className="priority-stack-container">
+                                                        {/* Collapsible Header */}
+                                                        <div
+                                                            className="prioritized-section-header"
+                                                            onClick={() => setPrioritizedCollapsed(!prioritizedCollapsed)}
+                                                        >
+                                                            <div className="prioritized-section-title">
+                                                                <span>⚡</span>
+                                                                <span>Prioritized Emails</span>
+                                                                <span className="text-xs">({priorityEmails.length})</span>
+                                                            </div>
+                                                            <div className={`prioritized-collapse-icon ${prioritizedCollapsed ? 'collapsed' : ''}`}>
+                                                                ▼
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Priority Stack */}
+                                                        {!prioritizedCollapsed && (
+                                                            <div
+                                                                className={`priority-stack ${priorityStackExpanded ? 'expanded' : ''}`}
+                                                                onClick={() => setPriorityStackExpanded(!priorityStackExpanded)}
+                                                                style={{height: priorityStackExpanded ? 'auto' : '80px', marginBottom: priorityStackExpanded ? '12px' : '20px'}}
+                                                            >
+                                                                {priorityEmails.slice(0, 3).map((email, index) => (
+                                                                    <div
+                                                                        key={email.id}
+                                                                        className="priority-stack-item"
+                                                                        onClick={(e) => {
+                                                                            if (priorityStackExpanded) {
+                                                                                e.stopPropagation();
+                                                                                setViewingEmail(email);
+                                                                            }
+                                                                        }}
+                                                                        style={{cursor: priorityStackExpanded ? 'pointer' : 'default'}}
+                                                                    >
+                                                                        <div className="flex items-center justify-between">
+                                                                            <div className="flex-1 pr-2">
+                                                                                <div className="text-xs font-bold text-gray-800 mb-1 truncate">⚡ {email.from}</div>
+                                                                                <div className="text-sm font-semibold text-gray-700 truncate">{email.subject}</div>
+                                                                            </div>
+                                                                            {index === 0 && !priorityStackExpanded && priorityEmails.length > 1 && (
+                                                                                <div className="text-xs bg-indigo-600 text-white px-2 py-1 rounded-full font-bold">
+                                                                                    +{priorityEmails.length - 1}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Regular Email List */}
+                                                <div className={`space-y-2 ${activeProvider === 'outlook' ? 'outlook-slide-enter' : 'gmail-slide-enter'}`}>
+                                                    {inboxViewMode === 'received' ? (
+                                                        activeProvider === 'outlook' ? (
+                                                            outlookEmails.length > 0 ? (
+                                                                outlookEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map((email, index) => (
+                                                                    <div
+                                                                        key={email.id}
+                                                                        onClick={() => {
+                                                                            setViewingEmail(email);
+                                                                            if (unreadEmails.has(email.id)) {
+                                                                                setUnreadEmails(prev => {
+                                                                                    const updated = new Set(prev);
+                                                                                    updated.delete(email.id);
+                                                                                    return updated;
+                                                                                });
+                                                                            }
+                                                                        }}
+                                                                        className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                                        style={{animationDelay: `${index * 0.05}s`}}
+                                                                    >
+                                                                        <button
+                                                                            className="email-delete-btn"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDeleteEmail(email.id, 'inbox');
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </button>
+                                                                        {unreadEmails.has(email.id) && (
+                                                                            <div className="unread-label" style={{position: 'absolute', top: '8px', right: '8px', fontSize: '9px', padding: '2px 6px'}}>
+                                                                                NEW
+                                                                            </div>
+                                                                        )}
+                                                                        <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
+                                                                        <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                                                        <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
+                                                                        <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="text-center py-12 text-gray-500">
+                                                                    <div className="text-6xl mb-4">📮</div>
+                                                                    <p>No Outlook emails</p>
+                                                                </div>
+                                                            )
+                                                        ) : (
+                                                            gmailEmails.filter(email => !priorityEmails.find(p => p.id === email.id)).map((email, index) => (
+                                                                <div
+                                                                    key={email.id}
+                                                                    onClick={() => {
+                                                                        setViewingEmail(email);
+                                                                        if (unreadEmails.has(email.id)) {
+                                                                            setUnreadEmails(prev => {
+                                                                                const updated = new Set(prev);
+                                                                                updated.delete(email.id);
+                                                                                return updated;
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                                    style={{animationDelay: `${index * 0.05}s`}}
+                                                                >
+                                                                    <button
+                                                                        className="email-delete-btn"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteEmail(email.id, 'inbox');
+                                                                        }}
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                    {unreadEmails.has(email.id) && (
+                                                                        <div className="unread-label" style={{position: 'absolute', top: '8px', right: '8px', fontSize: '9px', padding: '2px 6px'}}>
+                                                                            NEW
+                                                                        </div>
+                                                                    )}
+                                                                    <div className="text-xs font-bold text-gray-800 mb-1 truncate">{email.from}</div>
+                                                                    <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                                                    <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
+                                                                    <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                                                </div>
+                                                            ))
+                                                        )
+                                                    ) : (
+                                                        /* Sent Emails */
+                                                        sentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
+                                                            sentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
+                                                                <div
+                                                                    key={email.id}
+                                                                    onClick={() => setViewingEmail(email)}
+                                                                    className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''}`}
+                                                                    style={{animationDelay: `${index * 0.05}s`}}
+                                                                >
+                                                                    <button
+                                                                        className="email-delete-btn"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteEmail(email.id, 'sent');
+                                                                        }}
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                    <div className="text-xs font-bold text-gray-800 mb-1 truncate">To: {email.to}</div>
+                                                                    <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                                                    <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
+                                                                    <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="text-center py-12 text-gray-500">
+                                                                <div className="text-6xl mb-4">📭</div>
+                                                                <p>No sent emails</p>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* View Toggle at Bottom (Received/Sent) */}
+                                            <div className="inbox-view-toggle-container">
+                                                <div className="inbox-view-toggle">
+                                                    <button
+                                                        className={`inbox-view-toggle-btn ${inboxViewMode === 'received' ? 'active' : ''}`}
+                                                        onClick={() => setInboxViewMode('received')}
+                                                    >
+                                                        📥 Received
+                                                    </button>
+                                                    <button
+                                                        className={`inbox-view-toggle-btn ${inboxViewMode === 'sent' ? 'active' : ''}`}
+                                                        onClick={() => setInboxViewMode('sent')}
+                                                    >
+                                                        📤 Sent
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Provider Tabs at Bottom */}
+                                            {(emailConnected || outlookConnected) && (
+                                                <div className="provider-tabs-container">
+                                                    {emailConnected && (
+                                                        <div
+                                                            className={`provider-tab unified-button ${activeProvider === 'gmail' ? 'active' : ''}`}
+                                                            onClick={() => setActiveProvider('gmail')}
+                                                        >
+                                                            📧 Gmail
+                                                        </div>
+                                                    )}
+                                                    {outlookConnected && (
+                                                        <div
+                                                            className={`provider-tab unified-button ${activeProvider === 'outlook' ? 'active' : ''}`}
+                                                            onClick={() => setActiveProvider('outlook')}
+                                                        >
+                                                            📮 Outlook
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Right Content Area - Email Viewer or AI Tools */}
+                                        <div
+                                            className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                setIsDraggingOver(true);
+                                            }}
+                                            onDragLeave={(e) => {
+                                                e.preventDefault();
+                                                setIsDraggingOver(false);
+                                            }}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                setIsDraggingOver(false);
+                                                if (draggedEmail) {
+                                                    setDroppedEmailFile(draggedEmail);
+                                                    setViewingEmail(null);
+                                                }
+                                            }}
+                                        >
+                                            {viewingEmail ? (
+                                                <>
+                                                    {/* Email Viewer Header */}
+                                                    <div className="email-viewer-header">
+                                                        <button
+                                                            onClick={() => setViewingEmail(null)}
+                                                            className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all unified-button border-2 border-white flex items-center gap-2"
+                                                        >
+                                                            <span>←</span>
+                                                            <span>Back</span>
+                                                        </button>
+                                                        <div className="email-action-buttons">
+                                                            <button
+                                                                onClick={() => handleSummarizeEmail(viewingEmail)}
+                                                                className="px-4 py-2 rounded-full text-gray-800 text-sm font-medium hover:opacity-90 transition-all unified-button border-2 border-white glass-effect"
+                                                            >
+                                                                ✨ Summarize
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEmailReply('');
+                                                                    setTimeout(() => {
+                                                                        document.getElementById('reply-section')?.scrollIntoView({ behavior: 'smooth' });
+                                                                    }, 100);
+                                                                }}
+                                                                className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all unified-button border-2 border-white"
+                                                            >
+                                                                ✍️ Reply
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Email Content */}
+                                                    <div className="mb-4">
+                                                        <h2 className="text-2xl font-bold text-gray-800 mb-3">{viewingEmail.subject}</h2>
+                                                        <div className="flex justify-between items-center mb-4">
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-gray-700">From: {viewingEmail.from}</div>
+                                                                <div className="text-xs text-gray-500 mt-1">{viewingEmail.date}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="prose max-w-none">
+                                                        <p className="text-gray-700 leading-relaxed email-content-formatted">{viewingEmail.snippet}</p>
+                                                    </div>
+
+                                                    {/* Summarize Popup in Viewer */}
+                                                    {summarizingEmail === viewingEmail.id && (
+                                                        <div className="summary-popup mt-4" style={{position: 'relative', top: 0, marginTop: '16px'}}>
+                                                            {isSummarizing ? (
+                                                                <div className="space-y-3">
+                                                                    <div className="flex items-center gap-3 mb-3">
+                                                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-600 border-t-transparent"></div>
+                                                                        <span className="text-sm text-gray-700 font-medium">Summarizing...</span>
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                                        <div className="loading-line" style={{height: '8px'}}></div>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <div>
+                                                                    <div className="flex justify-between items-center mb-2">
+                                                                        <span className="text-sm font-bold text-indigo-600">✨ Summary</span>
+                                                                        <button
+                                                                            onClick={() => setSummaryHidden(!summaryHidden)}
+                                                                            className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+                                                                        >
+                                                                            {summaryHidden ? 'Show' : 'Hide'}
+                                                                        </button>
+                                                                    </div>
+                                                                    {!summaryHidden && (
+                                                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                                                            {summaryText.split(' ').map((word, i) => (
+                                                                                <span key={i} style={{
+                                                                                    display: 'inline-block',
+                                                                                    animation: 'fadeInWord 0.3s ease-out',
+                                                                                    animationDelay: `${i * 0.05}s`,
+                                                                                    animationFillMode: 'backwards',
+                                                                                    marginRight: '0.25em'
+                                                                                }}>
+                                                                                    {word}
+                                                                                </span>
+                                                                            ))}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Reply Section */}
+                                                    <div id="reply-section" className="mt-8 pt-6 border-t border-gray-300">
+                                                        <h3 className="text-lg font-bold text-gray-800 mb-4">✍️ Write Reply</h3>
+                                                        <div className="relative mb-4">
+                                                            <textarea
+                                                                value={emailReply}
+                                                                onChange={(e) => setEmailReply(e.target.value)}
+                                                                className="w-full h-48 px-6 py-4 pr-24 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none"
+                                                                placeholder="Type your reply here..."
+                                                            />
+                                                            {emailReply && emailReply.trim().length > 0 && (
+                                                                <button
+                                                                    onClick={handleSendEmail}
+                                                                    disabled={isSending}
+                                                                    className={isSending ? 'send-button-float send-button-sending' : 'send-button-float'}
+                                                                >
+                                                                    {isSending ? (
+                                                                        <>
+                                                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                                                            <span>Sending...</span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <span>→</span>
+                                                                            <span>Send</span>
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                        <div className="ai-transform-container">
+                                                            <input
+                                                                type="text"
+                                                                value={replyPrompt}
+                                                                onChange={(e) => setReplyPrompt(e.target.value)}
+                                                                className="ai-transform-input"
+                                                                placeholder="✨ Rewrite with AI (e.g., 'Make it more professional', 'Add email structure')"
+                                                                onKeyPress={(e) => {
+                                                                    if (e.key === 'Enter' && replyPrompt && emailReply) {
+                                                                        handleRewriteReply();
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <button
+                                                                onClick={handleRewriteReply}
+                                                                disabled={!replyPrompt || !emailReply || isRewritingReply}
+                                                                className="ai-transform-button"
+                                                            >
+                                                                {isRewritingReply ? '✨ Rewriting...' : 'Rewrite'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {/* AI Writer as Default */}
+                                                    <div className="rounded-3xl p-4 relative">
+                                                        {/* Tab Switches */}
+                                                        <div className="flex justify-center mb-8">
+                                                            <div className="tab-container tab-button-container">
+                                                                <div
+                                                                    className="tab-slider"
+                                                                    style={{
+                                                                        width: '50%',
+                                                                        height: 'calc(100% - 12px)',
+                                                                        top: '6px',
+                                                                        left: activeView === 'writer' ? '6px' : 'calc(50% - 6px)',
+                                                                    }}
+                                                                ></div>
+                                                                <button
+                                                                    onClick={() => setActiveView('writer')}
+                                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
+                                                                        activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                                    }`}
+                                                                >
+                                                                    ✍️ AI Writer
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setActiveView('results')}
+                                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
+                                                                        activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                                    }`}
+                                                                >
+                                                                    ✨ Results
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Content Area */}
+                                                        <div className="min-h-[500px]">
+                                                            {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
+                                ) : (
+                                    /* Original Home Page Layout when not connected */
+                                    <div className="rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
+                                        {/* Tab Switches */}
+                                        <div className="flex justify-center mb-8">
+                                            <div className="tab-container tab-button-container">
+                                                <div
+                                                    className="tab-slider"
+                                                    style={{
+                                                        width: '50%',
+                                                        height: 'calc(100% - 12px)',
+                                                        top: '6px',
+                                                        left: activeView === 'writer' ? '6px' : 'calc(50% - 6px)',
+                                                    }}
+                                                ></div>
+                                                <button
+                                                    onClick={() => setActiveView('writer')}
+                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
+                                                        activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                    }`}
+                                                >
+                                                    ✍️ AI Writer
+                                                </button>
+                                                <button
+                                                    onClick={() => setActiveView('results')}
+                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
+                                                        activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                    }`}
+                                                >
+                                                    ✨ Results
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                    {/* Content Area */}
-                                    <div className="min-h-[500px]">
-                                        {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
+                                        {/* Content Area */}
+                                        <div className="min-h-[500px]">
+                                            {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </>
                         )}
                     </div>
