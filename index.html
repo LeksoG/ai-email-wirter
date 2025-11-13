@@ -4282,26 +4282,40 @@ useEffect(() => {
            const handleOutlookConnect = async () => {
     try {
         console.log('🔐 Initiating Outlook OAuth...');
+        console.log('🌐 Current location:', window.location.href);
+        console.log('🌐 Current origin:', window.location.origin);
         
         const response = await fetch('/api/outlook-auth');
         
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to get auth URL');
+            const errorText = await response.text();
+            console.error('❌ Auth endpoint failed:', response.status, errorText);
+            throw new Error('Failed to get auth URL: ' + response.status);
         }
         
         const data = await response.json();
+        console.log('📦 Auth response:', data);
         
         if (!data.success || !data.authUrl) {
             throw new Error('Invalid response from auth endpoint');
         }
         
+        console.log('📮 Redirect URI generated:', data.redirectUri);
         console.log('📮 Redirecting to Microsoft OAuth...');
-        console.log('🔗 Redirect URI being used:', data.redirectUri);
-        console.log('⚠️ Make sure this EXACT URI is registered in Azure AD!');
         
-        // Show alert with the redirect URI so you can copy it
-        alert('Redirect URI: ' + data.redirectUri + '\n\nMake sure this is registered in Azure AD!');
+        // Pause to let you see the console logs
+        const proceed = confirm(
+            '⚠️ REDIRECT URI CHECK\n\n' +
+            'Generated URI:\n' + data.redirectUri + '\n\n' +
+            'Azure AD registered URI:\n' + 'https://ai-email-wirter.vercel.app/api/outlook-callback\n\n' +
+            'Do these match EXACTLY?\n' +
+            'Click OK to continue to Microsoft login.'
+        );
+        
+        if (!proceed) {
+            console.log('❌ User cancelled OAuth flow');
+            return;
+        }
         
         localStorage.setItem('oauth_in_progress', 'outlook');
         window.location.href = data.authUrl;
@@ -4310,7 +4324,6 @@ useEffect(() => {
         alert('Failed to connect Outlook: ' + error.message);
     }
 };
-
             const isTokenExpired = (expiryDate) => {
                 if (!expiryDate) return true;
                 // Add 5 minute buffer before actual expiry
