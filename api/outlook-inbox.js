@@ -1,49 +1,73 @@
 export default async function handler(req, res) {
+    console.log('📮 ========== OUTLOOK INBOX API HIT ==========');
+    
     if (req.method !== 'POST') {
+        console.log('❌ Wrong method:', req.method);
         return res.status(405).json({ message: 'Method not allowed' });
     }
 
+    const { accessToken } = req.body;
+    
+    console.log('🔑 Access token received:', !!accessToken);
+    console.log('🔑 Access token preview:', accessToken ? accessToken.substring(0, 20) + '...' : 'MISSING');
+
+    if (!accessToken) {
+        console.log('❌ No access token provided');
+        return res.status(400).json({ message: 'Access token required' });
+    }
+
     try {
-        const { accessToken } = req.body;
-
-        if (!accessToken) {
-            return res.status(400).json({ message: 'Access token required' });
-        }
-
+        console.log('📡 Fetching emails from Microsoft Graph API...');
+        
         const response = await fetch(
-            'https://graph.microsoft.com/v1.0/me/messages?$top=20&$orderby=receivedDateTime desc',
+            'https://graph.microsoft.com/v1.0/me/messages?$top=20&$select=id,subject,from,receivedDateTime,bodyPreview,conversationId',
             {
                 headers: {
-                    'Authorization': 'Bearer ' + accessToken,
+                    'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/json'
                 }
             }
         );
 
+        console.log('📡 Microsoft Graph response status:', response.status);
+
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || 'Failed to fetch emails');
+            const errorData = await response.json();
+            console.error('❌ Microsoft Graph API error:', errorData);
+            return res.status(response.status).json({
+                message: 'Failed to fetch Outlook emails',
+                details: errorData
+            });
         }
 
         const data = await response.json();
         
-        const emails = data.value.map(function(email) {
-            return {
+        console.log('📧 Raw response from Microsoft:', data);
+        console.log('📧 Emails count:', data.value?.length || 0);
+
+        const emails = data.value.map(email => {
+            const formatted = {
                 id: email.id,
-                from: email.from?.emailAddress?.address || 'Unknown',
+                from: email.from?.emailAddress?.name || email.from?.emailAddress?.address || 'Unknown',
                 subject: email.subject || 'No Subject',
                 snippet: email.bodyPreview || '',
                 date: new Date(email.receivedDateTime).toLocaleString(),
                 threadId: email.conversationId
             };
+            console.log('✅ Formatted email:', formatted);
+            return formatted;
         });
 
-        res.json({ emails: emails });
+        console.log('✅ ========== RETURNING EMAILS ==========');
+        console.log('Total emails:', emails.length);
 
+        res.status(200).json({ emails });
     } catch (error) {
-        console.error('Outlook inbox error:', error);
+        console.error('❌ ========== OUTLOOK INBOX ERROR ==========');
+        console.error('Error:', error.message);
+        console.error('Stack:', error.stack);
         res.status(500).json({ 
-            message: 'Failed to fetch Outlook emails',
+            message: 'Internal server error',
             details: error.message 
         });
     }
