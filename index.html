@@ -3593,6 +3593,68 @@ body.dark-mode .version-update-item-small {
 .provider-tab.active, .inbox-view-toggle-btn.active {
     backdrop-filter: blur(20px);
 }
+
+        .inbox-back-btn-tab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    backdrop-filter: blur(10px);
+    border: 2px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #374151;
+    font-weight: bold;
+}
+
+.inbox-back-btn-tab:hover {
+    transform: scale(1.1) translateX(-2px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9));
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.inbox-back-btn-tab:active {
+    transform: scale(0.95);
+}
+
+/* Smooth provider/view mode transitions */
+.provider-tabs-container, .inbox-view-toggle {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth content transitions */
+.gmail-slide-enter, .outlook-slide-enter {
+    animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+        filter: blur(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+        filter: blur(0);
+    }
+}
     </style>
 </head>
 <body>
@@ -3896,6 +3958,13 @@ useEffect(() => {
         }
     }
 }, [autoPrioritize, gmailEmails.length, outlookEmails.length, currentPage, inboxViewMode, activeProvider]);
+
+            // Set default to tabs view when connected
+useEffect(() => {
+    if (emailConnected || outlookConnected) {
+        setInboxViewMode('tabs');
+    }
+}, [emailConnected, outlookConnected]);
 
             // Check for version updates
             useEffect(() => {
@@ -6016,30 +6085,82 @@ useEffect(() => {
                                                 </div>
                                             </div>
 
-                                            {/* Bottom Tabs - Provider and View Toggle */}
-                                            <div style={{marginTop: 'auto', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px'}}>
-                                                {/* Received/Sent Toggle */}
-                                                <div className="inbox-view-toggle">
-                                                    <button
-                                                        className={`inbox-view-toggle-btn ${inboxViewMode === 'received' ? 'active' : ''}`}
-                                                        onClick={() => {
-                                                            setInboxViewMode('received');
-                                                            setViewingEmail(null);
-                                                        }}
-                                                    >
-                                                        📥 Received
-                                                    </button>
-                                                    <button
-                                                        className={`inbox-view-toggle-btn ${inboxViewMode === 'sent' ? 'active' : ''}`}
-                                                        onClick={() => {
-                                                            setInboxViewMode('sent');
-                                                            setPriorityEmails([]);
-                                                            setViewingEmail(null);
-                                                        }}
-                                                    >
-                                                        📤 Sent
-                                                    </button>
-                                                </div>
+                                           {/* Bottom Tabs - Single Location with Smooth Transitions */}
+                                            <div style={{marginTop: 'auto', paddingTop: '16px'}}>
+                                                {inboxViewMode === 'tabs' ? (
+                                                    /* Provider Selection */
+                                                    <div className="provider-tabs-container" style={{
+                                                        animation: 'fadeIn 0.3s ease-out'
+                                                    }}>
+                                                        {emailConnected && (
+                                                            <div
+                                                                className={`provider-tab unified-button ${activeProvider === 'gmail' ? 'active' : ''}`}
+                                                                onClick={() => {
+                                                                    setActiveProvider('gmail');
+                                                                    setInboxViewMode('received');
+                                                                    setPriorityEmails([]);
+                                                                    setViewingEmail(null);
+                                                                }}
+                                                            >
+                                                                📧 Gmail
+                                                            </div>
+                                                        )}
+                                                        <div
+                                                            className={`provider-tab unified-button ${activeProvider === 'outlook' ? 'active' : ''}`}
+                                                            onClick={() => {
+                                                                setActiveProvider('outlook');
+                                                                setInboxViewMode('received');
+                                                                setPriorityEmails([]);
+                                                                setViewingEmail(null);
+                                                            }}
+                                                        >
+                                                            📮 Outlook
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    /* Received/Sent Toggle with Back Button */
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        gap: '8px',
+                                                        alignItems: 'center',
+                                                        animation: 'fadeIn 0.3s ease-out'
+                                                    }}>
+                                                        <button
+                                                            className="inbox-back-btn-tab"
+                                                            onClick={() => {
+                                                                setInboxViewMode('tabs');
+                                                                setPriorityEmails([]);
+                                                                setViewingEmail(null);
+                                                            }}
+                                                            title="Back to providers"
+                                                        >
+                                                            ←
+                                                        </button>
+                                                        <div className="inbox-view-toggle" style={{flex: 1}}>
+                                                            <button
+                                                                className={`inbox-view-toggle-btn ${inboxViewMode === 'received' ? 'active' : ''}`}
+                                                                onClick={() => {
+                                                                    setInboxViewMode('received');
+                                                                    setViewingEmail(null);
+                                                                }}
+                                                            >
+                                                                📥 Received
+                                                            </button>
+                                                            <button
+                                                                className={`inbox-view-toggle-btn ${inboxViewMode === 'sent' ? 'active' : ''}`}
+                                                                onClick={() => {
+                                                                    setInboxViewMode('sent');
+                                                                    setPriorityEmails([]);
+                                                                    setViewingEmail(null);
+                                                                }}
+                                                            >
+                                                                📤 Sent
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
 
                                                 {/* Provider Tabs */}
                                                 <div className="provider-tabs-container">
