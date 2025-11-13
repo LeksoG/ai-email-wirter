@@ -5330,6 +5330,8 @@ useEffect(() => {
 
             const renderWriterContent = () => {
                 switch(activeTab) {
+                    case 'email':
+                        return (
                             <div className="space-y-6 fade-in">
                                 {/* Current Tool Indicator */}
                                 <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
@@ -5513,6 +5515,34 @@ useEffect(() => {
                                 </div>
                             </div>
                         );
+                    
+                    default:
+                        return (
+                            <div className="space-y-6 fade-in">
+                                <div className="relative">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center">
+                                            <span className="text-lg mr-2">📄</span>
+                                            Enter your text
+                                        </label>
+                                    </div>
+                                    <textarea
+                                        value={emailText}
+                                        onChange={(e) => setEmailText(e.target.value)}
+                                        className="w-full h-64 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
+                                        placeholder="Type or paste your content here..."
+                                    />
+                                </div>
+                                <button
+                                    onClick={handleToolProcess}
+                                    className="w-full px-8 py-4 glass-effect rounded-full text-gray-800 font-semibold text-lg hover:bg-white/90 transition-all oval-button border-2 border-white unified-button"
+                                >
+                                    🚀 Process with AI
+                                </button>
+                            </div>
+                        );
+                }
+            };
                     
                     default:
                         return (
