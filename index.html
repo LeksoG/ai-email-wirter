@@ -3770,27 +3770,37 @@ useEffect(() => {
     const provider = urlParams.get('provider');
 
     if (tokensParam) {
-        try {
-            const tokens = JSON.parse(decodeURIComponent(tokensParam));
-            console.log('🎉 OAuth tokens received for:', provider);
+    try {
+        const tokens = JSON.parse(decodeURIComponent(tokensParam));
+        console.log('🎉 OAuth tokens received for:', provider);
+        console.log('📦 Token data:', tokens); // ADD THIS LINE
 
-            if (provider === 'outlook') {
-                // Outlook OAuth
-                localStorage.setItem('outlookTokens', JSON.stringify(tokens));
-                localStorage.setItem('outlookConnected', 'true');
-                localStorage.removeItem('oauth_in_progress');
-                setOutlookConnected(true);
-                
-                // Fetch Outlook emails
-                fetchOutlookEmails(tokens.access_token);
-                
-                console.log('✅ Outlook connected!');
-                
-                // Show success notification
-                setTimeout(() => {
-                    alert('✅ Outlook connected successfully!');
-                }, 500);
-            } else {
+        if (provider === 'outlook') {
+            console.log('📮 Processing Outlook connection...'); // ADD THIS LINE
+            
+            // Outlook OAuth
+            localStorage.setItem('outlookTokens', JSON.stringify(tokens));
+            localStorage.setItem('outlookConnected', 'true');
+            localStorage.removeItem('oauth_in_progress');
+            
+            console.log('💾 Saved to localStorage'); // ADD THIS LINE
+            console.log('📍 outlookConnected:', localStorage.getItem('outlookConnected')); // ADD THIS LINE
+            
+            setOutlookConnected(true);
+            
+            console.log('🔄 State updated, outlookConnected should be true'); // ADD THIS LINE
+            
+            // Fetch Outlook emails
+            fetchOutlookEmails(tokens.access_token);
+            
+            console.log('✅ Outlook connected!');
+            
+            // Show success notification
+            setTimeout(() => {
+                alert('✅ Outlook connected successfully!');
+            }, 500);
+        } else {
+            
                 // Gmail OAuth (existing code)
                 localStorage.setItem('gmailTokens', JSON.stringify(tokens));
                 localStorage.setItem('emailConnected', 'true');
@@ -3825,12 +3835,13 @@ useEffect(() => {
                 console.log('✅ Gmail connected!');
             }
 
-            // Clean URL
-            window.history.replaceState({}, '', '/');
-        } catch (error) {
-            console.error('❌ Error processing OAuth tokens:', error);
-        }
+           // Clean URL
+        window.history.replaceState({}, '', '/');
+    } catch (error) {
+        console.error('❌ Error processing OAuth tokens:', error);
+        console.error('Token param was:', tokensParam); // ADD THIS LINE
     }
+}
 
     // Load email connection from localStorage
     const savedConnection = localStorage.getItem('emailConnected');
