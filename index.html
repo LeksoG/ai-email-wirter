@@ -4283,7 +4283,6 @@ useEffect(() => {
     try {
         console.log('🔐 Initiating Outlook OAuth...');
         
-        // Call your auth endpoint to get the OAuth URL
         const response = await fetch('/api/outlook-auth');
         
         if (!response.ok) {
@@ -4298,6 +4297,11 @@ useEffect(() => {
         }
         
         console.log('📮 Redirecting to Microsoft OAuth...');
+        console.log('🔗 Redirect URI being used:', data.redirectUri);
+        console.log('⚠️ Make sure this EXACT URI is registered in Azure AD!');
+        
+        // Show alert with the redirect URI so you can copy it
+        alert('Redirect URI: ' + data.redirectUri + '\n\nMake sure this is registered in Azure AD!');
         
         localStorage.setItem('oauth_in_progress', 'outlook');
         window.location.href = data.authUrl;
