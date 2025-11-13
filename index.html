@@ -3655,6 +3655,62 @@ body.dark-mode .version-update-item-small {
         filter: blur(0);
     }
 }
+
+        /* Bottom Success Notification */
+.bottom-notification {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 16px 32px;
+    border-radius: 50px;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    z-index: 10000;
+    animation: slideUpNotification 0.5s ease-out forwards;
+    backdrop-filter: blur(10px);
+}
+
+.bottom-notification.hide {
+    animation: slideDownNotification 0.5s ease-out forwards;
+}
+
+.bottom-notification-icon {
+    font-size: 24px;
+    animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes slideUpNotification {
+    from {
+        bottom: -100px;
+        opacity: 0;
+    }
+    to {
+        bottom: 32px;
+        opacity: 1;
+    }
+}
+
+@keyframes slideDownNotification {
+    from {
+        bottom: 32px;
+        opacity: 1;
+    }
+    to {
+        bottom: -100px;
+        opacity: 0;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
     </style>
 </head>
 <body>
@@ -3728,6 +3784,8 @@ body.dark-mode .version-update-item-small {
             const [isRefreshing, setIsRefreshing] = useState(false);
             const [deletedEmails, setDeletedEmails] = useState([]);
             const [deletingEmailId, setDeletingEmailId] = useState(null);
+            const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+            const [notificationMessage, setNotificationMessage] = useState('');
 
             // New state variables for enhanced features
             const [activeProvider, setActiveProvider] = useState('gmail');
@@ -3771,42 +3829,34 @@ if (tokensParam) {
     try {
         const tokens = JSON.parse(decodeURIComponent(tokensParam));
         console.log('🎉 OAuth tokens received for:', provider);
-        console.log('📦 Token data:', tokens);
 
         if (provider === 'outlook') {
             console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
             
-            // Outlook OAuth - DO NOT CALL GMAIL
             localStorage.setItem('outlookTokens', JSON.stringify(tokens));
             localStorage.setItem('outlookConnected', 'true');
             localStorage.removeItem('oauth_in_progress');
             
-            console.log('💾 Saved Outlook tokens to localStorage');
-            console.log('🔄 Setting outlookConnected to TRUE');
-            
             setOutlookConnected(true);
-            setActiveProvider('outlook'); // Set active provider to Outlook
+            setActiveProvider('outlook');
             
-            console.log('📧 Fetching OUTLOOK emails (NOT Gmail)...');
             fetchOutlookEmails(tokens.access_token);
             
-            console.log('✅ Outlook connection complete!');
+            console.log('✅ Outlook connected!');
             
-            // Show success notification
+            // Show bottom notification instead of alert
             setTimeout(() => {
-                alert('✅ Outlook connected successfully!');
+                showNotification('📮 Outlook connected successfully!');
             }, 500);
             
         } else if (provider === 'gmail' || !provider) {
             console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
             
-            // Gmail OAuth
             localStorage.setItem('gmailTokens', JSON.stringify(tokens));
             localStorage.setItem('emailConnected', 'true');
             localStorage.removeItem('oauth_in_progress');
             setEmailConnected(true);
 
-            // Fetch user info
             fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
                 headers: {
                     Authorization: 'Bearer ' + tokens.access_token
@@ -3821,25 +3871,26 @@ if (tokensParam) {
                 const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
                 setUserName(name);
                 localStorage.setItem('userName', name);
-                console.log('👋 Welcome', name);
             })
             .catch(function(err) { 
                 console.error('Error fetching user info:', err); 
             });
 
-            // Fetch GMAIL emails (NOT Outlook)
-            console.log('📧 Fetching GMAIL emails...');
             fetchGmailEmails(tokens.access_token);
             fetchSentEmails(tokens.access_token);
             
-            console.log('✅ Gmail connection complete!');
+            console.log('✅ Gmail connected!');
+            
+            // Show bottom notification instead of alert
+            setTimeout(() => {
+                showNotification('📧 Gmail connected successfully!');
+            }, 500);
         }
 
         // Clean URL
         window.history.replaceState({}, '', '/');
     } catch (error) {
         console.error('❌ Error processing OAuth tokens:', error);
-        console.error('Token param was:', tokensParam);
     }
 }
 
@@ -4027,6 +4078,17 @@ useEffect(() => {
                     setShowWelcomeAnimation(false);
                 }
             }, [emailText, customPrompt]);
+
+            // Helper Functions - PUT IT HERE
+    const showNotification = (message) => {
+        setNotificationMessage(message);
+        setShowSuccessNotification(true);
+        
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            setShowSuccessNotification(false);
+        }, 3000);
+    };
 
             // Play notification sound
             const playNotificationSound = () => {
@@ -4260,35 +4322,29 @@ useEffect(() => {
             }, [searchQuery, gmailEmails]);
 
             const handleGmailConnect = async () => {
-                try {
-                    console.log('🔐 Initiating Gmail OAuth...');
+    try {
+        console.log('🔐 Initiating Gmail OAuth...');
 
-                    // Call your auth endpoint to get the OAuth URL
-                    const response = await fetch('/api/gmail-auth');
+        const response = await fetch('/api/gmail-auth');
 
-                    if (!response.ok) {
-                        throw new Error('Failed to initiate OAuth');
-                    }
+        if (!response.ok) {
+            throw new Error('Failed to initiate OAuth');
+        }
 
-                    const data = await response.json();
-                    console.log('📧 Redirecting to Google OAuth...');
+        const data = await response.json();
+        console.log('📧 Redirecting to Google OAuth...');
 
-                    // Store that we're in OAuth flow
-                    localStorage.setItem('oauth_in_progress', 'true');
-
-                    // Redirect to Google's OAuth consent screen
-                    window.location.href = data.authUrl;
-                } catch (error) {
-                    console.error('❌ Gmail OAuth error:', error);
-                    console.error('Please check: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set in Vercel');
-                }
-            };
+        localStorage.setItem('oauth_in_progress', 'true');
+        window.location.href = data.authUrl;
+    } catch (error) {
+        console.error('❌ Gmail OAuth error:', error);
+        showNotification('❌ Failed to connect Gmail');
+    }
+};
 
            const handleOutlookConnect = async () => {
     try {
         console.log('🔐 Initiating Outlook OAuth...');
-        console.log('🌐 Current location:', window.location.href);
-        console.log('🌐 Current origin:', window.location.origin);
         
         const response = await fetch('/api/outlook-auth');
         
@@ -4308,25 +4364,12 @@ useEffect(() => {
         console.log('📮 Redirect URI generated:', data.redirectUri);
         console.log('📮 Redirecting to Microsoft OAuth...');
         
-        // Pause to let you see the console logs
-        const proceed = confirm(
-            '⚠️ REDIRECT URI CHECK\n\n' +
-            'Generated URI:\n' + data.redirectUri + '\n\n' +
-            'Azure AD registered URI:\n' + 'https://ai-email-wirter.vercel.app/api/outlook-callback\n\n' +
-            'Do these match EXACTLY?\n' +
-            'Click OK to continue to Microsoft login.'
-        );
-        
-        if (!proceed) {
-            console.log('❌ User cancelled OAuth flow');
-            return;
-        }
-        
+        // NO CONFIRM DIALOG - Direct redirect
         localStorage.setItem('oauth_in_progress', 'outlook');
         window.location.href = data.authUrl;
     } catch (error) {
         console.error('❌ Outlook OAuth error:', error);
-        alert('Failed to connect Outlook: ' + error.message);
+        showNotification('❌ Failed to connect Outlook');
     }
 };
             const isTokenExpired = (expiryDate) => {
@@ -6519,6 +6562,14 @@ const fetchOutlookEmails = async (accessToken) => {
                             📧
                         </div>
                     )}
+
+                    {/* Bottom Success Notification - ADD IT HERE */}
+        {showSuccessNotification && (
+            <div className="bottom-notification">
+                <div className="bottom-notification-icon">✓</div>
+                <span>{notificationMessage}</span>
+            </div>
+        )}
 
                     {/* Version Update Modal */}
                     {showVersionModal && (
