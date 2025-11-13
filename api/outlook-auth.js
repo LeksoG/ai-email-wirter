@@ -1,10 +1,16 @@
 export default async function handler(req, res) {
     try {
         const clientId = process.env.OUTLOOK_CLIENT_ID;
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || req.headers.origin || 'http://localhost:3000';
+        
+        // Get the actual deployed URL
+        const host = req.headers.host; // e.g., "your-app.vercel.app"
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const appUrl = `${protocol}://${host}`;
         const redirectUri = `${appUrl}/api/outlook-callback`;
         
         console.log('🔐 Outlook auth initiated');
+        console.log('🌐 Host:', host);
+        console.log('🔒 Protocol:', protocol);
         console.log('📍 App URL:', appUrl);
         console.log('📍 Redirect URI:', redirectUri);
         
@@ -25,10 +31,12 @@ export default async function handler(req, res) {
             `&prompt=select_account`;
 
         console.log('✅ Auth URL generated successfully');
+        console.log('🔗 Full redirect URI:', redirectUri);
         
         res.status(200).json({ 
             success: true,
-            authUrl: authUrl 
+            authUrl: authUrl,
+            redirectUri: redirectUri // Send this back so we can see it
         });
     } catch (error) {
         console.error('❌ Outlook auth error:', error);
