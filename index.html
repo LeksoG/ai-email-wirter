@@ -6069,8 +6069,8 @@ body.dark-mode .version-update-item-small {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                            className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
-                                            onDragOver={(e) => {
+    className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+    onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
                                             }}
