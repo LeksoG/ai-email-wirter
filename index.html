@@ -4489,41 +4489,69 @@ useEffect(() => {
                 }
             };
 
-            const fetchOutlookEmails = async (accessToken) => {
-                try {
-                    console.log('📬 Fetching Outlook inbox...');
-                    
-                    const response = await fetch('/api/outlook-inbox', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ accessToken })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.message || 'Failed to fetch Outlook emails');
-                    }
-                    
-                    // Format emails for display
-                    const formattedEmails = data.emails.map(function(email) {
-                        return {
-                            id: email.id,
-                            from: email.from,
-                            subject: email.subject,
-                            snippet: email.snippet,
-                            date: email.date,
-                            threadId: email.threadId,
-                            internalDate: new Date(email.date).getTime()
-                        };
-                    });
-                    
-                    setOutlookEmails(formattedEmails);
-                    console.log('✅ Loaded ' + formattedEmails.length + ' Outlook emails');
-                } catch (error) {
-                    console.error('❌ Error fetching Outlook emails:', error);
-                }
+const fetchOutlookEmails = async (accessToken) => {
+    try {
+        console.log('📮 ========== FETCHING OUTLOOK EMAILS ==========');
+        console.log('🔑 Access token present:', !!accessToken);
+        console.log('🔑 Access token preview:', accessToken ? accessToken.substring(0, 20) + '...' : 'MISSING');
+        
+        const response = await fetch('/api/outlook-inbox', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken })
+        });
+        
+        console.log('📡 Outlook inbox API response status:', response.status);
+        console.log('📡 Response OK:', response.ok);
+        
+        const data = await response.json();
+        
+        console.log('📦 Outlook API response data:', data);
+        
+        if (!response.ok) {
+            console.error('❌ Outlook inbox API error');
+            console.error('Status:', response.status);
+            console.error('Error message:', data.message);
+            console.error('Error details:', data.details);
+            throw new Error(data.message || 'Failed to fetch Outlook emails');
+        }
+        
+        console.log('📧 Outlook emails received:', data.emails?.length || 0);
+        
+        if (data.emails && data.emails.length > 0) {
+            console.log('📧 First email sample:', data.emails[0]);
+        }
+        
+        // Format emails for display
+        const formattedEmails = data.emails.map(function(email) {
+            const formatted = {
+                id: email.id,
+                from: email.from,
+                subject: email.subject,
+                snippet: email.snippet,
+                date: email.date,
+                threadId: email.threadId,
+                internalDate: new Date(email.date).getTime()
             };
+            console.log('✅ Formatted email:', formatted);
+            return formatted;
+        });
+        
+        console.log('📧 Total formatted emails:', formattedEmails.length);
+        console.log('📧 Formatted emails array:', formattedEmails);
+        
+        setOutlookEmails(formattedEmails);
+        
+        console.log('✅ ========== OUTLOOK EMAILS SET IN STATE ==========');
+        console.log('State should now have', formattedEmails.length, 'Outlook emails');
+        
+    } catch (error) {
+        console.error('❌ ========== ERROR FETCHING OUTLOOK EMAILS ==========');
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        console.error('Full error:', error);
+    }
+};
 
             const callAIAPI = async (prompt, text) => {
                 console.log('🤖 Calling AI API...');
