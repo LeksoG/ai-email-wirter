@@ -4279,26 +4279,33 @@ useEffect(() => {
                 }
             };
 
-            const handleOutlookConnect = async () => {
-                try {
-                    console.log('🔐 Initiating Outlook OAuth...');
-                    
-                    const response = await fetch('/api/outlook-auth');
-                    
-                    if (!response.ok) {
-                        throw new Error('Failed to initiate OAuth');
-                    }
-                    
-                    const data = await response.json();
-                    console.log('📮 Redirecting to Microsoft OAuth...');
-                    
-                    localStorage.setItem('oauth_in_progress', 'outlook');
-                    window.location.href = data.authUrl;
-                } catch (error) {
-                    console.error('❌ Outlook OAuth error:', error);
-                    alert('Failed to connect Outlook. Please check console.');
-                }
-            };
+           const handleOutlookConnect = async () => {
+    try {
+        console.log('🔐 Initiating Outlook OAuth...');
+        
+        // Call your auth endpoint to get the OAuth URL
+        const response = await fetch('/api/outlook-auth');
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to get auth URL');
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success || !data.authUrl) {
+            throw new Error('Invalid response from auth endpoint');
+        }
+        
+        console.log('📮 Redirecting to Microsoft OAuth...');
+        
+        localStorage.setItem('oauth_in_progress', 'outlook');
+        window.location.href = data.authUrl;
+    } catch (error) {
+        console.error('❌ Outlook OAuth error:', error);
+        alert('Failed to connect Outlook: ' + error.message);
+    }
+};
 
             const isTokenExpired = (expiryDate) => {
                 if (!expiryDate) return true;
