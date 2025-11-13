@@ -3761,87 +3761,34 @@ body.dark-mode .version-update-item-small {
            // Initialize app with console logging
 useEffect(() => {
     console.log('🚀 AI Email Writer initialized');
-    console.log('📊 Initial state:', { activeTab, activeView, currentPage });
-    console.log('🔌 API endpoint:', '/api/transform');
-
-    // Check for OAuth callback with tokens
+    
+    // Check for OAuth errors with full details
     const urlParams = new URLSearchParams(window.location.search);
-    const tokensParam = urlParams.get('tokens');
-    const provider = urlParams.get('provider');
-
-    if (tokensParam) {
-    try {
-        const tokens = JSON.parse(decodeURIComponent(tokensParam));
-        console.log('🎉 OAuth tokens received for:', provider);
-        console.log('📦 Token data:', tokens); // ADD THIS LINE
-
-        if (provider === 'outlook') {
-            console.log('📮 Processing Outlook connection...'); // ADD THIS LINE
-            
-            // Outlook OAuth
-            localStorage.setItem('outlookTokens', JSON.stringify(tokens));
-            localStorage.setItem('outlookConnected', 'true');
-            localStorage.removeItem('oauth_in_progress');
-            
-            console.log('💾 Saved to localStorage'); // ADD THIS LINE
-            console.log('📍 outlookConnected:', localStorage.getItem('outlookConnected')); // ADD THIS LINE
-            
-            setOutlookConnected(true);
-            
-            console.log('🔄 State updated, outlookConnected should be true'); // ADD THIS LINE
-            
-            // Fetch Outlook emails
-            fetchOutlookEmails(tokens.access_token);
-            
-            console.log('✅ Outlook connected!');
-            
-            // Show success notification
-            setTimeout(() => {
-                alert('✅ Outlook connected successfully!');
-            }, 500);
-        } else {
-            
-                // Gmail OAuth (existing code)
-                localStorage.setItem('gmailTokens', JSON.stringify(tokens));
-                localStorage.setItem('emailConnected', 'true');
-                localStorage.removeItem('oauth_in_progress');
-                setEmailConnected(true);
-
-                // Fetch user info
-                fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                    headers: {
-                        Authorization: 'Bearer ' + tokens.access_token
-                    }
-                })
-                .then(function(res) { return res.json(); })
-                .then(function(userInfo) {
-                    console.log('👤 User:', userInfo.email);
-                    setUserEmail(userInfo.email);
-                    localStorage.setItem('userEmail', userInfo.email);
-
-                    const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
-                    setUserName(name);
-                    localStorage.setItem('userName', name);
-                    console.log('👋 Welcome', name);
-                })
-                .catch(function(err) { 
-                    console.error('Error fetching user info:', err); 
-                });
-
-                // Fetch emails
-                fetchGmailEmails(tokens.access_token);
-                fetchSentEmails(tokens.access_token);
-                
-                console.log('✅ Gmail connected!');
-            }
-
-           // Clean URL
+    const error = urlParams.get('error');
+    
+    if (error) {
+        const errorType = urlParams.get('error_type');
+        const errorDesc = urlParams.get('error_desc');
+        const errorUri = urlParams.get('error_uri');
+        const details = urlParams.get('details');
+        
+        console.error('❌ OAuth Error:', error);
+        console.error('📋 Error Type:', errorType);
+        console.error('📋 Description:', errorDesc);
+        console.error('🔗 Error URI:', errorUri);
+        console.error('📋 Details:', details);
+        
+        alert(
+            '❌ OAuth Error\n\n' +
+            'Error: ' + error + '\n' +
+            'Type: ' + (errorType || 'N/A') + '\n' +
+            'Description: ' + (errorDesc || 'N/A') + '\n\n' +
+            'Check browser console for full details.'
+        );
+        
         window.history.replaceState({}, '', '/');
-    } catch (error) {
-        console.error('❌ Error processing OAuth tokens:', error);
-        console.error('Token param was:', tokensParam); // ADD THIS LINE
+        return;
     }
-}
 
     // Load email connection from localStorage
     const savedConnection = localStorage.getItem('emailConnected');
