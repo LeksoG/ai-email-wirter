@@ -3882,23 +3882,24 @@ if (tokensParam) {
     }
 
     // Load Outlook connection
-    const savedOutlookConnection = localStorage.getItem('outlookConnected');
-    const savedOutlookTokens = localStorage.getItem('outlookTokens');
+const savedOutlookConnection = localStorage.getItem('outlookConnected');
+const savedOutlookTokens = localStorage.getItem('outlookTokens');
 
-    if (savedOutlookConnection === 'true' && savedOutlookTokens) {
-        setOutlookConnected(true);
-        
-        // Fetch Outlook emails with saved tokens
-        try {
-            const tokens = JSON.parse(savedOutlookTokens);
-            fetchOutlookEmails(tokens.access_token);
-        } catch (error) {
-            console.error('❌ Error loading saved Outlook tokens:', error);
-            localStorage.removeItem('outlookTokens');
-            localStorage.removeItem('outlookConnected');
-            setOutlookConnected(false);
-        }
+if (savedOutlookConnection === 'true' && savedOutlookTokens) {
+    setOutlookConnected(true);
+    
+    try {
+        const tokens = JSON.parse(savedOutlookTokens);  // Parse ONCE
+        console.log('📮 Loading saved Outlook tokens');
+        console.log('Access token present:', !!tokens.access_token);
+        fetchOutlookEmails(tokens.access_token);  // Use the access_token directly
+    } catch (error) {
+        console.error('❌ Error loading saved Outlook tokens:', error);
+        localStorage.removeItem('outlookTokens');
+        localStorage.removeItem('outlookConnected');
+        setOutlookConnected(false);
     }
+}
 
     // Load dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -3979,15 +3980,14 @@ useEffect(() => {
 
             // GOOD - checks which provider
 useEffect(() => {
-    if (emailConnected && activeProvider === 'gmail') {
-        const tokens = JSON.parse(localStorage.getItem('gmailTokens'));
-        fetchGmailEmails(tokens.access_token);
-    } else if (outlookConnected && activeProvider === 'outlook') {
-        const tokens = JSON.parse(localStorage.getItem('outlookTokens'));
-        const parsed = JSON.parse(tokens);
-        fetchOutlookEmails(parsed.access_token);
+    if (outlookConnected) {
+        const tokensString = localStorage.getItem('outlookTokens');
+        if (tokensString) {
+            const tokens = JSON.parse(tokensString);  // ✅ Parse once
+            fetchOutlookEmails(tokens.access_token);
+        }
     }
-}, [emailConnected, outlookConnected, activeProvider]);
+}, [outlookConnected]);
 
             // Check for version updates
             useEffect(() => {
