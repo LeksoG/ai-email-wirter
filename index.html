@@ -345,6 +345,285 @@
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
+        /* Inactive nav tab styling - light grey/white in dark mode */
+        .nav-tab-inactive {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        body.dark-mode .nav-tab-inactive {
+            background: rgba(100, 100, 100, 0.4);
+            color: #e5e5e5 !important;
+        }
+
+        body.dark-mode .nav-tab-inactive:hover {
+            background: rgba(120, 120, 120, 0.5);
+        }
+
+        /* Custom Language Dropdown */
+        .custom-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .custom-language-select {
+            width: 100%;
+            padding: 14px 40px 14px 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(249, 250, 251, 0.8));
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+        }
+
+        .custom-language-select:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .custom-language-select:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1),
+                        0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        body.dark-mode .custom-language-select {
+            background: linear-gradient(135deg, rgba(60, 60, 60, 0.8), rgba(40, 40, 40, 0.7));
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .custom-language-select:hover {
+            background: linear-gradient(135deg, rgba(70, 70, 70, 0.9), rgba(50, 50, 50, 0.8));
+            border-color: rgba(99, 102, 241, 0.6);
+        }
+
+        .custom-dropdown-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: rgba(99, 102, 241, 0.7);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .custom-language-select:focus + .custom-dropdown-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        body.dark-mode .custom-dropdown-arrow {
+            color: rgba(167, 139, 250, 0.8);
+        }
+
+        /* Authentication Popup */
+        .auth-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .auth-popup-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(249, 250, 251, 0.9));
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            animation: popup-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body.dark-mode .auth-popup-container {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.9));
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes popup-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .auth-popup-icon {
+            font-size: 60px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .auth-popup-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        body.dark-mode .auth-popup-title {
+            color: #e5e5e5;
+        }
+
+        .auth-popup-message {
+            font-size: 15px;
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        body.dark-mode .auth-popup-message {
+            color: #a0a0a0;
+        }
+
+        .auth-popup-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .auth-popup-button {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+        }
+
+        .auth-popup-button-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .auth-popup-button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .auth-popup-button-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #374151;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .auth-popup-button-secondary:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        body.dark-mode .auth-popup-button-secondary {
+            background: rgba(60, 60, 60, 0.8);
+            color: #e5e5e5;
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        body.dark-mode .auth-popup-button-secondary:hover {
+            background: rgba(70, 70, 70, 0.9);
+        }
+
+        /* Account Details Section */
+        .account-details-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(249, 250, 251, 0.8));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        body.dark-mode .account-details-section {
+            background: linear-gradient(135deg, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.8));
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .account-profile-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .account-info {
+            flex: 1;
+        }
+
+        .account-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        body.dark-mode .account-name {
+            color: #e5e5e5;
+        }
+
+        .account-email {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        body.dark-mode .account-email {
+            color: #a0a0a0;
+        }
+
+        .account-logout-btn {
+            padding: 8px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #ef4444;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .account-logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
         /* Search Bar Transform */
         .nav-search-bar {
             position: absolute;
@@ -4157,6 +4436,12 @@ body.dark-mode .ai-send-button {
             const [showSuggestionsEnabled, setShowSuggestionsEnabled] = useState(true);
             const [userEmail, setUserEmail] = useState('');
             const [viewingEmail, setViewingEmail] = useState(null);
+
+            // Authentication states
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [userData, setUserData] = useState(null);
+            const [showAuthPopup, setShowAuthPopup] = useState(false);
+            const [showAuthInSettings, setShowAuthInSettings] = useState(false);
             const [emailReply, setEmailReply] = useState('');
             const [replyPrompt, setReplyPrompt] = useState('');
             const [summarizingEmail, setSummarizingEmail] = useState(null);
@@ -4401,6 +4686,40 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                     localStorage.setItem('darkMode', 'false');
                 }
             }, [darkMode]);
+
+            // Check for stored authentication data
+            useEffect(() => {
+                const storedUserData = localStorage.getItem('userData');
+                const storedLoginStatus = localStorage.getItem('isLoggedIn');
+
+                if (storedLoginStatus === 'true' && storedUserData) {
+                    setIsLoggedIn(true);
+                    setUserData(JSON.parse(storedUserData));
+                }
+            }, []);
+
+            // Function to handle sign up/login
+            const handleSignUp = (name, email) => {
+                const newUserData = {
+                    name: name,
+                    email: email,
+                    joinedDate: new Date().toLocaleDateString()
+                };
+
+                setUserData(newUserData);
+                setIsLoggedIn(true);
+                setShowAuthInSettings(false);
+                localStorage.setItem('userData', JSON.stringify(newUserData));
+                localStorage.setItem('isLoggedIn', 'true');
+            };
+
+            // Function to handle logout
+            const handleLogout = () => {
+                setUserData(null);
+                setIsLoggedIn(false);
+                localStorage.removeItem('userData');
+                localStorage.removeItem('isLoggedIn');
+            };
 
             // Update suggestions based on custom prompt only
             useEffect(() => {
@@ -4805,6 +5124,12 @@ useEffect(() => {
             }, [searchQuery, gmailEmails]);
 
             const handleGmailConnect = async () => {
+    // Check if user is logged in
+    if (!isLoggedIn) {
+        setShowAuthPopup(true);
+        return;
+    }
+
     try {
         console.log('🔐 Initiating Gmail OAuth...');
 
@@ -4826,9 +5151,15 @@ useEffect(() => {
 };
 
            const handleOutlookConnect = async () => {
+    // Check if user is logged in
+    if (!isLoggedIn) {
+        setShowAuthPopup(true);
+        return;
+    }
+
     try {
         console.log('🔐 Initiating Outlook OAuth...');
-        
+
         const response = await fetch('/api/outlook-auth');
         
         if (!response.ok) {
@@ -5717,6 +6048,84 @@ const fetchOutlookEmails = async (accessToken) => {
                         <div className="glass-effect rounded-3xl p-8 ai-glow">
                             <h2 className="text-3xl font-bold text-gray-800 mb-6">⚙️ Settings</h2>
 
+                            {/* Account Details Section - Show when logged in */}
+                            {isLoggedIn && userData && (
+                                <div className="account-details-section">
+                                    <div className="account-profile-icon">
+                                        {userData.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="account-info">
+                                        <div className="account-name">{userData.name}</div>
+                                        <div className="account-email">{userData.email}</div>
+                                    </div>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="account-logout-btn"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Authentication Section - Show when not logged in */}
+                            {!isLoggedIn && (
+                                <div className="space-y-6 mb-6">
+                                    <div className="glass-dark px-6 py-5 rounded-2xl border-2 border-indigo-400">
+                                        <h3 className="text-lg font-bold text-gray-800 mb-3">🔐 Create Account / Log In</h3>
+                                        <p className="text-sm text-gray-600 mb-4">
+                                            Sign up or log in to unlock premium features like email connections, AI transformations, and more!
+                                        </p>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    id="auth-name"
+                                                    placeholder="Your Name"
+                                                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 text-gray-800 outline-none focus:border-indigo-500 transition-all"
+                                                    style={{
+                                                        background: darkMode ? 'rgba(40, 40, 40, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                                                        color: darkMode ? '#e5e5e5' : '#374151'
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <input
+                                                    type="email"
+                                                    id="auth-email"
+                                                    placeholder="Your Email"
+                                                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 text-gray-800 outline-none focus:border-indigo-500 transition-all"
+                                                    style={{
+                                                        background: darkMode ? 'rgba(40, 40, 40, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                                                        color: darkMode ? '#e5e5e5' : '#374151'
+                                                    }}
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const name = document.getElementById('auth-name').value;
+                                                    const email = document.getElementById('auth-email').value;
+
+                                                    if (name && email) {
+                                                        handleSignUp(name, email);
+                                                    } else {
+                                                        alert('Please enter both name and email');
+                                                    }
+                                                }}
+                                                className="w-full px-6 py-3 rounded-xl font-semibold text-white"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+                                                }}
+                                            >
+                                                Sign Up / Log In
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Settings Options - Only show when logged in */}
+                            {isLoggedIn ? (
                             <div className="space-y-6">
                                 {/* Dark Mode Toggle */}
                                 <div>
@@ -5772,25 +6181,19 @@ const fetchOutlookEmails = async (accessToken) => {
                                         🌍 Language Settings
                                     </label>
 
-                                    {/* Language Selection Dropdown */}
+                                    {/* Language Selection Dropdown - Custom Design */}
                                     <div className="mb-4">
                                         <label className="block text-xs font-medium text-gray-600 mb-2">
                                             Response Language
                                         </label>
-                                        <div className="glass-dark px-4 py-3 rounded-xl">
+                                        <div className="custom-dropdown-wrapper">
                                             <select
                                                 value={selectedLanguage}
                                                 onChange={(e) => {
                                                     setSelectedLanguage(e.target.value);
                                                     localStorage.setItem('selectedLanguage', e.target.value);
                                                 }}
-                                                className="w-full bg-transparent text-gray-700 text-sm font-medium outline-none cursor-pointer"
-                                                style={{
-                                                    background: darkMode ? 'rgba(40, 40, 40, 0.5)' : 'rgba(255, 255, 255, 0.5)',
-                                                    padding: '8px 12px',
-                                                    borderRadius: '8px',
-                                                    border: '1px solid rgba(99, 102, 241, 0.3)'
-                                                }}
+                                                className="custom-language-select"
                                             >
                                                 <option value="english">🇬🇧 English</option>
                                                 <option value="german">🇩🇪 German</option>
@@ -5798,6 +6201,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                 <option value="georgian">🇬🇪 Georgian</option>
                                                 <option value="spanish">🇪🇸 Spanish</option>
                                             </select>
+                                            <div className="custom-dropdown-arrow">▼</div>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">
                                             AI will respond in the selected language
@@ -5998,6 +6402,13 @@ const fetchOutlookEmails = async (accessToken) => {
                                     </div>
                                 </div>
                             </div>
+                            ) : (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-600 text-sm">
+                                        Please sign up or log in above to access settings options.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 );
@@ -6560,20 +6971,20 @@ const fetchOutlookEmails = async (accessToken) => {
                                 <div className={`nav-container ${showSearchBar ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} style={{transition: 'opacity 0.3s ease'}} ref={navRef}>
                                     <button
                                         onClick={() => setCurrentPage('home')}
-                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
+                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
                                             currentPage === 'home'
                                                 ? 'active text-gray-800'
-                                                : 'glass-dark text-gray-700 hover:bg-white/70'
+                                                : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
                                         }`}
                                     >
                                         Home
                                     </button>
                                     <button
                                         onClick={() => setCurrentPage('settings')}
-                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab ${
+                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
                                             currentPage === 'settings'
                                                 ? 'active text-gray-800'
-                                                : 'glass-dark text-gray-700 hover:bg-white/70'
+                                                : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
                                         }`}
                                     >
                                         Settings
@@ -7315,45 +7726,6 @@ const fetchOutlookEmails = async (accessToken) => {
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Mobile AI Writer Container - shown on mobile when connected */}
-                                    <div className="ai-writer-container rounded-3xl p-8 relative">
-                                        {/* Tab Switches */}
-                                        <div className="flex justify-center mb-8">
-                                            <div className="tab-container tab-button-container">
-                                                <div
-                                                    className="tab-slider"
-                                                    style={{
-                                                        width: '50%',
-                                                        height: 'calc(100% - 12px)',
-                                                        top: '6px',
-                                                        left: activeView === 'writer' ? '6px' : 'calc(50% - 6px)',
-                                                    }}
-                                                ></div>
-                                                <button
-                                                    onClick={() => setActiveView('writer')}
-                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                        activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
-                                                    }`}
-                                                >
-                                                    ✍️ AI Writer
-                                                </button>
-                                                <button
-                                                    onClick={() => setActiveView('results')}
-                                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                        activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
-                                                    }`}
-                                                >
-                                                    ✨ Results
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Content Area */}
-                                        <div className="min-h-[500px]">
-                                            {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
-                                        </div>
-                                    </div>
                                     </>
                                 ) : (
                                     /* Original Home Page Layout when not connected */
@@ -7492,6 +7864,39 @@ const fetchOutlookEmails = async (accessToken) => {
                                 <div className="version-modal-footer">
                                     <button onClick={handleCloseVersionModal} className="version-cta-btn">
                                         Got it! Let's go 🎉
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Authentication Popup */}
+                    {showAuthPopup && (
+                        <div className="auth-popup-overlay" onClick={() => setShowAuthPopup(false)}>
+                            <div className="auth-popup-container" onClick={(e) => e.stopPropagation()}>
+                                <div className="auth-popup-icon">🔒</div>
+                                <h2 className="auth-popup-title">Account Required</h2>
+                                <p className="auth-popup-message">
+                                    To access premium features like email connections and AI transformations, please create an account or log in.
+                                    <br /><br />
+                                    Visit <strong>Settings</strong> to sign up or log in to unlock all features!
+                                </p>
+                                <div className="auth-popup-buttons">
+                                    <button
+                                        className="auth-popup-button auth-popup-button-secondary"
+                                        onClick={() => setShowAuthPopup(false)}
+                                    >
+                                        Later
+                                    </button>
+                                    <button
+                                        className="auth-popup-button auth-popup-button-primary"
+                                        onClick={() => {
+                                            setShowAuthPopup(false);
+                                            setCurrentPage('settings');
+                                            setShowAuthInSettings(true);
+                                        }}
+                                    >
+                                        Go to Settings
                                     </button>
                                 </div>
                             </div>
