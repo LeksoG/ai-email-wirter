@@ -3099,7 +3099,7 @@
         /* Replace the hamburger-btn styles with this */
 .mobile-inbox-button {
     position: fixed;
-    top: 80px;
+    top: 60px;
     right: 24px;
     padding: 12px 24px;
     border-radius: 50px;
@@ -6488,48 +6488,6 @@ const fetchOutlookEmails = async (accessToken) => {
                                                             )
                                                         )
                                                     )}
-
-                                                    {/* Mobile & Non-Connected: Always show AI Writer */}
-        <div className="ai-writer-container">
-            <div className="rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
-                {/* Tab Switches */}
-                <div className="flex justify-center mb-8">
-                    <div className="tab-container tab-button-container">
-                        <div
-                            className="tab-slider"
-                            style={{
-                                width: '50%',
-                                height: 'calc(100% - 12px)',
-                                top: '6px',
-                                left: activeView === 'writer' ? '6px' : 'calc(50% - 6px)',
-                            }}
-                        ></div>
-                        <button
-                            onClick={() => setActiveView('writer')}
-                            className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
-                            }`}
-                        >
-                            ✍️ AI Writer
-                        </button>
-                        <button
-                            onClick={() => setActiveView('results')}
-                            className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
-                            }`}
-                        >
-                            ✨ Results
-                        </button>
-                    </div>
-                </div>
-
-                {/* Content Area */}
-                <div className="min-h-[500px]">
-                    {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
-                </div>
-            </div>
-        </div>
-)}
                                                 </div>
                                             </div>
 
