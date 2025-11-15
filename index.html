@@ -424,6 +424,34 @@
             color: rgba(167, 139, 250, 0.8);
         }
 
+        /* Dropdown options styling */
+        .custom-language-select option {
+            background: white;
+            color: #374151;
+            padding: 12px;
+        }
+
+        body.dark-mode .custom-language-select option {
+            background: rgba(40, 40, 40, 0.95);
+            color: #e5e5e5;
+        }
+
+        /* Smooth dropdown animation */
+        @keyframes dropdown-slide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-language-select:focus {
+            animation: dropdown-slide 0.3s ease-out;
+        }
+
         /* Authentication Popup */
         .auth-popup-overlay {
             position: fixed;
@@ -1355,13 +1383,14 @@
             }
         }
 
-        /* New Suggestion Carousel Design */
+        /* New Suggestion Carousel Design - Professional AI Style */
         .suggestion-carousel-container {
             position: relative;
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 12px 0;
+            margin-left: -60px; /* Move to the left */
         }
 
         .suggestion-carousel {
@@ -1369,8 +1398,12 @@
             overflow: hidden;
             position: relative;
             border-radius: 50px;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 8px 16px;
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.08) 0%,
+                rgba(139, 92, 246, 0.05) 100%);
+            padding: 6px 12px;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            backdrop-filter: blur(10px);
         }
 
         .suggestion-carousel-track {
@@ -1380,37 +1413,65 @@
 
         .suggestion-carousel-item {
             min-width: 100%;
-            padding: 8px 16px;
+            padding: 10px 20px;
             text-align: center;
             cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            color: #1f2937;
-            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            color: #4f46e5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.85) 100%);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.95) 0%,
+                rgba(249, 250, 251, 0.9) 100%);
             border-radius: 50px;
-            border: 2px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+            border: 1.5px solid rgba(99, 102, 241, 0.25);
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
         .suggestion-carousel-item:hover {
-            border-color: rgba(59, 130, 246, 0.5);
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2),
+                        0 8px 24px rgba(99, 102, 241, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 1);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(249, 250, 251, 0.95) 100%);
         }
 
         body.dark-mode .suggestion-carousel {
-            background: rgba(40, 40, 40, 0.7);
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.12) 0%,
+                rgba(139, 92, 246, 0.08) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
         }
 
         body.dark-mode .suggestion-carousel-item {
-            background: linear-gradient(135deg, rgba(60, 60, 60, 0.9) 0%, rgba(50, 50, 50, 0.85) 100%);
-            color: #e5e5e5;
+            background: linear-gradient(135deg,
+                rgba(55, 55, 65, 0.95) 0%,
+                rgba(45, 45, 55, 0.9) 100%);
+            color: #a5b4fc;
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
-        /* Suggestion Indicator */
+        body.dark-mode .suggestion-carousel-item:hover {
+            background: linear-gradient(135deg,
+                rgba(65, 65, 75, 1) 0%,
+                rgba(55, 55, 65, 0.95) 100%);
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25),
+                        0 8px 24px rgba(99, 102, 241, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Suggestion Indicator - Hidden */
         .suggestion-indicator {
+            display: none; /* Remove scroll indicator */
             position: absolute;
             top: -32px;
             right: 0;
@@ -1471,6 +1532,237 @@
             background: rgba(255, 255, 255, 0.6);
             border: 2px solid rgba(99, 102, 241, 0.2);
             box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Email Tools Tab Bar */
+        .email-tools-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.85) 0%,
+                rgba(249, 250, 251, 0.8) 100%);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 16px 16px 0 0;
+            backdrop-filter: blur(10px);
+        }
+
+        body.dark-mode .email-tools-bar {
+            background: linear-gradient(135deg,
+                rgba(40, 40, 40, 0.85) 0%,
+                rgba(30, 30, 30, 0.8) 100%);
+            border-bottom-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .email-tool-btn {
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.08) 0%,
+                rgba(139, 92, 246, 0.05) 100%);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            color: #4f46e5;
+            box-shadow: 0 1px 3px rgba(99, 102, 241, 0.08);
+        }
+
+        .email-tool-btn:hover {
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.15) 0%,
+                rgba(139, 92, 246, 0.1) 100%);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+        }
+
+        body.dark-mode .email-tool-btn {
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.15) 0%,
+                rgba(139, 92, 246, 0.1) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+        }
+
+        body.dark-mode .email-tool-btn:hover {
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.25) 0%,
+                rgba(139, 92, 246, 0.15) 100%);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        }
+
+        .email-writing-container {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid white;
+        }
+
+        body.dark-mode .email-writing-container {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            margin-top: 40px;
+            padding: 32px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(249, 250, 251, 0.85) 100%);
+            border-radius: 24px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
+        }
+
+        body.dark-mode .stats-section {
+            background: linear-gradient(135deg,
+                rgba(30, 30, 30, 0.9) 0%,
+                rgba(20, 20, 20, 0.85) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .stats-header {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.dark-mode .stats-header {
+            color: #e5e5e5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.08) 0%,
+                rgba(139, 92, 246, 0.05) 100%);
+            border-radius: 16px;
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg,
+                rgba(99, 102, 241, 0.15) 0%,
+                rgba(139, 92, 246, 0.1) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        body.dark-mode .stat-card:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .stat-value {
+            color: #a5b4fc;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        body.dark-mode .stat-label {
+            color: #9ca3af;
+        }
+
+        .priority-list {
+            margin-top: 24px;
+        }
+
+        .priority-list-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark-mode .priority-list-header {
+            color: #e5e5e5;
+        }
+
+        .priority-item {
+            padding: 16px;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.95) 0%,
+                rgba(249, 250, 251, 0.9) 100%);
+            border-radius: 12px;
+            border: 1.5px solid rgba(99, 102, 241, 0.15);
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .priority-item:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+        }
+
+        body.dark-mode .priority-item {
+            background: linear-gradient(135deg,
+                rgba(40, 40, 40, 0.95) 0%,
+                rgba(30, 30, 30, 0.9) 100%);
+            border-color: rgba(99, 102, 241, 0.25);
+        }
+
+        body.dark-mode .priority-item:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .priority-high {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .priority-low {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
         }
 
         /* File Viewer Modal */
@@ -5067,12 +5359,12 @@ useEffect(() => {
             ];
 
             const generalSuggestions = [
-                { id: 'longer', label: '📏 Make Longer', prompt: 'Expand this email with more details and context' },
-                { id: 'clearer', label: '💡 More Clear', prompt: 'Rewrite this email to be more clear and understandable' },
-                { id: 'simpler', label: '🔤 Simplify', prompt: 'Simplify this email to be easier to understand' },
-                { id: 'formal', label: '🎩 More Formal', prompt: 'Make this email more formal and professional' },
-                { id: 'action', label: '⚡ Add Action Items', prompt: 'Add clear action items and next steps to this email' },
-                { id: 'polite', label: '🌟 More Polite', prompt: 'Make this email more polite and courteous' }
+                { id: 'longer', label: 'Make Longer', prompt: 'Expand this email with more details and context' },
+                { id: 'clearer', label: 'More Clear', prompt: 'Rewrite this email to be more clear and understandable' },
+                { id: 'simpler', label: 'Simplify', prompt: 'Simplify this email to be easier to understand' },
+                { id: 'formal', label: 'More Formal', prompt: 'Make this email more formal and professional' },
+                { id: 'action', label: 'Add Action Items', prompt: 'Add clear action items and next steps to this email' },
+                { id: 'polite', label: 'More Polite', prompt: 'Make this email more polite and courteous' }
             ];
 
             const welcomeMessages = [
@@ -6652,23 +6944,55 @@ const fetchOutlookEmails = async (accessToken) => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="relative">
-                                            <textarea
-                                                value={emailText}
-                                                onChange={(e) => setEmailText(e.target.value)}
-                                                className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
-                                                placeholder="Type or paste your email content here and watch the magic happen..."
-                                                disabled={droppedEmailFile !== null}
-                                            />
-                                            {/* Language Indicator */}
-                                            <div
-                                                className="absolute top-3 right-4 text-xs font-medium pointer-events-none"
-                                                style={{
-                                                    color: darkMode ? '#888' : '#999',
-                                                    opacity: 0.8
-                                                }}
-                                            >
-                                                Responses in {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                                        <div className="email-writing-container">
+                                            {/* Tools Tab Bar */}
+                                            <div className="email-tools-bar">
+                                                <button
+                                                    className="email-tool-btn"
+                                                    onClick={() => setCustomPrompt('Extract the key points from this email')}
+                                                >
+                                                    Key Points
+                                                </button>
+                                                <button
+                                                    className="email-tool-btn"
+                                                    onClick={() => setCustomPrompt('Provide a brief summary of this email')}
+                                                >
+                                                    Summarize
+                                                </button>
+                                                <button
+                                                    className="email-tool-btn"
+                                                    onClick={() => setCustomPrompt('Create a detailed summary of this email')}
+                                                >
+                                                    Summary
+                                                </button>
+                                                <button
+                                                    className="email-tool-btn"
+                                                    onClick={() => setCustomPrompt('List the action items from this email')}
+                                                >
+                                                    Action Items
+                                                </button>
+                                            </div>
+
+                                            {/* Email Textarea */}
+                                            <div className="relative">
+                                                <textarea
+                                                    value={emailText}
+                                                    onChange={(e) => setEmailText(e.target.value)}
+                                                    className="w-full h-80 px-6 py-4 custom-textarea text-gray-800 placeholder-gray-500 resize-none border-0"
+                                                    style={{borderRadius: '0 0 16px 16px'}}
+                                                    placeholder="Type or paste your email content here and watch the magic happen..."
+                                                    disabled={droppedEmailFile !== null}
+                                                />
+                                                {/* Language Indicator */}
+                                                <div
+                                                    className="absolute top-3 right-4 text-xs font-medium pointer-events-none"
+                                                    style={{
+                                                        color: darkMode ? '#888' : '#999',
+                                                        opacity: 0.8
+                                                    }}
+                                                >
+                                                    Responses in {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                                                </div>
                                             </div>
                                         </div>
                                     )}
@@ -7905,6 +8229,67 @@ const fetchOutlookEmails = async (accessToken) => {
                                         {/* Content Area */}
                                         <div className="min-h-[500px]">
                                             {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
+                                        </div>
+
+                                        {/* Stats Section */}
+                                        <div className="stats-section fade-in">
+                                            <h2 className="stats-header">
+                                                Analytics Dashboard
+                                            </h2>
+
+                                            <div className="stats-grid">
+                                                <div className="stat-card">
+                                                    <div className="stat-value">{sentEmails.length}</div>
+                                                    <div className="stat-label">Emails Sent</div>
+                                                </div>
+                                                <div className="stat-card">
+                                                    <div className="stat-value">{gmailEmails.filter(e => !e.read).length}</div>
+                                                    <div className="stat-label">Unread Emails</div>
+                                                </div>
+                                                <div className="stat-card">
+                                                    <div className="stat-value">{priorityEmails.length}</div>
+                                                    <div className="stat-label">Priority Items</div>
+                                                </div>
+                                                <div className="stat-card">
+                                                    <div className="stat-value">{gmailEmails.length + outlookEmails.length}</div>
+                                                    <div className="stat-label">Total Received</div>
+                                                </div>
+                                            </div>
+
+                                            {/* AI Priority Suggestions */}
+                                            <div className="priority-list">
+                                                <h3 className="priority-list-header">
+                                                    AI Priority Suggestions
+                                                </h3>
+                                                {priorityEmails.length > 0 ? (
+                                                    priorityEmails.slice(0, 3).map((email, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="priority-item"
+                                                            onClick={() => setViewingEmail(email)}
+                                                        >
+                                                            <span className={`priority-badge priority-${email.priority === 'high' ? 'high' : email.priority === 'medium' ? 'medium' : 'low'}`}>
+                                                                {email.priority ? email.priority.toUpperCase() : 'MEDIUM'} PRIORITY
+                                                            </span>
+                                                            <div style={{fontSize: '14px', fontWeight: '600', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px'}}>
+                                                                {email.subject}
+                                                            </div>
+                                                            <div style={{fontSize: '12px', color: darkMode ? '#9ca3af' : '#6b7280'}}>
+                                                                From: {email.from}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div style={{
+                                                        padding: '24px',
+                                                        textAlign: 'center',
+                                                        color: darkMode ? '#9ca3af' : '#6b7280',
+                                                        fontSize: '14px'
+                                                    }}>
+                                                        No priority emails yet. Connect your email to see AI-powered priority suggestions.
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
