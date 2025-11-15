@@ -479,6 +479,26 @@
                 transform: scale(1.2);
             }
 
+            /* Better visibility for toggle switches on mobile */
+            .settings-panel button[class*="inline-flex"][class*="items-center"][class*="rounded-full"] {
+                height: 32px !important;
+                width: 56px !important;
+                min-width: 56px;
+            }
+
+            .settings-panel button[class*="inline-flex"] span[class*="rounded-full"] {
+                height: 24px !important;
+                width: 24px !important;
+            }
+
+            .settings-panel button[class*="inline-flex"] span[class*="translate-x-6"] {
+                transform: translateX(28px) !important;
+            }
+
+            .settings-panel button[class*="inline-flex"] span[class*="translate-x-1"] {
+                transform: translateX(4px) !important;
+            }
+
             /* Mobile search bar */
             .nav-search-bar {
                 padding: 6px 12px;
@@ -2338,8 +2358,13 @@
         }
 
         body.dark-mode .email-content-area {
-            background: rgba(20, 20, 20, 0.85);
+            background: linear-gradient(135deg,
+                rgba(10, 10, 10, 0.95) 0%,
+                rgba(20, 20, 20, 0.9) 100%
+            );
             border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                        0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .email-content-area.viewing-email {
@@ -4202,6 +4227,10 @@ body.dark-mode .ai-send-button {
             const [showVersionModal, setShowVersionModal] = useState(false);
             const CURRENT_VERSION = '3.0';
 
+            // Language settings state
+            const [selectedLanguage, setSelectedLanguage] = useState('english');
+            const [showLanguageInHome, setShowLanguageInHome] = useState(false);
+
             // Audio references for notifications
             const audioRef = useRef(null);
             const sendAudioRef = useRef(null);
@@ -4303,6 +4332,16 @@ if (tokensParam) {
 
     if (savedShowSuggestions !== null) {
         setShowSuggestionsEnabled(savedShowSuggestions === 'true');
+    }
+
+    // Load language settings
+    const savedLanguage = localStorage.getItem('selectedLanguage');
+    const savedShowLanguageInHome = localStorage.getItem('showLanguageInHome');
+    if (savedLanguage) {
+        setSelectedLanguage(savedLanguage);
+    }
+    if (savedShowLanguageInHome !== null) {
+        setShowLanguageInHome(savedShowLanguageInHome === 'true');
     }
 
     if (savedConnection === 'true' && savedTokens) {
@@ -5223,6 +5262,19 @@ const fetchOutlookEmails = async (accessToken) => {
                     prompt = `${customPrompt} in a ${toneLabel} tone`;
                 }
 
+                // Add language instruction to the prompt
+                const languageMap = {
+                    'english': 'English',
+                    'german': 'German',
+                    'french': 'French',
+                    'georgian': 'Georgian',
+                    'spanish': 'Spanish'
+                };
+                const targetLanguage = languageMap[selectedLanguage] || 'English';
+                if (selectedLanguage !== 'english') {
+                    prompt = `${prompt}. IMPORTANT: Respond in ${targetLanguage} language.`;
+                }
+
                 try {
                     const transformedText = await callAIAPI(prompt, uploadedFile?.content || emailText);
                     setResult(transformedText);
@@ -5714,6 +5766,74 @@ const fetchOutlookEmails = async (accessToken) => {
                                     </div>
                                 </div>
 
+                                {/* Language Settings Section */}
+                                <div className="pt-6 border-t border-gray-300">
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                        🌍 Language Settings
+                                    </label>
+
+                                    {/* Language Selection Dropdown */}
+                                    <div className="mb-4">
+                                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                                            Response Language
+                                        </label>
+                                        <div className="glass-dark px-4 py-3 rounded-xl">
+                                            <select
+                                                value={selectedLanguage}
+                                                onChange={(e) => {
+                                                    setSelectedLanguage(e.target.value);
+                                                    localStorage.setItem('selectedLanguage', e.target.value);
+                                                }}
+                                                className="w-full bg-transparent text-gray-700 text-sm font-medium outline-none cursor-pointer"
+                                                style={{
+                                                    background: darkMode ? 'rgba(40, 40, 40, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+                                                    padding: '8px 12px',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid rgba(99, 102, 241, 0.3)'
+                                                }}
+                                            >
+                                                <option value="english">🇬🇧 English</option>
+                                                <option value="german">🇩🇪 German</option>
+                                                <option value="french">🇫🇷 French</option>
+                                                <option value="georgian">🇬🇪 Georgian</option>
+                                                <option value="spanish">🇪🇸 Spanish</option>
+                                            </select>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">
+                                            AI will respond in the selected language
+                                        </p>
+                                    </div>
+
+                                    {/* Quick Language Switcher Toggle */}
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                                            Quick Access
+                                        </label>
+                                        <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                            <span className="text-sm text-gray-700">Show language selector in home tab</span>
+                                            <button
+                                                onClick={() => {
+                                                    const newValue = !showLanguageInHome;
+                                                    setShowLanguageInHome(newValue);
+                                                    localStorage.setItem('showLanguageInHome', newValue.toString());
+                                                }}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    showLanguageInHome ? 'bg-indigo-600' : 'bg-gray-300'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        showLanguageInHome ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2">
+                                            Toggle on to quickly change language from the home tab
+                                        </p>
+                                    </div>
+                                </div>
+
                                 {/* Priority Mode Selection */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -5901,10 +6021,33 @@ const fetchOutlookEmails = async (accessToken) => {
                                             <span className="text-lg mr-2">✍️</span>
                                             Paste your email content
                                         </label>
-                                        <label className="px-4 py-2 glass-effect rounded-full text-gray-700 text-xs font-medium hover:bg-white/90 transition-all cursor-pointer border-2 border-white unified-button">
-                                            <span>📎 Upload File</span>
-                                            <input type="file" accept=".txt,.eml" onChange={handleFileUpload} className="hidden" />
-                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            {/* Quick Language Selector (conditional) */}
+                                            {showLanguageInHome && (
+                                                <select
+                                                    value={selectedLanguage}
+                                                    onChange={(e) => {
+                                                        setSelectedLanguage(e.target.value);
+                                                        localStorage.setItem('selectedLanguage', e.target.value);
+                                                    }}
+                                                    className="px-3 py-1.5 glass-effect rounded-full text-gray-700 text-xs font-medium transition-all cursor-pointer border-2 border-white"
+                                                    style={{
+                                                        background: darkMode ? 'rgba(40, 40, 40, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                                        outline: 'none'
+                                                    }}
+                                                >
+                                                    <option value="english">🇬🇧 English</option>
+                                                    <option value="german">🇩🇪 German</option>
+                                                    <option value="french">🇫🇷 French</option>
+                                                    <option value="georgian">🇬🇪 Georgian</option>
+                                                    <option value="spanish">🇪🇸 Spanish</option>
+                                                </select>
+                                            )}
+                                            <label className="px-4 py-2 glass-effect rounded-full text-gray-700 text-xs font-medium hover:bg-white/90 transition-all cursor-pointer border-2 border-white unified-button">
+                                                <span>📎 Upload File</span>
+                                                <input type="file" accept=".txt,.eml" onChange={handleFileUpload} className="hidden" />
+                                            </label>
+                                        </div>
                                     </div>
 
                                     {droppedEmailFile ? (
@@ -5957,13 +6100,25 @@ const fetchOutlookEmails = async (accessToken) => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <textarea
-                                            value={emailText}
-                                            onChange={(e) => setEmailText(e.target.value)}
-                                            className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
-                                            placeholder="Type or paste your email content here and watch the magic happen..."
-                                            disabled={droppedEmailFile !== null}
-                                        />
+                                        <div className="relative">
+                                            <textarea
+                                                value={emailText}
+                                                onChange={(e) => setEmailText(e.target.value)}
+                                                className="w-full h-80 px-6 py-4 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
+                                                placeholder="Type or paste your email content here and watch the magic happen..."
+                                                disabled={droppedEmailFile !== null}
+                                            />
+                                            {/* Language Indicator */}
+                                            <div
+                                                className="absolute top-3 right-4 text-xs font-medium pointer-events-none"
+                                                style={{
+                                                    color: darkMode ? '#888' : '#999',
+                                                    opacity: 0.8
+                                                }}
+                                            >
+                                                Responses in {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
 
