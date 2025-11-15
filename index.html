@@ -504,6 +504,131 @@
             .email-content-formatted {
                 font-size: 13px;
             }
+
+            /* Mobile Email Writer Input */
+            .mobile-email-input-container {
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 20px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            body.dark-mode .mobile-email-input-container {
+                background: rgba(30, 30, 30, 0.8);
+            }
+
+            .mobile-email-input-container input {
+                flex: 1;
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+
+            /* Circular Filling Animation */
+            .typing-progress-circle {
+                width: 40px;
+                height: 40px;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transform: scale(0.8);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .typing-progress-circle.active {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            .typing-progress-circle svg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                transform: rotate(-90deg);
+            }
+
+            .typing-progress-circle circle {
+                fill: none;
+                stroke-width: 3;
+                stroke-linecap: round;
+            }
+
+            .progress-bg {
+                stroke: rgba(59, 130, 246, 0.2);
+            }
+
+            .progress-fill {
+                stroke: #3B82F6;
+                stroke-dasharray: 113;
+                stroke-dashoffset: 113;
+                transition: stroke-dashoffset 0.3s ease;
+            }
+
+            body.dark-mode .progress-fill {
+                stroke: #60a5fa;
+            }
+
+            /* Send Button Animation */
+            .send-btn-mobile {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+                border: 2px solid white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                opacity: 0;
+                transform: scale(0) rotate(-45deg);
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            }
+
+            .send-btn-mobile.active {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+
+            .send-btn-mobile:hover {
+                transform: scale(1.1) rotate(0deg);
+                box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+            }
+
+            .send-btn-mobile svg {
+                width: 18px;
+                height: 18px;
+                fill: white;
+            }
+
+            body.dark-mode .send-btn-mobile {
+                background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            }
+
+            /* Suggestions on left for mobile */
+            .suggestion-carousel-container {
+                flex-direction: row-reverse;
+            }
+
+            .mobile-suggestions-left {
+                animation: slide-in-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            @keyframes slide-in-left {
+                from {
+                    opacity: 0;
+                    transform: translateX(-30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
         }
 
         @media (max-width: 480px) {
@@ -3042,110 +3167,195 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 85%;
-            max-width: 400px;
+            width: 100%;
             height: 100%;
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.95) 0%,
-                rgba(249, 250, 251, 0.9) 100%
+                rgba(255, 255, 255, 0.98) 0%,
+                rgba(249, 250, 251, 0.95) 100%
             );
             backdrop-filter: blur(30px);
             z-index: 1000;
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
         }
 
         body.dark-mode .mobile-inbox-drawer {
-            background: rgba(20, 20, 20, 0.95);
+            background: linear-gradient(135deg,
+                rgba(20, 20, 20, 0.98) 0%,
+                rgba(10, 10, 10, 0.95) 100%
+            );
         }
 
         .mobile-inbox-drawer.active {
-            transform: translateX(0);
+            transform: translateY(0);
         }
 
         .mobile-inbox-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
         }
 
         body.dark-mode .mobile-inbox-header {
             border-bottom-color: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 30, 30, 0.5);
         }
 
         .mobile-close-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
-            border: none;
+            border: 2px solid rgba(239, 68, 68, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
-            transition: all 0.2s ease;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
         .mobile-close-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.25);
+            transform: scale(1.1);
+            border-color: rgba(239, 68, 68, 0.5);
         }
 
-        .hamburger-btn {
-            position: fixed;
-            top: 90px;
-            left: 24px;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.95);
+        /* Mobile Floating Tabs Container */
+        .mobile-floating-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .mobile-floating-tabs {
+            background: rgba(30, 30, 30, 0.3);
+        }
+
+        .mobile-tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.85) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .mobile-tab-btn.active {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            border-color: white;
+            color: white;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+            transform: scale(1.05);
+        }
+
+        body.dark-mode .mobile-tab-btn {
+            background: linear-gradient(135deg, rgba(60, 60, 60, 0.9) 0%, rgba(50, 50, 50, 0.85) 100%);
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .mobile-tab-btn.active {
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            color: white;
+        }
+
+        /* Mobile Sub-tabs (Received/Sent) */
+        .mobile-sub-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        body.dark-mode .mobile-sub-tabs {
+            background: rgba(20, 20, 20, 0.2);
+        }
+
+        .mobile-sub-tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid transparent;
+            color: #4b5563;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-sub-tab-btn.active {
+            background: white;
+            border-color: #3B82F6;
+            color: #3B82F6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark-mode .mobile-sub-tab-btn {
+            background: rgba(50, 50, 50, 0.6);
+            color: #a0a0a0;
+        }
+
+        body.dark-mode .mobile-sub-tab-btn.active {
+            background: rgba(60, 60, 60, 0.9);
+            border-color: #2563EB;
+            color: #60a5fa;
+        }
+
+        .inbox-btn-mobile {
+            position: fixed;
+            top: 60px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid white;
             display: none;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 998;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
         }
 
-        body.dark-mode .hamburger-btn {
-            background: rgba(20, 20, 20, 0.95);
-            border-color: rgba(255, 255, 255, 0.2);
+        body.dark-mode .inbox-btn-mobile {
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .hamburger-btn:hover {
-            transform: scale(1.05);
-            border-color: rgba(0, 0, 0, 0.3);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        .inbox-btn-mobile:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
         }
 
-        body.dark-mode .hamburger-btn:hover {
-            border-color: rgba(255, 255, 255, 0.4);
+        body.dark-mode .inbox-btn-mobile:hover {
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
         }
 
-        .hamburger-icon {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .hamburger-line {
-            width: 20px;
-            height: 2px;
-            background: #1f2937;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .hamburger-line {
-            background: #f3f4f6;
+        .inbox-icon {
+            font-size: 22px;
+            color: white;
         }
 
         @media (max-width: 1024px) {
@@ -3157,7 +3367,7 @@
                 display: none;
             }
 
-            .hamburger-btn {
+            .inbox-btn-mobile {
                 display: flex;
             }
 
@@ -3770,6 +3980,9 @@ body.dark-mode .version-update-item-small {
             const [unreadEmails, setUnreadEmails] = useState(new Set());
             const [lastEmailCheck, setLastEmailCheck] = useState(Date.now());
             const [showInboxExpand, setShowInboxExpand] = useState(false);
+            const [isTyping, setIsTyping] = useState(false);
+            const [typingProgress, setTypingProgress] = useState(0);
+            const [showSendBtn, setShowSendBtn] = useState(false);
             const [userName, setUserName] = useState('');
             const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
             const [aiLoadingState, setAiLoadingState] = useState('');
@@ -5590,7 +5803,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                     Use mouse wheel to scroll
                                                 </div>
                                             )}
-                                            <div className="suggestion-carousel-container" ref={carouselRef}>
+                                            <div className="suggestion-carousel-container mobile-suggestions-left" ref={carouselRef}>
                                                 <div className="suggestion-carousel">
                                                     <div
                                                         className="suggestion-carousel-track"
@@ -5662,17 +5875,74 @@ const fetchOutlookEmails = async (accessToken) => {
                                         <input
                                             type="text"
                                             value={customPrompt}
-                                            onChange={(e) => setCustomPrompt(e.target.value)}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setCustomPrompt(value);
+
+                                                // Mobile typing animation logic
+                                                if (window.innerWidth <= 768) {
+                                                    if (value.length > 0) {
+                                                        setIsTyping(true);
+                                                        // Calculate progress based on text length (max at 50 chars)
+                                                        const progress = Math.min((value.length / 50) * 100, 100);
+                                                        setTypingProgress(progress);
+
+                                                        // Show send button when user has typed something meaningful
+                                                        if (value.length >= 3) {
+                                                            setTimeout(() => setShowSendBtn(true), 300);
+                                                        } else {
+                                                            setShowSendBtn(false);
+                                                        }
+                                                    } else {
+                                                        setIsTyping(false);
+                                                        setTypingProgress(0);
+                                                        setShowSendBtn(false);
+                                                    }
+                                                }
+                                            }}
+                                            onFocus={() => {
+                                                if (window.innerWidth <= 768 && customPrompt.length > 0) {
+                                                    setIsTyping(true);
+                                                }
+                                            }}
                                             className="flex-1 px-5 py-3 glass-effect border-2 border-white rounded-full text-gray-800 placeholder-gray-500 unified-button"
                                             placeholder="e.g., 'Make it more casual' or 'Add urgency'"
                                             onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
                                         />
+
+                                        {/* Desktop Generate Button */}
                                         <button
                                             onClick={handleGenerate}
                                             disabled={(!emailText && !uploadedFile) || (!selectedTone && !customPrompt)}
-                                            className="px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-white unified-button disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="hidden md:flex px-8 py-3 glass-effect rounded-full text-gray-800 font-medium hover:bg-white/90 transition-all oval-button border-2 border-white unified-button disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             ✨ Generate
+                                        </button>
+
+                                        {/* Mobile: Typing Progress Circle */}
+                                        <div className={`typing-progress-circle md:hidden ${isTyping && !showSendBtn ? 'active' : ''}`}>
+                                            <svg width="40" height="40">
+                                                <circle className="progress-bg" cx="20" cy="20" r="18" />
+                                                <circle
+                                                    className="progress-fill"
+                                                    cx="20"
+                                                    cy="20"
+                                                    r="18"
+                                                    style={{strokeDashoffset: 113 - (113 * typingProgress / 100)}}
+                                                />
+                                            </svg>
+                                            <span style={{fontSize: '16px'}}>✨</span>
+                                        </div>
+
+                                        {/* Mobile: Send Button */}
+                                        <button
+                                            onClick={handleGenerate}
+                                            disabled={(!emailText && !uploadedFile) || (!selectedTone && !customPrompt)}
+                                            className={`send-btn-mobile md:hidden ${showSendBtn ? 'active' : ''}`}
+                                        >
+                                            <svg viewBox="0 0 24 24" fill="white">
+                                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                                            </svg>
                                         </button>
                                     </div>
                                 </div>
@@ -5768,21 +6038,214 @@ const fetchOutlookEmails = async (accessToken) => {
 
             return (
                 <div className="min-h-screen relative">
-                    {/* Hamburger Button for Mobile */}
-                    {emailConnected && (
+                    {/* Inbox Button for Mobile */}
+                    {(emailConnected || outlookConnected) && (
                         <button
-                            className="hamburger-btn"
+                            className="inbox-btn-mobile"
                             onClick={() => setMobileInboxOpen(!mobileInboxOpen)}
                         >
-                            <div className="hamburger-icon">
-                                <div className="hamburger-line"></div>
-                                <div className="hamburger-line"></div>
-                                <div className="hamburger-line"></div>
-                            </div>
+                            <div className="inbox-icon">📥</div>
                         </button>
                     )}
 
-                    {/* Mobile Inbox components and modals would go here - keeping code length manageable */}
+                    {/* Mobile Inbox Full-Screen Panel */}
+                    {(emailConnected || outlookConnected) && (
+                        <>
+                            <div
+                                className={`mobile-inbox-overlay ${mobileInboxOpen ? 'active' : ''}`}
+                                onClick={() => setMobileInboxOpen(false)}
+                            ></div>
+                            <div className={`mobile-inbox-drawer ${mobileInboxOpen ? 'active' : ''}`}>
+                                {/* Header with Close Button */}
+                                <div className="mobile-inbox-header">
+                                    <h2 className="text-xl font-bold text-gray-800">Inbox</h2>
+                                    <button
+                                        className="mobile-close-btn"
+                                        onClick={() => setMobileInboxOpen(false)}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+
+                                {/* Floating Tabs (Outlook/Gmail) */}
+                                <div className="mobile-floating-tabs">
+                                    {outlookConnected && (
+                                        <button
+                                            className={`mobile-tab-btn ${activeEmailTab === 'outlook' ? 'active' : ''}`}
+                                            onClick={() => setActiveEmailTab('outlook')}
+                                        >
+                                            📧 Outlook
+                                        </button>
+                                    )}
+                                    {emailConnected && (
+                                        <button
+                                            className={`mobile-tab-btn ${activeEmailTab === 'gmail' ? 'active' : ''}`}
+                                            onClick={() => setActiveEmailTab('gmail')}
+                                        >
+                                            ✉️ Gmail
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Sub-tabs (Received/Sent) */}
+                                <div className="mobile-sub-tabs">
+                                    <button
+                                        className={`mobile-sub-tab-btn ${inboxTab === 'received' ? 'active' : ''}`}
+                                        onClick={() => setInboxTab('received')}
+                                    >
+                                        📬 Received
+                                    </button>
+                                    <button
+                                        className={`mobile-sub-tab-btn ${inboxTab === 'sent' ? 'active' : ''}`}
+                                        onClick={() => setInboxTab('sent')}
+                                    >
+                                        📤 Sent
+                                    </button>
+                                </div>
+
+                                {/* Email List */}
+                                <div className="flex-1 overflow-y-auto">
+                                    {inboxTab === 'received' ? (
+                                        activeEmailTab === 'gmail' ? (
+                                            emails.length > 0 ? (
+                                                emails.map((email, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="modern-email-item"
+                                                        onClick={() => {
+                                                            setSelectedEmail(email);
+                                                            setMobileInboxOpen(false);
+                                                        }}
+                                                    >
+                                                        <div className="email-item-header">
+                                                            <div className="email-sender-avatar">
+                                                                {email.from ? email.from.charAt(0).toUpperCase() : '?'}
+                                                            </div>
+                                                            <div className="email-item-meta">
+                                                                <div className="email-sender-name">
+                                                                    {email.from || 'Unknown Sender'}
+                                                                </div>
+                                                                <div className="email-date">
+                                                                    {new Date(email.date).toLocaleDateString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="email-subject">{email.subject}</div>
+                                                        <div className="email-snippet">
+                                                            {email.snippet || 'No preview available'}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500">No emails found</div>
+                                            )
+                                        ) : (
+                                            outlookEmails.length > 0 ? (
+                                                outlookEmails.map((email, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="modern-email-item"
+                                                        onClick={() => {
+                                                            setSelectedEmail(email);
+                                                            setMobileInboxOpen(false);
+                                                        }}
+                                                    >
+                                                        <div className="email-item-header">
+                                                            <div className="email-sender-avatar">
+                                                                {email.from ? email.from.charAt(0).toUpperCase() : '?'}
+                                                            </div>
+                                                            <div className="email-item-meta">
+                                                                <div className="email-sender-name">
+                                                                    {email.from || 'Unknown Sender'}
+                                                                </div>
+                                                                <div className="email-date">
+                                                                    {new Date(email.receivedDateTime).toLocaleDateString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="email-subject">{email.subject}</div>
+                                                        <div className="email-snippet">
+                                                            {email.bodyPreview || 'No preview available'}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500">No emails found</div>
+                                            )
+                                        )
+                                    ) : (
+                                        activeEmailTab === 'gmail' ? (
+                                            sentEmails.length > 0 ? (
+                                                sentEmails.map((email, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="modern-email-item"
+                                                        onClick={() => {
+                                                            setSelectedEmail(email);
+                                                            setMobileInboxOpen(false);
+                                                        }}
+                                                    >
+                                                        <div className="email-item-header">
+                                                            <div className="email-sender-avatar">
+                                                                {email.to ? email.to.charAt(0).toUpperCase() : '?'}
+                                                            </div>
+                                                            <div className="email-item-meta">
+                                                                <div className="email-sender-name">
+                                                                    To: {email.to || 'Unknown'}
+                                                                </div>
+                                                                <div className="email-date">
+                                                                    {new Date(email.date).toLocaleDateString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="email-subject">{email.subject}</div>
+                                                        <div className="email-snippet">
+                                                            {email.snippet || 'No preview available'}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500">No sent emails found</div>
+                                            )
+                                        ) : (
+                                            outlookSentEmails.length > 0 ? (
+                                                outlookSentEmails.map((email, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="modern-email-item"
+                                                        onClick={() => {
+                                                            setSelectedEmail(email);
+                                                            setMobileInboxOpen(false);
+                                                        }}
+                                                    >
+                                                        <div className="email-item-header">
+                                                            <div className="email-sender-avatar">
+                                                                {email.toRecipients?.[0]?.emailAddress?.name?.charAt(0).toUpperCase() || '?'}
+                                                            </div>
+                                                            <div className="email-item-meta">
+                                                                <div className="email-sender-name">
+                                                                    To: {email.toRecipients?.[0]?.emailAddress?.name || 'Unknown'}
+                                                                </div>
+                                                                <div className="email-date">
+                                                                    {new Date(email.sentDateTime).toLocaleDateString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="email-subject">{email.subject}</div>
+                                                        <div className="email-snippet">
+                                                            {email.bodyPreview || 'No preview available'}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500">No sent emails found</div>
+                                            )
+                                        )
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     {/* AI Floating Particles */}
                     <div className="ai-particle" style={{top: '20%', left: '10%', animationDelay: '0s'}}></div>
