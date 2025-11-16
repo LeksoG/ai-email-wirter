@@ -2326,15 +2326,24 @@
             0% {
                 opacity: 0;
                 transform: translateY(-20px) scale(0.9);
-                box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+                box-shadow: 0 0 0 rgba(99, 102, 241, 0), inset 0 0 0 rgba(99, 102, 241, 0);
             }
-            40% {
-                box-shadow: 0 0 30px rgba(99, 102, 241, 0.7), 0 0 60px rgba(139, 92, 246, 0.5);
+            30% {
+                box-shadow: 0 0 35px rgba(99, 102, 241, 0.8), 0 0 70px rgba(139, 92, 246, 0.6),
+                           inset -200px 0 100px -50px rgba(99, 102, 241, 0.4);
+            }
+            60% {
+                box-shadow: 0 0 35px rgba(99, 102, 241, 0.8), 0 0 70px rgba(139, 92, 246, 0.6),
+                           inset 0 0 100px -50px rgba(99, 102, 241, 0.4);
+            }
+            85% {
+                box-shadow: 0 0 35px rgba(99, 102, 241, 0.8), 0 0 70px rgba(139, 92, 246, 0.6),
+                           inset 200px 0 100px -50px rgba(99, 102, 241, 0.4);
             }
             100% {
                 opacity: 1;
                 transform: translateY(0) scale(1);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 0 0 rgba(99, 102, 241, 0);
             }
         }
 
@@ -2595,7 +2604,7 @@
         @keyframes emailAppearGlow {
             0% {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(30px) translateX(-20px);
                 box-shadow: 0 0 0 rgba(99, 102, 241, 0);
             }
             50% {
@@ -2603,9 +2612,29 @@
             }
             100% {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) translateX(0);
                 box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
             }
+        }
+
+        /* Ladder animation for sequential email appearance */
+        .modern-email-item:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .modern-email-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .modern-email-item:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        .modern-email-item:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+        .modern-email-item:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+        .modern-email-item:nth-child(n+6) {
+            animation-delay: 0.5s;
         }
 
         .modern-email-item::before {
@@ -3386,10 +3415,18 @@
             backdrop-filter: blur(20px);
             border: 2px solid rgba(99, 102, 241, 0.3);
             border-radius: 16px;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             z-index: 10;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Hide scrollbar but keep functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .inbox-search-suggestions::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         body.dark-mode .inbox-search-suggestions {
@@ -7291,10 +7328,115 @@ const fetchOutlookSentEmails = async (accessToken) => {
                     case 'email':
                         return (
                             <div className="space-y-6 fade-in">
-                                {/* Current Tool Indicator */}
-                                <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
-                                    <span className="text-xl">✉️</span>
-                                    <span className="text-sm font-semibold text-gray-700">Email Rewriter</span>
+                                {/* Current Tool Indicator and Model Selector */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
+                                            <span className="text-xl">✉️</span>
+                                            <span className="text-sm font-semibold text-gray-700">Email Writer</span>
+                                        </div>
+
+                                        {/* AI Model Switcher - Small Oval */}
+                                        <div style={{position: 'relative'}}>
+                                            <button
+                                                onClick={() => setShowModelDropdown(!showModelDropdown)}
+                                                style={{
+                                                    padding: '8px 16px',
+                                                    fontSize: '12px',
+                                                    fontWeight: '600',
+                                                    background: darkMode
+                                                        ? 'linear-gradient(135deg, rgba(30, 30, 35, 0.95) 0%, rgba(25, 25, 30, 0.9) 100%)'
+                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                    border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
+                                                    borderRadius: '50px',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease',
+                                                    boxShadow: darkMode
+                                                        ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+                                                        : '0 2px 8px rgba(99, 102, 241, 0.15)',
+                                                    color: darkMode ? '#c7d2fe' : '#374151',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px',
+                                                    whiteSpace: 'nowrap'
+                                                }}
+                                                className="unified-button"
+                                            >
+                                                <span>🤖 {selectedModel}</span>
+                                                <span style={{transition: 'transform 0.3s ease', transform: showModelDropdown ? 'rotate(180deg)' : 'rotate(0deg)', fontSize: '10px'}}>▼</span>
+                                            </button>
+
+                                            {showModelDropdown && (
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: 0,
+                                                        marginTop: '8px',
+                                                        background: darkMode
+                                                            ? 'linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(25, 25, 30, 0.95) 100%)'
+                                                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%)',
+                                                        border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
+                                                        borderRadius: '12px',
+                                                        boxShadow: darkMode
+                                                            ? '0 8px 24px rgba(0, 0, 0, 0.4)'
+                                                            : '0 8px 24px rgba(99, 102, 241, 0.2)',
+                                                        zIndex: 1000,
+                                                        overflow: 'hidden',
+                                                        animation: 'slideDownFade 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                        minWidth: '280px'
+                                                    }}
+                                                >
+                                                    {[
+                                                        { name: 'Ink 2.0', description: 'Mistral AI Small Latest' },
+                                                        { name: 'Ink 2.5', description: 'Mistral AI Medium' }
+                                                    ].map((model) => (
+                                                        <button
+                                                            key={model.name}
+                                                            onClick={() => {
+                                                                setSelectedModel(model.name);
+                                                                setShowModelDropdown(false);
+                                                            }}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '12px 16px',
+                                                                fontSize: '13px',
+                                                                background: selectedModel === model.name
+                                                                    ? (darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)')
+                                                                    : 'transparent',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.2s ease',
+                                                                color: darkMode ? '#c7d2fe' : '#374151',
+                                                                textAlign: 'left',
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                gap: '4px'
+                                                            }}
+                                                            onMouseEnter={(e) => {
+                                                                if (selectedModel !== model.name) {
+                                                                    e.currentTarget.style.background = darkMode
+                                                                        ? 'rgba(99, 102, 241, 0.1)'
+                                                                        : 'rgba(99, 102, 241, 0.05)';
+                                                                }
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                if (selectedModel !== model.name) {
+                                                                    e.currentTarget.style.background = 'transparent';
+                                                                }
+                                                            }}
+                                                        >
+                                                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontWeight: '600'}}>
+                                                                <span>{model.name}</span>
+                                                                {selectedModel === model.name && <span>✓</span>}
+                                                            </div>
+                                                            <span style={{fontSize: '11px', opacity: 0.7, fontWeight: '400'}}>{model.description}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Email Writing Area */}
@@ -7397,92 +7539,6 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                                 >
                                                     Responses in {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
                                                 </div>
-
-                                                {/* Starter Suggestions - Inside Textarea */}
-                                                {!emailText && showStarterSuggestions && (() => {
-                                                    const suggestionSets = [
-                                                        [
-                                                            { emoji: '💼', text: 'Job Application', prompt: 'Write a professional job application email' },
-                                                            { emoji: '🤝', text: 'Collaboration', prompt: 'Write a collaboration proposal email' },
-                                                            { emoji: '📝', text: 'Feedback Request', prompt: 'Write an email requesting feedback' },
-                                                            { emoji: '✨', text: 'Newsletter', prompt: 'Write an engaging newsletter email' }
-                                                        ],
-                                                        [
-                                                            { emoji: '🎯', text: 'Sales Pitch', prompt: 'Write a compelling sales pitch email' },
-                                                            { emoji: '🙏', text: 'Apology', prompt: 'Write a sincere apology email' },
-                                                            { emoji: '📊', text: 'Progress Update', prompt: 'Write a project progress update email' },
-                                                            { emoji: '🎉', text: 'Announcement', prompt: 'Write an exciting announcement email' }
-                                                        ],
-                                                        [
-                                                            { emoji: '💡', text: 'Proposal', prompt: 'Write a business proposal email' },
-                                                            { emoji: '🔔', text: 'Reminder', prompt: 'Write a polite reminder email' },
-                                                            { emoji: '👋', text: 'Introduction', prompt: 'Write a professional introduction email' },
-                                                            { emoji: '📞', text: 'Follow-Up', prompt: 'Write an effective follow-up email' }
-                                                        ]
-                                                    ];
-
-                                                    const currentSuggestions = suggestionSets[currentSuggestionSet];
-
-                                                    return (
-                                                        <div
-                                                            key={currentSuggestionSet}
-                                                            style={{
-                                                                position: 'absolute',
-                                                                bottom: '16px',
-                                                                left: '50%',
-                                                                transform: 'translateX(-50%)',
-                                                                display: 'flex',
-                                                                gap: '10px',
-                                                                opacity: emailText ? 0 : 1,
-                                                                animation: 'blurFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                                pointerEvents: emailText ? 'none' : 'auto'
-                                                            }}
-                                                        >
-                                                            {currentSuggestions.map((suggestion, idx) => (
-                                                                <button
-                                                                    key={idx}
-                                                                    onClick={() => {
-                                                                        setCustomPrompt(suggestion.prompt);
-                                                                        setEmailText('');
-                                                                    }}
-                                                                    style={{
-                                                                        padding: '8px 16px',
-                                                                        fontSize: '13px',
-                                                                        background: darkMode
-                                                                            ? 'linear-gradient(135deg, rgba(30, 30, 35, 0.95) 0%, rgba(25, 25, 30, 0.9) 100%)'
-                                                                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
-                                                                        border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
-                                                                        borderRadius: '12px',
-                                                                        cursor: 'pointer',
-                                                                        transition: 'all 0.3s ease',
-                                                                        boxShadow: darkMode
-                                                                            ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-                                                                            : '0 2px 8px rgba(99, 102, 241, 0.15)',
-                                                                        fontWeight: '600',
-                                                                        color: darkMode ? '#c7d2fe' : '#374151',
-                                                                        whiteSpace: 'nowrap',
-                                                                        animationDelay: `${idx * 0.1}s`
-                                                                    }}
-                                                                    className="unified-button"
-                                                                    onMouseOver={(e) => {
-                                                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                                                        e.currentTarget.style.boxShadow = darkMode
-                                                                            ? '0 4px 12px rgba(99, 102, 241, 0.35)'
-                                                                            : '0 4px 12px rgba(99, 102, 241, 0.25)';
-                                                                    }}
-                                                                    onMouseOut={(e) => {
-                                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                                        e.currentTarget.style.boxShadow = darkMode
-                                                                            ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-                                                                            : '0 2px 8px rgba(99, 102, 241, 0.15)';
-                                                                    }}
-                                                                >
-                                                                    {suggestion.emoji} {suggestion.text}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    );
-                                                })()}
                                             </div>
                                         </div>
                                     )}
@@ -7557,32 +7613,53 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 const value = e.target.value;
                 setCustomPrompt(value);
 
-                // Generate dynamic suggestions
-                if (value.length > 0) {
+                // Generate dynamic suggestions (trigger with 2+ characters)
+                if (value.length >= 2) {
                     const suggestions = [];
                     const lowerValue = value.toLowerCase();
 
-                    if (lowerValue.includes('short') || lowerValue.includes('brief')) {
+                    // More triggers with less characters needed
+                    if (lowerValue.includes('sh') || lowerValue.includes('br')) {
                         suggestions.push('Make this email shorter and more concise');
                     }
-                    if (lowerValue.includes('formal') || lowerValue.includes('professional')) {
-                        suggestions.push('Rewrite in a more formal tone');
+                    if (lowerValue.includes('fo') || lowerValue.includes('pr')) {
+                        suggestions.push('Rewrite in a more formal and professional tone');
                     }
-                    if (lowerValue.includes('casual') || lowerValue.includes('friendly')) {
+                    if (lowerValue.includes('ca') || lowerValue.includes('fr')) {
                         suggestions.push('Make this more casual and friendly');
                     }
-                    if (lowerValue.includes('tone')) {
-                        suggestions.push('Change the tone to be more professional', 'Adjust the tone to be more friendly');
+                    if (lowerValue.includes('to')) {
+                        suggestions.push('Adjust the tone to match your audience');
                     }
-                    if (lowerValue.includes('fix') || lowerValue.includes('correct')) {
+                    if (lowerValue.includes('fi') || lowerValue.includes('co')) {
                         suggestions.push('Fix grammar and spelling errors');
                     }
-                    if (lowerValue.includes('add')) {
-                        suggestions.push('Add more details to the email', 'Add a professional closing');
+                    if (lowerValue.includes('ad') || lowerValue.includes('mo')) {
+                        suggestions.push('Add more details and context');
+                    }
+                    if (lowerValue.includes('cl') || lowerValue.includes('si')) {
+                        suggestions.push('Make this clearer and simpler');
+                    }
+                    if (lowerValue.includes('lo') || lowerValue.includes('ex')) {
+                        suggestions.push('Make this longer and more detailed');
+                    }
+                    if (lowerValue.includes('po') || lowerValue.includes('im')) {
+                        suggestions.push('Polish and improve overall quality');
+                    }
+                    if (lowerValue.includes('re')) {
+                        suggestions.push('Rewrite this email completely');
+                    }
+                    if (lowerValue.includes('em')) {
+                        suggestions.push('Add more emphasis to key points');
+                    }
+                    if (lowerValue.includes('st') || lowerValue.includes('bu')) {
+                        suggestions.push('Restructure for better flow');
                     }
 
-                    setDynamicSuggestions(suggestions.slice(0, 3));
-                    setShowDynamicSuggestions(suggestions.length > 0);
+                    // Remove duplicates and limit to 4
+                    const uniqueSuggestions = [...new Set(suggestions)];
+                    setDynamicSuggestions(uniqueSuggestions.slice(0, 4));
+                    setShowDynamicSuggestions(uniqueSuggestions.length > 0);
                 } else {
                     setShowDynamicSuggestions(false);
                 }
@@ -7602,106 +7679,6 @@ const fetchOutlookSentEmails = async (accessToken) => {
         ) : null}
     </div>
 </div>
-
-                                {/* AI Model Switcher */}
-                                <div style={{marginTop: '16px', position: 'relative'}}>
-                                    <label className="text-sm font-medium text-gray-700 flex items-center mb-2">
-                                        <span className="text-lg mr-2">🤖</span>
-                                        AI Model
-                                    </label>
-                                    <button
-                                        onClick={() => setShowModelDropdown(!showModelDropdown)}
-                                        style={{
-                                            width: '100%',
-                                            padding: '12px 16px',
-                                            fontSize: '14px',
-                                            fontWeight: '600',
-                                            background: darkMode
-                                                ? 'linear-gradient(135deg, rgba(30, 30, 35, 0.95) 0%, rgba(25, 25, 30, 0.9) 100%)'
-                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
-                                            border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
-                                            borderRadius: '12px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.3s ease',
-                                            boxShadow: darkMode
-                                                ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-                                                : '0 2px 8px rgba(99, 102, 241, 0.15)',
-                                            color: darkMode ? '#c7d2fe' : '#374151',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between'
-                                        }}
-                                        className="unified-button"
-                                    >
-                                        <span>{selectedModel}</span>
-                                        <span style={{transition: 'transform 0.3s ease', transform: showModelDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}}>▼</span>
-                                    </button>
-
-                                    {showModelDropdown && (
-                                        <div
-                                            style={{
-                                                position: 'absolute',
-                                                top: '100%',
-                                                left: 0,
-                                                right: 0,
-                                                marginTop: '8px',
-                                                background: darkMode
-                                                    ? 'linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(25, 25, 30, 0.95) 100%)'
-                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%)',
-                                                border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
-                                                borderRadius: '12px',
-                                                boxShadow: darkMode
-                                                    ? '0 8px 24px rgba(0, 0, 0, 0.4)'
-                                                    : '0 8px 24px rgba(99, 102, 241, 0.2)',
-                                                zIndex: 1000,
-                                                overflow: 'hidden',
-                                                animation: 'slideDownFade 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                                            }}
-                                        >
-                                            {['Ink 2.0', 'Ink 2.5'].map((model) => (
-                                                <button
-                                                    key={model}
-                                                    onClick={() => {
-                                                        setSelectedModel(model);
-                                                        setShowModelDropdown(false);
-                                                    }}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '12px 16px',
-                                                        fontSize: '14px',
-                                                        fontWeight: '600',
-                                                        background: selectedModel === model
-                                                            ? (darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)')
-                                                            : 'transparent',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        transition: 'all 0.2s ease',
-                                                        color: darkMode ? '#c7d2fe' : '#374151',
-                                                        textAlign: 'left',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'space-between'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        if (selectedModel !== model) {
-                                                            e.currentTarget.style.background = darkMode
-                                                                ? 'rgba(99, 102, 241, 0.1)'
-                                                                : 'rgba(99, 102, 241, 0.05)';
-                                                        }
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        if (selectedModel !== model) {
-                                                            e.currentTarget.style.background = 'transparent';
-                                                        }
-                                                    }}
-                                                >
-                                                    <span>{model}</span>
-                                                    {selectedModel === model && <span>✓</span>}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
                                 </div>
                             </div>
                         );
@@ -8903,16 +8880,17 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                     </button>
                                 </div>
 
-                                {/* Quick Action Suggestions - Left Side */}
+                                {/* Quick Action Suggestions - Left Side - Only show when typing */}
+                                {fullscreenPrompt && fullscreenPrompt.length >= 1 && (
                                 <div style={{
                                     position: 'absolute',
                                     left: '20px',
-                                    top: '100px',
+                                    bottom: '120px',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    gap: '12px',
+                                    gap: '10px',
                                     zIndex: 100,
-                                    animation: 'slideInFromLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                                    animation: 'slideInFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
                                 }}>
                                     {[
                                         { emoji: '✂️', text: 'Shorten', prompt: 'Make this email shorter and more concise' },
@@ -8966,9 +8944,10 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                         </button>
                                     ))}
                                 </div>
+                                )}
 
                                 {/* Email Content */}
-                                <div className="fullscreen-email-content" style={{paddingLeft: '140px'}}>
+                                <div className="fullscreen-email-content" style={{paddingLeft: fullscreenPrompt && fullscreenPrompt.length >= 1 ? '140px' : '24px'}}>
                                     <div className="fullscreen-email-text">
                                         {fullscreenEmailText}
                                     </div>
