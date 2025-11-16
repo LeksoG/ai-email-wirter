@@ -7112,37 +7112,29 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 playNotificationSound();
 
                 try {
-                    // Create a context-aware prompt for generating a reply
-                    const draftPrompt = `Generate a professional and appropriate email reply to this email.
-
-From: ${email.from}
-Subject: ${email.subject}
-Content: ${email.snippet}
-
-Please write a well-structured reply with:
-1. An appropriate greeting
-2. A thoughtful response addressing the main points
-3. A professional closing
-4. Keep it concise and natural
-
-Reply:`;
+                    // Create the email context as text to transform
+                    const contextText = `I received an email from ${email.from} with subject "${email.subject}". The email says: ${email.snippet}`;
 
                     const response = await fetch('/api/transform', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            prompt: draftPrompt,
-                            text: '',
+                            prompt: 'Write a professional and friendly email reply to this. Include a greeting, address their main points, and end with a professional closing.',
+                            text: contextText,
                             temperature: 0.7
                         })
                     });
 
                     const data = await response.json();
+                    console.log('📧 Draft response:', data);
 
-                    if (data.result) {
+                    if (data.result && data.result.trim().length > 0) {
                         setAiDraft(data.result);
                         setHasDraft(true);
                         console.log('✅ AI draft generated successfully');
+                    } else {
+                        console.error('❌ No result in response');
+                        setHasDraft(false);
                     }
 
                     setIsGeneratingDraft(false);
