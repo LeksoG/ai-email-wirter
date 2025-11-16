@@ -2549,9 +2549,41 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 48px;
-            z-index: 10000;
+            font-size: 80px;
+            z-index: 10001;
             animation: envelope-fly-center 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Envelope blur overlay */
+        .envelope-blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            animation: envelope-blur-fade 1.8s ease forwards;
+        }
+
+        @keyframes envelope-blur-fade {
+            0% {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+            20% {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+            }
+            80% {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+            }
+            100% {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
         }
 
         @keyframes envelope-fly-center {
@@ -2560,19 +2592,19 @@
                 opacity: 0;
             }
             20% {
-                transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
+                transform: translate(-50%, -50%) scale(1.3) rotate(0deg);
                 opacity: 1;
             }
             40% {
-                transform: translate(-50%, -50%) scale(1) rotate(-5deg);
+                transform: translate(-50%, -50%) scale(1.1) rotate(-5deg);
                 opacity: 1;
             }
             60% {
-                transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+                transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
                 opacity: 1;
             }
             100% {
-                transform: translate(-50%, -150%) scale(0.3) rotate(25deg);
+                transform: translate(-50%, -180%) scale(0.2) rotate(25deg);
                 opacity: 0;
             }
         }
@@ -3430,16 +3462,17 @@
             right: 0;
             top: 100%;
             margin-top: 8px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(99, 102, 241, 0.4);
             border-radius: 16px;
             max-height: 0;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
             z-index: 10;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease;
             opacity: 0;
+            transform: translateY(-10px);
             /* Hide scrollbar but keep functionality */
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE and Edge */
@@ -3449,6 +3482,7 @@
             max-height: 300px;
             overflow-y: auto;
             opacity: 1;
+            transform: translateY(0);
         }
 
         .inbox-search-suggestions::-webkit-scrollbar {
@@ -3456,8 +3490,9 @@
         }
 
         body.dark-mode .inbox-search-suggestions {
-            background: rgba(30, 30, 30, 0.95);
+            background: rgba(20, 20, 20, 0.98);
             border: 2px solid rgba(99, 102, 241, 0.5);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.3) inset;
         }
 
         .inbox-search-suggestion-item {
@@ -3492,6 +3527,18 @@
             .inbox-search-suggestion-item {
                 padding: 12px 14px;
             }
+        }
+
+        /* Blur inbox content when search suggestions are shown */
+        .inbox-content-blur {
+            filter: blur(8px);
+            transition: filter 0.3s ease;
+            pointer-events: none;
+        }
+
+        .inbox-content-normal {
+            filter: blur(0);
+            transition: filter 0.3s ease;
         }
 
         /* Delete Button on Hover */
@@ -7400,13 +7447,15 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                                         left: 0,
                                                         marginTop: '8px',
                                                         background: darkMode
-                                                            ? 'linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(25, 25, 30, 0.95) 100%)'
-                                                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%)',
-                                                        border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
+                                                            ? 'rgba(20, 20, 25, 0.95)'
+                                                            : 'rgba(255, 255, 255, 0.95)',
+                                                        backdropFilter: 'blur(25px)',
+                                                        WebkitBackdropFilter: 'blur(25px)',
+                                                        border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid rgba(99, 102, 241, 0.3)',
                                                         borderRadius: '12px',
                                                         boxShadow: darkMode
-                                                            ? '0 8px 24px rgba(0, 0, 0, 0.4)'
-                                                            : '0 8px 24px rgba(99, 102, 241, 0.2)',
+                                                            ? '0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.2) inset'
+                                                            : '0 12px 32px rgba(99, 102, 241, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.8) inset',
                                                         zIndex: 1000,
                                                         overflow: 'hidden',
                                                         animation: 'slideDownFade 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -7420,6 +7469,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                                         <button
                                                             key={model.name}
                                                             onClick={() => {
+                                                                console.log(`🔄 Switched to model: ${model.name} (${model.description})`);
                                                                 setSelectedModel(model.name);
                                                                 setShowModelDropdown(false);
                                                             }}
@@ -7574,84 +7624,11 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                 <div className="pt-4 border-t border-gray-300 space-y-4">
                                     {/* Custom Prompt Input */}
 <div style={{position: 'relative'}}>
-    {/* Dynamic Suggestions */}
-    {showDynamicSuggestions && dynamicSuggestions.length > 0 && (
-        <div className="dynamic-suggestions-stack">
-            {dynamicSuggestions.map((suggestion, index) => (
-                <div
-                    key={index}
-                    className="dynamic-suggestion-pill"
-                    onClick={() => {
-                        setCustomPrompt(suggestion);
-                        setShowDynamicSuggestions(false);
-                    }}
-                    style={{animationDelay: `${index * 0.05}s`}}
-                >
-                    {suggestion}
-                </div>
-            ))}
-        </div>
-    )}
-
     <div className="ai-prompt-container">
         <input
             type="text"
             value={customPrompt}
-            onChange={(e) => {
-                const value = e.target.value;
-                setCustomPrompt(value);
-
-                // Generate dynamic suggestions (trigger with 2+ characters)
-                if (value.length >= 2) {
-                    const suggestions = [];
-                    const lowerValue = value.toLowerCase();
-
-                    // More triggers with less characters needed
-                    if (lowerValue.includes('sh') || lowerValue.includes('br')) {
-                        suggestions.push('Make this email shorter and more concise');
-                    }
-                    if (lowerValue.includes('fo') || lowerValue.includes('pr')) {
-                        suggestions.push('Rewrite in a more formal and professional tone');
-                    }
-                    if (lowerValue.includes('ca') || lowerValue.includes('fr')) {
-                        suggestions.push('Make this more casual and friendly');
-                    }
-                    if (lowerValue.includes('to')) {
-                        suggestions.push('Adjust the tone to match your audience');
-                    }
-                    if (lowerValue.includes('fi') || lowerValue.includes('co')) {
-                        suggestions.push('Fix grammar and spelling errors');
-                    }
-                    if (lowerValue.includes('ad') || lowerValue.includes('mo')) {
-                        suggestions.push('Add more details and context');
-                    }
-                    if (lowerValue.includes('cl') || lowerValue.includes('si')) {
-                        suggestions.push('Make this clearer and simpler');
-                    }
-                    if (lowerValue.includes('lo') || lowerValue.includes('ex')) {
-                        suggestions.push('Make this longer and more detailed');
-                    }
-                    if (lowerValue.includes('po') || lowerValue.includes('im')) {
-                        suggestions.push('Polish and improve overall quality');
-                    }
-                    if (lowerValue.includes('re')) {
-                        suggestions.push('Rewrite this email completely');
-                    }
-                    if (lowerValue.includes('em')) {
-                        suggestions.push('Add more emphasis to key points');
-                    }
-                    if (lowerValue.includes('st') || lowerValue.includes('bu')) {
-                        suggestions.push('Restructure for better flow');
-                    }
-
-                    // Remove duplicates and limit to 4
-                    const uniqueSuggestions = [...new Set(suggestions)];
-                    setDynamicSuggestions(uniqueSuggestions.slice(0, 4));
-                    setShowDynamicSuggestions(uniqueSuggestions.length > 0);
-                } else {
-                    setShowDynamicSuggestions(false);
-                }
-            }}
+            onChange={(e) => setCustomPrompt(e.target.value)}
             className="ai-prompt-input"
             placeholder="e.g., 'Make it more casual'"
             onKeyPress={(e) => e.key === 'Enter' && customPrompt && handleGenerate()}
@@ -8103,27 +8080,9 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                                     />
                                                     {showInboxSearchSuggestions && inboxSearchResults.length > 0 && (
                                                         <>
-                                                            {/* Blur Overlay */}
-                                                            <div
-                                                                style={{
-                                                                    position: 'fixed',
-                                                                    top: 0,
-                                                                    left: 0,
-                                                                    width: '100%',
-                                                                    height: '100%',
-                                                                    background: 'rgba(0, 0, 0, 0.3)',
-                                                                    backdropFilter: 'blur(8px)',
-                                                                    zIndex: 9,
-                                                                    animation: 'fadeIn 0.3s ease-out'
-                                                                }}
-                                                                onClick={() => {
-                                                                    setShowInboxSearchSuggestions(false);
-                                                                    setInboxSearchQuery('');
-                                                                }}
-                                                            />
                                                             {/* Search Suggestions */}
                                                             <div className={`inbox-search-suggestions ${showInboxSearchSuggestions && inboxSearchResults.length > 0 ? 'show' : ''}`} style={{
-                                                                zIndex: 10
+                                                                zIndex: 100
                                                             }}>
                                                                 {inboxSearchResults.map(email => (
                                                                     <div
@@ -8172,7 +8131,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                             )}
 
                                             {/* Email List Area */}
-                                            <div className="inbox-scroll-area">
+                                            <div className={`inbox-scroll-area ${showInboxSearchSuggestions && inboxSearchResults.length > 0 ? 'inbox-content-blur' : 'inbox-content-normal'}`}>
                                                 {inboxViewMode === 'tabs' ? (
                                                     /* Provider Selection View */
                                                     <div className="text-center py-12 fade-in">
@@ -8833,9 +8792,12 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
                     {/* Envelope Flying Animation */}
                     {showEnvelope && (
-                        <div className="envelope-animation">
-                            📧
-                        </div>
+                        <>
+                            <div className="envelope-blur-overlay"></div>
+                            <div className="envelope-animation">
+                                📧
+                            </div>
+                        </>
                     )}
 
                     {/* Bottom Success Notification - ADD IT HERE */}
@@ -8943,70 +8905,17 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                 {/* Prompt Container */}
                                 <div className="fullscreen-prompt-container">
                                     <div style={{position: 'relative'}}>
-                                        {/* Dynamic Suggestions */}
-                                        {showDynamicSuggestions && dynamicSuggestions.length > 0 && (
-                                            <div className="dynamic-suggestions-stack">
-                                                {dynamicSuggestions.map((suggestion, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="dynamic-suggestion-pill"
-                                                        onClick={() => {
-                                                            setFullscreenPrompt(suggestion);
-                                                            setShowDynamicSuggestions(false);
-                                                        }}
-                                                        style={{animationDelay: `${index * 0.05}s`}}
-                                                    >
-                                                        {suggestion}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-
                                         {/* Prompt Input */}
                                         <div className="ai-prompt-container">
                                             <input
                                                 type="text"
                                                 value={fullscreenPrompt}
-                                                onChange={(e) => {
-                                                    const value = e.target.value;
-                                                    setFullscreenPrompt(value);
-
-                                                    // Generate dynamic suggestions
-                                                    if (value.length > 0) {
-                                                        const suggestions = [];
-                                                        const lowerValue = value.toLowerCase();
-
-                                                        if (lowerValue.includes('short') || lowerValue.includes('brief')) {
-                                                            suggestions.push('Make this email shorter and more concise');
-                                                        }
-                                                        if (lowerValue.includes('formal') || lowerValue.includes('professional')) {
-                                                            suggestions.push('Rewrite in a more formal tone');
-                                                        }
-                                                        if (lowerValue.includes('casual') || lowerValue.includes('friendly')) {
-                                                            suggestions.push('Make this more casual and friendly');
-                                                        }
-                                                        if (lowerValue.includes('tone')) {
-                                                            suggestions.push('Change the tone to be more professional', 'Adjust the tone to be more friendly');
-                                                        }
-                                                        if (lowerValue.includes('fix') || lowerValue.includes('correct')) {
-                                                            suggestions.push('Fix grammar and spelling errors');
-                                                        }
-                                                        if (lowerValue.includes('add')) {
-                                                            suggestions.push('Add more details to the email', 'Add a professional closing');
-                                                        }
-
-                                                        setDynamicSuggestions(suggestions.slice(0, 3));
-                                                        setShowDynamicSuggestions(suggestions.length > 0);
-                                                    } else {
-                                                        setShowDynamicSuggestions(false);
-                                                    }
-                                                }}
+                                                onChange={(e) => setFullscreenPrompt(e.target.value)}
                                                 className="ai-prompt-input"
                                                 placeholder="Ask AI to modify the email..."
                                                 onKeyPress={async (e) => {
                                                     if (e.key === 'Enter' && fullscreenPrompt) {
                                                         setIsEditingFullscreen(true);
-                                                        setShowDynamicSuggestions(false);
 
                                                         try {
                                                             const updatedEmail = await callAIAPI(fullscreenPrompt, fullscreenEmailText);
