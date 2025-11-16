@@ -5027,23 +5027,40 @@ body.dark-mode .ai-send-button {
     }
 }
 
-        /* Desktop inbox - only show on desktop when connected */
+/* Default state */
+.desktop-inbox-layout {
+    display: none;
+}
+
+.ai-writer-container {
+    display: block;
+}
+
+/* Desktop (>1024px) */
 @media (min-width: 1025px) {
+    /* Show desktop inbox when it exists */
     .desktop-inbox-layout {
         display: flex !important;
     }
-    
-    .ai-writer-container {
-        display: none;
+
+    /* Hide AI writer on desktop only when desktop-inbox-layout is present */
+    /* This way, when not connected (no desktop-inbox-layout), ai-writer still shows on desktop */
+    .page-container:has(.desktop-inbox-layout) .ai-writer-container {
+        display: none !important;
+    }
+
+    /* Fallback for browsers without :has() support - hide ai-writer if desktop-inbox exists as sibling */
+    .desktop-inbox-layout ~ .ai-writer-container {
+        display: none !important;
     }
 }
 
-/* Mobile - always show AI writer, hide desktop inbox */
+/* Mobile (<=1024px) - Always show AI writer, hide desktop inbox */
 @media (max-width: 1024px) {
     .desktop-inbox-layout {
         display: none !important;
     }
-    
+
     .ai-writer-container {
         display: block !important;
     }
@@ -5051,11 +5068,6 @@ body.dark-mode .ai-send-button {
     .mobile-inbox-button {
         display: flex !important;
     }
-}
-
-/* When NOT connected - always show AI writer on all screens */
-.ai-writer-container {
-    display: block;
 }
 
 /* Fullscreen Email Viewer */
@@ -8701,7 +8713,7 @@ const generateAiDraft = async (email) => {
                                 )}
 
                               {/* Desktop Layout: Inbox Sidebar + Content Area */}
-                                {emailConnected || outlookConnected ? (
+                                {(emailConnected || outlookConnected) && (
                                     <>
                                     <div className="desktop-inbox-layout">
                                         {/* Left Sidebar - Inbox */}
@@ -9710,9 +9722,10 @@ const generateAiDraft = async (email) => {
                                         </div>
                                     </div>
                                     </>
-                                ) : (
-                                    /* Original Home Page Layout when not connected */
-                                     <div className="ai-writer-container mouse-follow-writer rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
+                                )}
+
+                                {/* AI Writer Container - Always show (CSS handles visibility based on screen size and connection) */}
+                                <div className="ai-writer-container mouse-follow-writer rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
                                         {/* Tab Switches */}
                                         <div className="flex justify-center mb-8">
                                             <div className="tab-container tab-button-container">
@@ -9749,7 +9762,6 @@ const generateAiDraft = async (email) => {
                                             {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
                                         </div>
                                     </div>
-                                )}
                             </>
                         )}
                     </div>
