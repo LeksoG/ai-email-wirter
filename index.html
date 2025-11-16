@@ -5283,6 +5283,18 @@ body.dark-mode .dynamic-suggestion-pill:hover {
     animation: slideOutLeft 0.4s ease-out forwards;
 }
 
+        @keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+        filter: blur(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
     </style>
 </head>
 <body>
@@ -5425,6 +5437,34 @@ body.dark-mode .dynamic-suggestion-pill:hover {
             const sendAudioRef = useRef(null);
             const carouselRef = useRef(null);
             const navRef = useRef(null);
+
+            // Extract name from email "from" field
+const extractSenderName = (fromField) => {
+    if (!fromField) return 'there';
+    
+    // Check if it's in format "Name <email@domain.com>"
+    const nameMatch = fromField.match(/^(.+?)\s*</);
+    if (nameMatch) {
+        const name = nameMatch[1].trim();
+        // Check if it looks like a company (all caps, has Inc/LLC/Ltd, etc.)
+        if (/^[A-Z\s]+$/.test(name) || /\b(Inc|LLC|Ltd|Corp|Company|Team)\b/i.test(name)) {
+            return name; // Return company name as-is
+        }
+        // Return first name for individuals
+        return name.split(' ')[0];
+    }
+    
+    // If just email, extract name from email username
+    const emailMatch = fromField.match(/([^@<]+)[@<]/);
+    if (emailMatch) {
+        const username = emailMatch[1];
+        // Convert "john.doe" to "John"
+        return username.split(/[._-]/)[0].charAt(0).toUpperCase() + 
+               username.split(/[._-]/)[0].slice(1).toLowerCase();
+    }
+    
+    return 'there';
+};
 
            // Initialize app with console logging
 useEffect(() => {
@@ -7095,55 +7135,59 @@ const fetchOutlookSentEmails = async (accessToken) => {
             };
 
             // Generate AI draft for email reply
-            const generateAiDraft = async (email) => {
-                // Check if email is from a noreply address
-                const isNoReply = email.from.toLowerCase().includes('noreply') ||
-                                 email.from.toLowerCase().includes('no-reply') ||
-                                 email.from.toLowerCase().includes('no_reply');
+const generateAiDraft = async (email) => {
+    // Check if email is from a noreply address
+    const isNoReply = email.from.toLowerCase().includes('noreply') ||
+                     email.from.toLowerCase().includes('no-reply') ||
+                     email.from.toLowerCase().includes('no_reply');
 
-                if (isNoReply) {
-                    console.log('⚠️ Email is from a noreply address, skipping AI draft generation');
-                    setHasDraft(false);
-                    return;
-                }
+    if (isNoReply) {
+        console.log('⚠️ Email is from a noreply address, skipping AI draft generation');
+        setHasDraft(false);
+        return;
+    }
 
-                setIsGeneratingDraft(true);
-                setHasDraft(false);
-                playNotificationSound();
+    setIsGeneratingDraft(true);
+    setHasDraft(false);
+    playNotificationSound();
 
-                try {
-                    // Create the email context as text to transform
-                    const contextText = `I received an email from ${email.from} with subject "${email.subject}". The email says: ${email.snippet}`;
+    try {
+        // Extract sender name and user's name
+        const senderName = extractSenderName(email.from);
+        const userFirstName = userData?.name?.split(' ')[0] || userName || 'there';
+        
+        // Create the email context as text to transform
+        const contextText = `I received an email from ${email.from} with subject "${email.subject}". The email says: ${email.snippet}`;
 
-                    const response = await fetch('/api/transform', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            prompt: 'Write a professional and friendly email reply to this. Include a greeting, address their main points, and end with a professional closing.',
-                            text: contextText,
-                            temperature: 0.7
-                        })
-                    });
+        const response = await fetch('/api/transform', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prompt: `Write a professional and friendly email reply to this. Start with "Hi ${senderName}," and end with "Best regards,\n${userFirstName}". Address their main points in a warm, helpful tone.`,
+                text: contextText,
+                temperature: 0.7
+            })
+        });
 
-                    const data = await response.json();
-                    console.log('📧 Draft response:', data);
+        const data = await response.json();
+        console.log('📧 Draft response:', data);
 
-                    if (data.result && data.result.trim().length > 0) {
-                        setAiDraft(data.result);
-                        setHasDraft(true);
-                        console.log('✅ AI draft generated successfully');
-                    } else {
-                        console.error('❌ No result in response');
-                        setHasDraft(false);
-                    }
+        if (data.result && data.result.trim().length > 0) {
+            setAiDraft(data.result);
+            setHasDraft(true);
+            console.log('✅ AI draft generated successfully');
+        } else {
+            console.error('❌ No result in response');
+            setHasDraft(false);
+        }
 
-                    setIsGeneratingDraft(false);
-                } catch (error) {
-                    console.error('❌ Error generating AI draft:', error);
-                    setIsGeneratingDraft(false);
-                    setHasDraft(false);
-                }
-            };
+        setIsGeneratingDraft(false);
+    } catch (error) {
+        console.error('❌ Error generating AI draft:', error);
+        setIsGeneratingDraft(false);
+        setHasDraft(false);
+    }
+};
 
             const handleRewriteReply = async () => {
                 if (!emailReply || !replyPrompt) return;
@@ -7797,19 +7841,65 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                 {/* Custom Transformation + Suggestions */}
                                 <div className="pt-4 border-t border-gray-300 space-y-4">
                                      {/* Custom Prompt Input */}
+{/* Custom Prompt Input */}
 <div style={{position: 'relative'}}>
-    <div className="ai-prompt-container">
-        {/* Inline Model Switcher */}
-        <div className="inline-model-switcher">
+    <div className="ai-prompt-container" style={{position: 'relative', paddingLeft: '140px'}}>
+        {/* Model Switcher - Bottom Left */}
+        <div style={{
+            position: 'absolute',
+            left: '8px',
+            bottom: '8px',
+            zIndex: 10
+        }}>
             <button
                 onClick={() => setShowModelDropdown(!showModelDropdown)}
-                className="inline-model-button"
+                style={{
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    background: darkMode
+                        ? 'linear-gradient(135deg, rgba(40, 40, 45, 0.95) 0%, rgba(35, 35, 40, 0.9) 100%)'
+                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                    border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
+                    borderRadius: '50px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
+                    color: darkMode ? '#c7d2fe' : '#374151',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap'
+                }}
+                className="unified-button"
             >
+                <span style={{fontSize: '14px'}}>🤖</span>
                 <span>{selectedModel}</span>
-                <span style={{fontSize: '8px', transition: 'transform 0.3s', transform: showModelDropdown ? 'rotate(180deg)' : 'rotate(0)'}}>▼</span>
+                <span style={{
+                    transition: 'transform 0.3s',
+                    transform: showModelDropdown ? 'rotate(180deg)' : 'rotate(0)',
+                    fontSize: '8px'
+                }}>▼</span>
             </button>
+
             {showModelDropdown && (
-                <div className="inline-model-dropdown">
+                <div style={{
+                    position: 'absolute',
+                    bottom: '100%',
+                    left: 0,
+                    marginBottom: '8px',
+                    background: darkMode
+                        ? 'rgba(20, 20, 25, 0.98)'
+                        : 'rgba(255, 255, 255, 0.98)',
+                    backdropFilter: 'blur(30px)',
+                    border: darkMode ? '2px solid rgba(99, 102, 241, 0.5)' : '2px solid white',
+                    borderRadius: '16px',
+                    boxShadow: '0 -12px 32px rgba(99, 102, 241, 0.25)',
+                    zIndex: 1000,
+                    overflow: 'hidden',
+                    animation: 'slideUpFade 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    minWidth: '280px'
+                }}>
                     {[
                         { name: 'Ink 2.0', description: 'Fast & efficient - Mistral AI Small Latest' },
                         { name: 'Ink 2.5', description: 'More powerful & detailed - Mistral AI Medium' }
@@ -7817,14 +7907,13 @@ const fetchOutlookSentEmails = async (accessToken) => {
                         <button
                             key={model.name}
                             onClick={() => {
-                                console.log(`🔄 Switched to model: ${model.name} (${model.description})`);
                                 setSelectedModel(model.name);
                                 setShowModelDropdown(false);
                             }}
                             style={{
                                 width: '100%',
-                                padding: '10px 14px',
-                                fontSize: '12px',
+                                padding: '12px 16px',
+                                fontSize: '13px',
                                 background: selectedModel === model.name
                                     ? (darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)')
                                     : 'transparent',
@@ -7835,11 +7924,13 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                 textAlign: 'left',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '2px'
+                                gap: '4px'
                             }}
                             onMouseEnter={(e) => {
                                 if (selectedModel !== model.name) {
-                                    e.currentTarget.style.background = darkMode ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.05)';
+                                    e.currentTarget.style.background = darkMode
+                                        ? 'rgba(99, 102, 241, 0.1)'
+                                        : 'rgba(99, 102, 241, 0.05)';
                                 }
                             }}
                             onMouseLeave={(e) => {
@@ -7852,7 +7943,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                 <span>{model.name}</span>
                                 {selectedModel === model.name && <span>✓</span>}
                             </div>
-                            <span style={{fontSize: '10px', opacity: 0.7, fontWeight: '400'}}>{model.description}</span>
+                            <span style={{fontSize: '11px', opacity: 0.7}}>{model.description}</span>
                         </button>
                     ))}
                 </div>
@@ -7878,9 +7969,6 @@ const fetchOutlookSentEmails = async (accessToken) => {
         ) : null}
     </div>
 </div>
-                                </div>
-                            </div>
-                        );
                     
                     default:
                         return (
