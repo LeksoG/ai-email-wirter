@@ -597,6 +597,21 @@
             border-color: rgba(99, 102, 241, 0.3);
         }
 
+        /* Mobile responsive for account details */
+        @media (max-width: 768px) {
+            .account-details-section {
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+                gap: 12px;
+            }
+
+            .account-logout-btn {
+                grid-column: 1 / -1;
+                justify-self: center;
+                width: 100%;
+            }
+        }
+
         .account-profile-icon {
             width: 56px;
             height: 56px;
@@ -4878,15 +4893,21 @@ body.dark-mode .fullscreen-prompt-container {
 }
 
 body.dark-mode .dynamic-suggestion-pill {
-    background: linear-gradient(135deg, rgba(55, 55, 65, 0.98), rgba(45, 45, 55, 0.95));
-    border-color: rgba(99, 102, 241, 0.4);
-    color: #a5b4fc;
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98), rgba(25, 25, 30, 0.95));
+    border-color: rgba(99, 102, 241, 0.5);
+    color: #c7d2fe;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .dynamic-suggestion-pill:hover {
     transform: translateX(8px) scale(1.02);
     box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
     border-color: rgba(99, 102, 241, 0.6);
+}
+
+body.dark-mode .dynamic-suggestion-pill:hover {
+    border-color: rgba(99, 102, 241, 0.7);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
 }
 
 @keyframes pillBounce {
@@ -7032,48 +7053,34 @@ const fetchOutlookEmails = async (accessToken) => {
                                     <span className="text-sm font-semibold text-gray-700">Email Rewriter</span>
                                 </div>
 
-                                {/* File Upload or Text Area */}
+                                {/* Email Writing Area */}
                                 <div className="relative">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <label className="text-sm font-medium text-gray-700 flex items-center">
-                                            <span className="text-lg mr-2">💬</span>
-                                            Recipient
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            {/* Language Selector - Always visible, oval with white outline */}
-                                            <div className="custom-dropdown-wrapper" style={{width: 'auto', minWidth: '140px'}}>
-                                                <select
-                                                    value={selectedLanguage}
-                                                    onChange={(e) => {
-                                                        setSelectedLanguage(e.target.value);
-                                                        localStorage.setItem('selectedLanguage', e.target.value);
-                                                    }}
-                                                    className="custom-language-select oval-button unified-button"
-                                                    style={{
-                                                        padding: '10px 32px 10px 14px',
-                                                        fontSize: '12px',
-                                                        fontWeight: '600',
-                                                        borderRadius: '50px'
-                                                    }}
-                                                >
-                                                    <option value="english">🇬🇧 English</option>
-                                                    <option value="german">🇩🇪 German</option>
-                                                    <option value="french">🇫🇷 French</option>
-                                                    <option value="georgian">🇬🇪 Georgian</option>
-                                                    <option value="spanish">🇪🇸 Spanish</option>
-                                                </select>
-                                                <div className="custom-dropdown-arrow" style={{right: '12px', fontSize: '8px'}}></div>
-                                            </div>
+                                    <div className="flex items-center justify-end mb-3">
+                                        {/* Language Selector - Always visible, oval with white outline */}
+                                        <div className="custom-dropdown-wrapper" style={{width: 'auto', minWidth: '140px'}}>
+                                            <select
+                                                value={selectedLanguage}
+                                                onChange={(e) => {
+                                                    setSelectedLanguage(e.target.value);
+                                                    localStorage.setItem('selectedLanguage', e.target.value);
+                                                }}
+                                                className="custom-language-select oval-button unified-button"
+                                                style={{
+                                                    padding: '10px 32px 10px 14px',
+                                                    fontSize: '12px',
+                                                    fontWeight: '600',
+                                                    borderRadius: '50px'
+                                                }}
+                                            >
+                                                <option value="english">🇬🇧 English</option>
+                                                <option value="german">🇩🇪 German</option>
+                                                <option value="french">🇫🇷 French</option>
+                                                <option value="georgian">🇬🇪 Georgian</option>
+                                                <option value="spanish">🇪🇸 Spanish</option>
+                                            </select>
+                                            <div className="custom-dropdown-arrow" style={{right: '12px', fontSize: '8px'}}></div>
                                         </div>
                                     </div>
-
-                                    {/* Recipient Input */}
-                                    <input
-                                        type="email"
-                                        placeholder="Enter recipient email address..."
-                                        className="w-full px-6 py-3 custom-textarea rounded-2xl text-gray-800 placeholder-gray-500 border-2 border-white unified-button mb-3"
-                                        style={{height: 'auto'}}
-                                    />
 
                                     {droppedEmailFile ? (
                                         <div
@@ -7126,13 +7133,159 @@ const fetchOutlookEmails = async (accessToken) => {
                                         </div>
                                     ) : (
                                         <div className="email-writing-container">
+                                            {/* Starter Suggestions - Show when no email text */}
+                                            {!emailText && (
+                                                <div style={{
+                                                    display: 'grid',
+                                                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                                                    gap: '16px',
+                                                    marginBottom: '20px'
+                                                }}>
+                                                    <button
+                                                        onClick={() => {
+                                                            setCustomPrompt('Write a professional follow-up email');
+                                                            setEmailText('');
+                                                        }}
+                                                        style={{
+                                                            padding: '24px',
+                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                            border: '2px solid white',
+                                                            borderRadius: '16px',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.3s ease',
+                                                            textAlign: 'left',
+                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
+                                                        }}
+                                                        className="unified-button"
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
+                                                        }}
+                                                    >
+                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>📧</div>
+                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
+                                                            Follow-Up Email
+                                                        </div>
+                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
+                                                            Write a professional follow-up message
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => {
+                                                            setCustomPrompt('Write a thank you email');
+                                                            setEmailText('');
+                                                        }}
+                                                        style={{
+                                                            padding: '24px',
+                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                            border: '2px solid white',
+                                                            borderRadius: '16px',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.3s ease',
+                                                            textAlign: 'left',
+                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
+                                                        }}
+                                                        className="unified-button"
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
+                                                        }}
+                                                    >
+                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>🙏</div>
+                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
+                                                            Thank You Email
+                                                        </div>
+                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
+                                                            Express gratitude professionally
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => {
+                                                            setCustomPrompt('Write an introduction email');
+                                                            setEmailText('');
+                                                        }}
+                                                        style={{
+                                                            padding: '24px',
+                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                            border: '2px solid white',
+                                                            borderRadius: '16px',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.3s ease',
+                                                            textAlign: 'left',
+                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
+                                                        }}
+                                                        className="unified-button"
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
+                                                        }}
+                                                    >
+                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>👋</div>
+                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
+                                                            Introduction
+                                                        </div>
+                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
+                                                            Introduce yourself or your company
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => {
+                                                            setCustomPrompt('Write a meeting request email');
+                                                            setEmailText('');
+                                                        }}
+                                                        style={{
+                                                            padding: '24px',
+                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                            border: '2px solid white',
+                                                            borderRadius: '16px',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.3s ease',
+                                                            textAlign: 'left',
+                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
+                                                        }}
+                                                        className="unified-button"
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
+                                                        }}
+                                                    >
+                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>📅</div>
+                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
+                                                            Meeting Request
+                                                        </div>
+                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
+                                                            Schedule a meeting professionally
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            )}
+
                                             {/* Email Textarea */}
                                             <div className="relative">
                                                 <textarea
                                                     value={emailText}
                                                     onChange={(e) => setEmailText(e.target.value)}
-                                                    className="w-full h-80 px-6 py-4 custom-textarea text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
-                                                    style={{borderRadius: '16px'}}
+                                                    className="w-full px-6 py-4 custom-textarea text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
+                                                    style={{borderRadius: '16px', height: '450px', maxWidth: '100%'}}
                                                     placeholder="Type or paste your email content here and watch the magic happen..."
                                                     disabled={droppedEmailFile !== null}
                                                 />
@@ -8317,7 +8470,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                                 <button
                                                                     onClick={() => setActiveView('writer')}
                                                                     className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                                        activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                                        activeView === 'writer' ? (darkMode ? 'text-white' : 'text-gray-900') : 'text-gray-700 hover:text-gray-800'
                                                                     }`}
                                                                 >
                                                                     ✍️ AI Writer
@@ -8325,7 +8478,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                                 <button
                                                                     onClick={() => setActiveView('results')}
                                                                     className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                                        activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                                        activeView === 'results' ? (darkMode ? 'text-white' : 'text-gray-900') : 'text-gray-700 hover:text-gray-800'
                                                                     }`}
                                                                 >
                                                                     ✨ Results
@@ -8361,7 +8514,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                 <button
                                                     onClick={() => setActiveView('writer')}
                                                     className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                        activeView === 'writer' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                        activeView === 'writer' ? (darkMode ? 'text-white' : 'text-gray-900') : 'text-gray-700 hover:text-gray-800'
                                                     }`}
                                                 >
                                                     ✍️ AI Writer
@@ -8369,7 +8522,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                 <button
                                                     onClick={() => setActiveView('results')}
                                                     className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                                        activeView === 'results' ? 'text-white' : 'text-gray-700 hover:text-gray-800'
+                                                        activeView === 'results' ? (darkMode ? 'text-white' : 'text-gray-900') : 'text-gray-700 hover:text-gray-800'
                                                     }`}
                                                 >
                                                     ✨ Results
