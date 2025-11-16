@@ -4964,6 +4964,22 @@ body.dark-mode .dynamic-suggestion-pill:hover {
     box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
 }
 
+/* Delete slide-left animation */
+@keyframes slideOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+.deleting-email {
+    animation: slideOutLeft 0.4s ease-out forwards;
+}
+
     </style>
 </head>
 <body>
@@ -5053,6 +5069,7 @@ body.dark-mode .dynamic-suggestion-pill:hover {
             const [activeProvider, setActiveProvider] = useState('gmail');
             const [outlookConnected, setOutlookConnected] = useState(false);
             const [outlookEmails, setOutlookEmails] = useState([]);
+            const [outlookSentEmails, setOutlookSentEmails] = useState([]);
             const [inboxSearchQuery, setInboxSearchQuery] = useState('');
             const [inboxSearchResults, setInboxSearchResults] = useState([]);
             const [showInboxSearchSuggestions, setShowInboxSearchSuggestions] = useState(false);
@@ -5077,6 +5094,9 @@ body.dark-mode .dynamic-suggestion-pill:hover {
             // Dynamic suggestions states
             const [dynamicSuggestions, setDynamicSuggestions] = useState([]);
             const [showDynamicSuggestions, setShowDynamicSuggestions] = useState(false)
+
+            // Starter suggestions states
+            const [showStarterSuggestions, setShowStarterSuggestions] = useState(false);
 
             // Version modal state
             const [showVersionModal, setShowVersionModal] = useState(false);
@@ -5115,9 +5135,10 @@ if (tokensParam) {
             
             setOutlookConnected(true);
             setActiveProvider('outlook');
-            
+
             fetchOutlookEmails(tokens.access_token);
-            
+            fetchOutlookSentEmails(tokens.access_token);
+
             console.log('✅ Outlook connected!');
             
             // Show bottom notification instead of alert
@@ -5230,6 +5251,7 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
         console.log('📮 Loading saved Outlook tokens');
         console.log('Access token present:', !!tokens.access_token);
         fetchOutlookEmails(tokens.access_token);  // Use the access_token directly
+        fetchOutlookSentEmails(tokens.access_token);
     } catch (error) {
         console.error('❌ Error loading saved Outlook tokens:', error);
         localStorage.removeItem('outlookTokens');
@@ -5402,6 +5424,7 @@ useEffect(() => {
         if (tokensString) {
             const tokens = JSON.parse(tokensString);  // ✅ Parse once
             fetchOutlookEmails(tokens.access_token);
+            fetchOutlookSentEmails(tokens.access_token);
         }
     }
 }, [outlookConnected]);
@@ -5415,6 +5438,14 @@ useEffect(() => {
                         setShowVersionModal(true);
                     }, 1000);
                 }
+            }, []);
+
+            // Starter suggestions delay
+            useEffect(() => {
+                const timer = setTimeout(() => {
+                    setShowStarterSuggestions(true);
+                }, 600);
+                return () => clearTimeout(timer);
             }, []);
 
             // Reset new email count when user views inbox
@@ -6094,6 +6125,75 @@ const fetchOutlookEmails = async (accessToken) => {
     }
 };
 
+const fetchOutlookSentEmails = async (accessToken) => {
+    try {
+        console.log('📮 ========== FETCHING OUTLOOK SENT EMAILS ==========');
+        console.log('🔑 Access token present:', !!accessToken);
+
+        const response = await fetch('/api/outlook-sent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken })
+        });
+
+        console.log('📡 Outlook sent API response status:', response.status);
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('❌ Outlook sent API error');
+            console.error('Status:', response.status);
+            console.error('Error message:', data.message);
+
+            // Handle 401 authentication errors
+            if (response.status === 401) {
+                console.warn('⚠️ Authentication failed - clearing Outlook tokens');
+                localStorage.removeItem('outlookTokens');
+                localStorage.removeItem('outlookConnected');
+                setOutlookConnected(false);
+                setOutlookSentEmails([]);
+                showNotification('⚠️ Outlook session expired. Please reconnect.');
+                return;
+            }
+
+            // If endpoint doesn't exist yet, just return empty array
+            if (response.status === 404) {
+                console.warn('⚠️ Outlook sent endpoint not available yet');
+                setOutlookSentEmails([]);
+                return;
+            }
+
+            throw new Error(data.message || 'Failed to fetch Outlook sent emails');
+        }
+
+        console.log('📧 Outlook sent emails received:', data.emails?.length || 0);
+
+        // Format emails for display
+        const formattedEmails = data.emails.map(function(email) {
+            return {
+                id: email.id,
+                to: email.to,
+                subject: email.subject,
+                snippet: email.snippet,
+                date: email.date,
+                threadId: email.threadId,
+                internalDate: new Date(email.date).getTime()
+            };
+        });
+
+        console.log('📧 Total formatted sent emails:', formattedEmails.length);
+        setOutlookSentEmails(formattedEmails);
+        console.log('✅ ========== OUTLOOK SENT EMAILS SET IN STATE ==========');
+
+    } catch (error) {
+        console.error('❌ ========== ERROR FETCHING OUTLOOK SENT EMAILS ==========');
+        console.error('Error message:', error.message);
+        console.error('Full error:', error);
+        // Set empty array on error
+        setOutlookSentEmails([]);
+    }
+};
+
             const callAIAPI = async (prompt, text) => {
                 console.log('🤖 Calling AI API...');
                 console.log('📝 Prompt:', prompt);
@@ -6393,9 +6493,16 @@ const fetchOutlookEmails = async (accessToken) => {
                 playNotificationSound();
 
                 // Find the email being deleted
-                const emailToDelete = type === 'inbox'
-                    ? gmailEmails.find(e => e.id === emailId)
-                    : sentEmails.find(e => e.id === emailId);
+                let emailToDelete;
+                if (type === 'inbox') {
+                    emailToDelete = activeProvider === 'outlook'
+                        ? outlookEmails.find(e => e.id === emailId)
+                        : gmailEmails.find(e => e.id === emailId);
+                } else {
+                    emailToDelete = activeProvider === 'outlook'
+                        ? outlookSentEmails.find(e => e.id === emailId)
+                        : sentEmails.find(e => e.id === emailId);
+                }
 
                 // Store deleted email for undo
                 setDeletedEmail({ email: emailToDelete, type });
@@ -6420,9 +6527,17 @@ const fetchOutlookEmails = async (accessToken) => {
                 // Delete with animation
                 setTimeout(() => {
                     if (type === 'inbox') {
-                        setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+                        if (activeProvider === 'outlook') {
+                            setOutlookEmails(prev => prev.filter(e => e.id !== emailId));
+                        } else {
+                            setGmailEmails(prev => prev.filter(e => e.id !== emailId));
+                        }
                     } else {
-                        setSentEmails(prev => prev.filter(e => e.id !== emailId));
+                        if (activeProvider === 'outlook') {
+                            setOutlookSentEmails(prev => prev.filter(e => e.id !== emailId));
+                        } else {
+                            setSentEmails(prev => prev.filter(e => e.id !== emailId));
+                        }
                     }
                     setDeletingEmailId(null);
                     console.log(`🗑️ Deleted ${type} email:`, emailId);
@@ -7145,152 +7260,6 @@ const fetchOutlookEmails = async (accessToken) => {
                                         </div>
                                     ) : (
                                         <div className="email-writing-container">
-                                            {/* Starter Suggestions - Show when no email text */}
-                                            {!emailText && (
-                                                <div style={{
-                                                    display: 'grid',
-                                                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                                                    gap: '16px',
-                                                    marginBottom: '20px'
-                                                }}>
-                                                    <button
-                                                        onClick={() => {
-                                                            setCustomPrompt('Write a professional follow-up email');
-                                                            setEmailText('');
-                                                        }}
-                                                        style={{
-                                                            padding: '24px',
-                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
-                                                            border: '2px solid white',
-                                                            borderRadius: '16px',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.3s ease',
-                                                            textAlign: 'left',
-                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
-                                                        }}
-                                                        className="unified-button"
-                                                        onMouseOver={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(-4px)';
-                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
-                                                        }}
-                                                        onMouseOut={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(0)';
-                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
-                                                        }}
-                                                    >
-                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>📧</div>
-                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
-                                                            Follow-Up Email
-                                                        </div>
-                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
-                                                            Write a professional follow-up message
-                                                        </div>
-                                                    </button>
-
-                                                    <button
-                                                        onClick={() => {
-                                                            setCustomPrompt('Write a thank you email');
-                                                            setEmailText('');
-                                                        }}
-                                                        style={{
-                                                            padding: '24px',
-                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
-                                                            border: '2px solid white',
-                                                            borderRadius: '16px',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.3s ease',
-                                                            textAlign: 'left',
-                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
-                                                        }}
-                                                        className="unified-button"
-                                                        onMouseOver={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(-4px)';
-                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
-                                                        }}
-                                                        onMouseOut={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(0)';
-                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
-                                                        }}
-                                                    >
-                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>🙏</div>
-                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
-                                                            Thank You Email
-                                                        </div>
-                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
-                                                            Express gratitude professionally
-                                                        </div>
-                                                    </button>
-
-                                                    <button
-                                                        onClick={() => {
-                                                            setCustomPrompt('Write an introduction email');
-                                                            setEmailText('');
-                                                        }}
-                                                        style={{
-                                                            padding: '24px',
-                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
-                                                            border: '2px solid white',
-                                                            borderRadius: '16px',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.3s ease',
-                                                            textAlign: 'left',
-                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
-                                                        }}
-                                                        className="unified-button"
-                                                        onMouseOver={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(-4px)';
-                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
-                                                        }}
-                                                        onMouseOut={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(0)';
-                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
-                                                        }}
-                                                    >
-                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>👋</div>
-                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
-                                                            Introduction
-                                                        </div>
-                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
-                                                            Introduce yourself or your company
-                                                        </div>
-                                                    </button>
-
-                                                    <button
-                                                        onClick={() => {
-                                                            setCustomPrompt('Write a meeting request email');
-                                                            setEmailText('');
-                                                        }}
-                                                        style={{
-                                                            padding: '24px',
-                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
-                                                            border: '2px solid white',
-                                                            borderRadius: '16px',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.3s ease',
-                                                            textAlign: 'left',
-                                                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)'
-                                                        }}
-                                                        className="unified-button"
-                                                        onMouseOver={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(-4px)';
-                                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.2)';
-                                                        }}
-                                                        onMouseOut={(e) => {
-                                                            e.currentTarget.style.transform = 'translateY(0)';
-                                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.1)';
-                                                        }}
-                                                    >
-                                                        <div style={{fontSize: '28px', marginBottom: '8px'}}>📅</div>
-                                                        <div style={{fontSize: '16px', fontWeight: '700', color: '#374151', marginBottom: '4px'}}>
-                                                            Meeting Request
-                                                        </div>
-                                                        <div style={{fontSize: '13px', color: '#6b7280'}}>
-                                                            Schedule a meeting professionally
-                                                        </div>
-                                                    </button>
-                                                </div>
-                                            )}
-
                                             {/* Email Textarea */}
                                             <div className="relative">
                                                 <textarea
@@ -7311,6 +7280,147 @@ const fetchOutlookEmails = async (accessToken) => {
                                                 >
                                                     Responses in {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
                                                 </div>
+
+                                                {/* Starter Suggestions - Inside Textarea */}
+                                                {!emailText && showStarterSuggestions && (
+                                                    <div
+                                                        style={{
+                                                            position: 'absolute',
+                                                            bottom: '16px',
+                                                            left: '50%',
+                                                            transform: 'translateX(-50%)',
+                                                            display: 'flex',
+                                                            gap: '10px',
+                                                            opacity: emailText ? 0 : 1,
+                                                            transition: 'opacity 0.4s ease-out',
+                                                            pointerEvents: emailText ? 'none' : 'auto'
+                                                        }}
+                                                    >
+                                                        <button
+                                                            onClick={() => {
+                                                                setCustomPrompt('Write a professional follow-up email');
+                                                                setEmailText('');
+                                                            }}
+                                                            style={{
+                                                                padding: '8px 16px',
+                                                                fontSize: '13px',
+                                                                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                                border: '2px solid white',
+                                                                borderRadius: '12px',
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.3s ease',
+                                                                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
+                                                                fontWeight: '600',
+                                                                color: '#374151',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                            className="unified-button"
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.25)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.15)';
+                                                            }}
+                                                        >
+                                                            📧 Follow-Up
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                setCustomPrompt('Write a thank you email');
+                                                                setEmailText('');
+                                                            }}
+                                                            style={{
+                                                                padding: '8px 16px',
+                                                                fontSize: '13px',
+                                                                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                                border: '2px solid white',
+                                                                borderRadius: '12px',
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.3s ease',
+                                                                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
+                                                                fontWeight: '600',
+                                                                color: '#374151',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                            className="unified-button"
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.25)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.15)';
+                                                            }}
+                                                        >
+                                                            🙏 Thank You
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                setCustomPrompt('Write an introduction email');
+                                                                setEmailText('');
+                                                            }}
+                                                            style={{
+                                                                padding: '8px 16px',
+                                                                fontSize: '13px',
+                                                                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                                border: '2px solid white',
+                                                                borderRadius: '12px',
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.3s ease',
+                                                                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
+                                                                fontWeight: '600',
+                                                                color: '#374151',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                            className="unified-button"
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.25)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.15)';
+                                                            }}
+                                                        >
+                                                            👋 Introduction
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                setCustomPrompt('Write a meeting request email');
+                                                                setEmailText('');
+                                                            }}
+                                                            style={{
+                                                                padding: '8px 16px',
+                                                                fontSize: '13px',
+                                                                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
+                                                                border: '2px solid white',
+                                                                borderRadius: '12px',
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.3s ease',
+                                                                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
+                                                                fontWeight: '600',
+                                                                color: '#374151',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                            className="unified-button"
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.25)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.15)';
+                                                            }}
+                                                        >
+                                                            📅 Meeting
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     )}
@@ -8114,7 +8224,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                                                                 });
                                                                                             }
                                                                                         }}
-                                                                                        className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                                                        className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
                                                                                         style={{animationDelay: `${index * 0.05}s`}}
                                                                                     >
                                                                                         <button
@@ -8157,7 +8267,7 @@ const fetchOutlookEmails = async (accessToken) => {
                                                                                             });
                                                                                         }
                                                                                     }}
-                                                                                    className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''}`}
+                                                                                    className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
                                                                                     style={{animationDelay: `${index * 0.05}s`}}
                                                                                 >
                                                                                     <button
@@ -8183,34 +8293,66 @@ const fetchOutlookEmails = async (accessToken) => {
                                                                         )
                                                                     ) : (
                                                                         /* Sent Emails */
-                                                                        sentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
-                                                                            sentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
-                                                                                <div
-                                                                                    key={email.id}
-                                                                                    onClick={() => setViewingEmail(email)}
-                                                                                    className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''}`}
-                                                                                    style={{animationDelay: `${index * 0.05}s`}}
-                                                                                >
-                                                                                    <button
-                                                                                        className="email-delete-btn"
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            handleDeleteEmail(email.id, 'sent');
-                                                                                        }}
+                                                                        activeProvider === 'outlook' ? (
+                                                                            outlookSentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
+                                                                                outlookSentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
+                                                                                    <div
+                                                                                        key={email.id}
+                                                                                        onClick={() => setViewingEmail(email)}
+                                                                                        className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
+                                                                                        style={{animationDelay: `${index * 0.05}s`}}
                                                                                     >
-                                                                                        Delete
-                                                                                    </button>
-                                                                                    <div className="text-xs font-bold text-gray-800 mb-1 truncate">To: {email.to}</div>
-                                                                                    <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
-                                                                                    <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
-                                                                                    <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                                                                        <button
+                                                                                            className="email-delete-btn"
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                handleDeleteEmail(email.id, 'sent');
+                                                                                            }}
+                                                                                        >
+                                                                                            Delete
+                                                                                        </button>
+                                                                                        <div className="text-xs font-bold text-gray-800 mb-1 truncate">To: {email.to}</div>
+                                                                                        <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                                                                        <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
+                                                                                        <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                                                                    </div>
+                                                                                ))
+                                                                            ) : (
+                                                                                <div className="text-center py-12 text-gray-500">
+                                                                                    <div className="text-6xl mb-4">📭</div>
+                                                                                    <p>No Outlook sent emails</p>
                                                                                 </div>
-                                                                            ))
+                                                                            )
                                                                         ) : (
-                                                                            <div className="text-center py-12 text-gray-500">
-                                                                                <div className="text-6xl mb-4">📭</div>
-                                                                                <p>No sent emails</p>
-                                                                            </div>
+                                                                            sentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
+                                                                                sentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
+                                                                                    <div
+                                                                                        key={email.id}
+                                                                                        onClick={() => setViewingEmail(email)}
+                                                                                        className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
+                                                                                        style={{animationDelay: `${index * 0.05}s`}}
+                                                                                    >
+                                                                                        <button
+                                                                                            className="email-delete-btn"
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                handleDeleteEmail(email.id, 'sent');
+                                                                                            }}
+                                                                                        >
+                                                                                            Delete
+                                                                                        </button>
+                                                                                        <div className="text-xs font-bold text-gray-800 mb-1 truncate">To: {email.to}</div>
+                                                                                        <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{email.subject}</div>
+                                                                                        <div className="text-xs text-gray-600 truncate">{getFirstWords(email.snippet)}</div>
+                                                                                        <div className="text-xs text-gray-400 mt-1">{email.date}</div>
+                                                                                    </div>
+                                                                                ))
+                                                                            ) : (
+                                                                                <div className="text-center py-12 text-gray-500">
+                                                                                    <div className="text-6xl mb-4">📭</div>
+                                                                                    <p>No Gmail sent emails</p>
+                                                                                </div>
+                                                                            )
                                                                         )
                                                                     )}
                                                                 </div>
