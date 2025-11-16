@@ -6023,25 +6023,37 @@ const fetchOutlookEmails = async (accessToken) => {
         console.log('📮 ========== FETCHING OUTLOOK EMAILS ==========');
         console.log('🔑 Access token present:', !!accessToken);
         console.log('🔑 Access token preview:', accessToken ? accessToken.substring(0, 20) + '...' : 'MISSING');
-        
+
         const response = await fetch('/api/outlook-inbox', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ accessToken })
         });
-        
+
         console.log('📡 Outlook inbox API response status:', response.status);
         console.log('📡 Response OK:', response.ok);
-        
+
         const data = await response.json();
-        
+
         console.log('📦 Outlook API response data:', data);
-        
+
         if (!response.ok) {
             console.error('❌ Outlook inbox API error');
             console.error('Status:', response.status);
             console.error('Error message:', data.message);
             console.error('Error details:', data.details);
+
+            // Handle 401 authentication errors
+            if (response.status === 401) {
+                console.warn('⚠️ Authentication failed - clearing Outlook tokens');
+                localStorage.removeItem('outlookTokens');
+                localStorage.removeItem('outlookConnected');
+                setOutlookConnected(false);
+                setOutlookEmails([]);
+                showNotification('⚠️ Outlook session expired. Please reconnect.');
+                return;
+            }
+
             throw new Error(data.message || 'Failed to fetch Outlook emails');
         }
         
