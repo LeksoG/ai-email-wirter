@@ -3444,72 +3444,90 @@ body.dark-mode .modern-email-item:hover {
 
         /* Smooth expand animation for search container */
         .inbox-search-container {
-            position: relative;
-            margin-bottom: 12px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    position: relative;
+    margin-bottom: 12px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 150; /* Added z-index */
+}
 
-        .inbox-search-container.expanded {
-            transform: scale(1.02);
-        }
+.inbox-search-container.expanded {
+    transform: scale(1.02);
+    z-index: 200; /* Higher when expanded */
+}
 
         .inbox-search-suggestions {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 100%;
-            margin-top: 8px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(30px);
-            border: 2px solid rgba(99, 102, 241, 0.4);
-            border-radius: 16px;
-            max-height: 0;
-            overflow: hidden;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
-            z-index: 10;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease;
-            opacity: 0;
-            transform: translateY(-10px);
-            /* Hide scrollbar but keep functionality */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
-        }
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 8px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 2px solid white;
+    border-radius: 16px;
+    max-height: 0;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 
+                0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+                0 20px 60px rgba(99, 102, 241, 0.3);
+    z-index: 200; /* Increased from 10 */
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    /* Hide scrollbar but keep functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
 
-        .inbox-search-suggestions.show {
-            max-height: 300px;
-            overflow-y: auto;
-            opacity: 1;
-            transform: translateY(0);
-        }
+.inbox-search-suggestions.show {
+    max-height: 300px;
+    overflow-y: auto;
+    opacity: 1;
+    transform: translateY(0);
+}
 
-        .inbox-search-suggestions::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
+.inbox-search-suggestions::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
 
-        body.dark-mode .inbox-search-suggestions {
-            background: rgba(20, 20, 20, 0.98);
-            border: 2px solid rgba(99, 102, 241, 0.5);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.3) inset;
-        }
+body.dark-mode .inbox-search-suggestions {
+    background: rgba(20, 20, 20, 0.98);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 
+                0 0 0 1px rgba(99, 102, 241, 0.3) inset,
+                0 20px 60px rgba(0, 0, 0, 0.8);
+}
 
         .inbox-search-suggestion-item {
-            padding: 10px 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.95);
+    position: relative;
+    z-index: 1;
+}
 
-        body.dark-mode .inbox-search-suggestion-item {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+.inbox-search-suggestion-item:last-child {
+    border-bottom: none;
+}
 
-        .inbox-search-suggestion-item:last-child {
-            border-bottom: none;
-        }
+.inbox-search-suggestion-item:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+    padding-left: 20px;
+    box-shadow: inset 4px 0 0 rgba(99, 102, 241, 0.6);
+}
 
-        .inbox-search-suggestion-item:hover {
-            background: rgba(99, 102, 241, 0.1);
-        }
+body.dark-mode .inbox-search-suggestion-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(30, 30, 30, 0.95);
+}
+
+body.dark-mode .inbox-search-suggestion-item:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+    box-shadow: inset 4px 0 0 rgba(99, 102, 241, 0.8);
+}
 
         /* Mobile optimizations for search suggestions */
         @media (max-width: 1024px) {
@@ -3528,15 +3546,19 @@ body.dark-mode .modern-email-item:hover {
 
         /* Blur inbox content when search suggestions are shown */
         .inbox-content-blur {
-            filter: blur(8px);
-            transition: filter 0.3s ease;
-            pointer-events: none;
-        }
+    filter: blur(8px);
+    transition: filter 0.3s ease;
+    pointer-events: none;
+    position: relative;
+    z-index: 1; /* Lower than suggestions */
+}
 
-        .inbox-content-normal {
-            filter: blur(0);
-            transition: filter 0.3s ease;
-        }
+.inbox-content-normal {
+    filter: blur(0);
+    transition: filter 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
 
         /* Delete Button on Hover */
         .email-delete-btn {
@@ -5293,13 +5315,13 @@ body.dark-mode .dynamic-suggestion-pill:hover {
     }
 }
 
-        /* Mouse Follow Effect */
-.mouse-follow-container {
+        /* Mouse Follow Effect - Inbox (Glow) */
+.mouse-follow-inbox {
     position: relative;
     overflow: hidden;
 }
 
-.mouse-follow-container::before {
+.mouse-follow-inbox::before {
     content: '';
     position: absolute;
     width: 600px;
@@ -5308,16 +5330,89 @@ body.dark-mode .dynamic-suggestion-pill:hover {
     border-radius: 50%;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.5s ease;
     transform: translate(-50%, -50%);
+    left: var(--mouse-x, 50%);
+    top: var(--mouse-y, 50%);
 }
 
-.mouse-follow-container:hover::before {
+.mouse-follow-inbox.active::before {
     opacity: 1;
 }
 
-body.dark-mode .mouse-follow-container::before {
+body.dark-mode .mouse-follow-inbox::before {
     background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+}
+
+/* Mouse Follow Effect - AI Writer (Trail with Text) */
+.mouse-follow-writer {
+    position: relative;
+    overflow: hidden;
+}
+
+.mouse-follow-writer::before {
+    content: 'AI email writer\AInkMind does the job';
+    white-space: pre;
+    position: absolute;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
+    border: 2px solid white;
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3),
+                0 8px 40px rgba(99, 102, 241, 0.2);
+    font-size: 13px;
+    font-weight: 600;
+    color: #4f46e5;
+    text-align: center;
+    line-height: 1.5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    transform: translate(-50%, -50%);
+    left: var(--mouse-x, 50%);
+    top: var(--mouse-y, 50%);
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+body.dark-mode .mouse-follow-writer::before {
+    background: linear-gradient(135deg, rgba(40, 40, 45, 0.95) 0%, rgba(35, 35, 40, 0.9) 100%);
+    border: 2px solid rgba(99, 102, 241, 0.5);
+    color: #a5b4fc;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5),
+                0 8px 40px rgba(99, 102, 241, 0.3);
+}
+
+.mouse-follow-writer.active::before {
+    opacity: 1;
+}
+
+/* Trail Effect for AI Writer */
+.mouse-trail {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(139, 92, 246, 0.6));
+    border-radius: 50%;
+    pointer-events: none;
+    animation: trailFade 1s ease-out forwards;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+}
+
+@keyframes trailFade {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+}
+
+body.dark-mode .mouse-trail {
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.8), rgba(139, 92, 246, 0.6));
+    box-shadow: 0 0 10px rgba(167, 139, 250, 0.6);
 }
 
         /* Priority Email Glow Effect */
@@ -5928,40 +6023,105 @@ useEffect(() => {
                 }
             }, [currentPage, newEmailCount]);
 
-            // Mouse follow effect
+            // Mouse follow effect - Different for inbox and AI writer
 useEffect(() => {
-    const containers = document.querySelectorAll('.mouse-follow-container');
+    const inboxContainers = document.querySelectorAll('.mouse-follow-inbox');
+    const writerContainers = document.querySelectorAll('.mouse-follow-writer');
     
-    const handleMouseMove = (e) => {
+    // Track if containers have content
+    const checkInboxContent = () => {
+        return gmailEmails.length > 0 || outlookEmails.length > 0 || inboxViewMode !== 'tabs';
+    };
+    
+    const checkWriterContent = () => {
+        return emailText.length > 0 || customPrompt.length > 0 || uploadedFile !== null;
+    };
+    
+    // Inbox glow effect
+    const handleInboxMouseMove = (e) => {
         const container = e.currentTarget;
         const rect = container.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        // Check if container has content (typed text or emails)
-        const hasContent = container.querySelector('textarea')?.value.length > 0 ||
-                          container.querySelector('.modern-email-item') ||
-                          container.querySelector('.sidebar-email-item');
+        const hasContent = checkInboxContent();
         
         if (!hasContent) {
             container.style.setProperty('--mouse-x', `${x}px`);
             container.style.setProperty('--mouse-y', `${y}px`);
-            const before = window.getComputedStyle(container, '::before');
-            container.style.setProperty('--before-left', `${x}px`);
-            container.style.setProperty('--before-top', `${y}px`);
+            container.classList.add('active');
+        } else {
+            container.classList.remove('active');
         }
     };
     
-    containers.forEach(container => {
-        container.addEventListener('mousemove', handleMouseMove);
+    const handleInboxMouseLeave = (e) => {
+        e.currentTarget.classList.remove('active');
+    };
+    
+    // AI Writer trail effect
+    let lastTrailTime = 0;
+    const trailInterval = 30; // milliseconds between trail dots
+    
+    const handleWriterMouseMove = (e) => {
+        const container = e.currentTarget;
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const hasContent = checkWriterContent();
+        
+        if (!hasContent) {
+            container.style.setProperty('--mouse-x', `${x}px`);
+            container.style.setProperty('--mouse-y', `${y}px`);
+            container.classList.add('active');
+            
+            // Create trail dots
+            const now = Date.now();
+            if (now - lastTrailTime > trailInterval) {
+                const trail = document.createElement('div');
+                trail.className = 'mouse-trail';
+                trail.style.left = `${x}px`;
+                trail.style.top = `${y}px`;
+                container.appendChild(trail);
+                
+                // Remove after animation
+                setTimeout(() => trail.remove(), 1000);
+                lastTrailTime = now;
+            }
+        } else {
+            container.classList.remove('active');
+        }
+    };
+    
+    const handleWriterMouseLeave = (e) => {
+        e.currentTarget.classList.remove('active');
+    };
+    
+    // Add event listeners
+    inboxContainers.forEach(container => {
+        container.addEventListener('mousemove', handleInboxMouseMove);
+        container.addEventListener('mouseleave', handleInboxMouseLeave);
     });
     
+    writerContainers.forEach(container => {
+        container.addEventListener('mousemove', handleWriterMouseMove);
+        container.addEventListener('mouseleave', handleWriterMouseLeave);
+    });
+    
+    // Cleanup
     return () => {
-        containers.forEach(container => {
-            container.removeEventListener('mousemove', handleMouseMove);
+        inboxContainers.forEach(container => {
+            container.removeEventListener('mousemove', handleInboxMouseMove);
+            container.removeEventListener('mouseleave', handleInboxMouseLeave);
+        });
+        
+        writerContainers.forEach(container => {
+            container.removeEventListener('mousemove', handleWriterMouseMove);
+            container.removeEventListener('mouseleave', handleWriterMouseLeave);
         });
     };
-}, [emailText, gmailEmails, outlookEmails]);
+}, [emailText, customPrompt, uploadedFile, gmailEmails, outlookEmails, inboxViewMode]);
 
             // Rotate welcome messages
             useEffect(() => {
@@ -8463,7 +8623,7 @@ const generateAiDraft = async (email) => {
                                     <div className="desktop-inbox-layout">
                                         {/* Left Sidebar - Inbox */}
                                         {/* Left Sidebar - Inbox */}
-                                         <div className="inbox-sidebar mouse-follow-container">
+                                         <div className="inbox-sidebar mouse-follow-inbox">
                                             {/* Header with Title and Buttons */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
@@ -9038,7 +9198,7 @@ const generateAiDraft = async (email) => {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                        className={`email-content-area mouse-follow-container ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+                                        className={`email-content-area mouse-follow-inbox ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
@@ -9469,7 +9629,7 @@ const generateAiDraft = async (email) => {
                                     </>
                                 ) : (
                                     /* Original Home Page Layout when not connected */
-                                     <div className="ai-writer-container mouse-follow-container rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
+                                     <div className="ai-writer-container mouse-follow-writer rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
                                         {/* Tab Switches */}
                                         <div className="flex justify-center mb-8">
                                             <div className="tab-container tab-button-container">
