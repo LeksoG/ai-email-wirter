@@ -2546,26 +2546,33 @@
         /* Envelope Flying Animation */
         .envelope-animation {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 48px;
             z-index: 10000;
-            animation: envelope-fly 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: envelope-fly-center 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
-        @keyframes envelope-fly {
+        @keyframes envelope-fly-center {
             0% {
-                transform: scale(1) rotate(0deg);
+                transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
                 opacity: 1;
             }
-            30% {
-                transform: scale(0.8) rotate(-10deg);
+            40% {
+                transform: translate(-50%, -50%) scale(1) rotate(-5deg);
+                opacity: 1;
             }
             60% {
-                transform: scale(1.2) rotate(5deg) translateY(-20px);
+                transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+                opacity: 1;
             }
             100% {
-                transform: scale(0.5) rotate(45deg) translate(300px, -300px);
+                transform: translate(-50%, -150%) scale(0.3) rotate(25deg);
                 opacity: 0;
             }
         }
@@ -3379,7 +3386,7 @@
             border: 2px solid rgba(99, 102, 241, 0.3);
             background: rgba(255, 255, 255, 0.7);
             font-size: 13px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 12px;
             color: #374151;
         }
@@ -3398,6 +3405,7 @@
             outline: none;
             border-color: rgba(99, 102, 241, 0.5);
             background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.02);
         }
 
         body.dark-mode .inbox-search-bar:focus {
@@ -3405,24 +3413,42 @@
             border-color: rgba(99, 102, 241, 0.7);
         }
 
+        /* Smooth expand animation for search container */
+        .inbox-search-container {
+            position: relative;
+            margin-bottom: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .inbox-search-container.expanded {
+            transform: scale(1.02);
+        }
+
         .inbox-search-suggestions {
             position: absolute;
-            left: 20px;
-            right: 20px;
+            left: 0;
+            right: 0;
             top: 100%;
             margin-top: 8px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border: 2px solid rgba(99, 102, 241, 0.3);
             border-radius: 16px;
-            max-height: 300px;
-            overflow-y: auto;
+            max-height: 0;
+            overflow: hidden;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             z-index: 10;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
             /* Hide scrollbar but keep functionality */
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .inbox-search-suggestions.show {
+            max-height: 300px;
+            overflow-y: auto;
+            opacity: 1;
         }
 
         .inbox-search-suggestions::-webkit-scrollbar {
@@ -5245,7 +5271,7 @@ body.dark-mode .dynamic-suggestion-pill:hover {
 
            // Initialize app with console logging
 useEffect(() => {
-    console.log('🚀 AI Email Writer initialized');
+    console.log('🚀 InkMind initialized');
     
    // Check for OAuth callback with tokens
 const urlParams = new URLSearchParams(window.location.search);
@@ -7333,7 +7359,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                     <div className="flex items-center gap-3">
                                         <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
                                             <span className="text-xl">✉️</span>
-                                            <span className="text-sm font-semibold text-gray-700">Email Writer</span>
+                                            <span className="text-sm font-semibold text-gray-700">InkMind</span>
                                         </div>
 
                                         {/* AI Model Switcher - Small Oval */}
@@ -7388,8 +7414,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                                     }}
                                                 >
                                                     {[
-                                                        { name: 'Ink 2.0', description: 'Mistral AI Small Latest' },
-                                                        { name: 'Ink 2.5', description: 'Mistral AI Medium' }
+                                                        { name: 'Ink 2.0', description: 'Fast & efficient - Mistral AI Small Latest' },
+                                                        { name: 'Ink 2.5', description: 'More powerful & detailed - Mistral AI Medium' }
                                                     ].map((model) => (
                                                         <button
                                                             key={model.name}
@@ -7546,44 +7572,6 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
                                 {/* Custom Transformation + Suggestions */}
                                 <div className="pt-4 border-t border-gray-300 space-y-4">
-                                    {/* Suggestion Buttons - Non-scrolling, appear above prompt */}
-                                    {showSuggestions && customPrompt && customPrompt.length > 0 && emailText && emailText.length > 0 && (
-                                        <div style={{marginBottom: '12px'}}>
-                                            <label className="text-sm font-medium text-gray-700 flex items-center mb-3">
-                                                <span className="text-lg mr-2">💡</span>
-                                                Quick Actions
-                                            </label>
-                                            <div style={{
-                                                display: 'flex',
-                                                flexWrap: 'wrap',
-                                                gap: '8px',
-                                                animation: 'blur-slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-                                            }}>
-                                                {generalSuggestions.map((suggestion) => (
-                                                    <button
-                                                        key={suggestion.id}
-                                                        onClick={() => setCustomPrompt(suggestion.prompt)}
-                                                        className="oval-button unified-button"
-                                                        style={{
-                                                            padding: '10px 20px',
-                                                            fontSize: '13px',
-                                                            fontWeight: '600',
-                                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%)',
-                                                            color: '#4f46e5',
-                                                            border: '2px solid white',
-                                                            borderRadius: '50px',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                            boxShadow: '0 2px 6px rgba(99, 102, 241, 0.08)'
-                                                        }}
-                                                    >
-                                                        {suggestion.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
                                     {/* Custom Prompt Input */}
 <div style={{position: 'relative'}}>
     {/* Dynamic Suggestions */}
@@ -8090,7 +8078,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
                                             {/* Search Bar - Only show when not in tabs view */}
                                             {inboxViewMode !== 'tabs' && (
-                                                <div style={{position: 'relative', marginBottom: '12px'}}>
+                                                <div className={`inbox-search-container ${showInboxSearchSuggestions && inboxSearchResults.length > 0 ? 'expanded' : ''}`}>
                                                     <input
                                                         type="text"
                                                         value={inboxSearchQuery}
@@ -8116,7 +8104,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                                     {showInboxSearchSuggestions && inboxSearchResults.length > 0 && (
                                                         <>
                                                             {/* Blur Overlay */}
-                                                            <div 
+                                                            <div
                                                                 style={{
                                                                     position: 'fixed',
                                                                     top: 0,
@@ -8134,9 +8122,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
                                                                 }}
                                                             />
                                                             {/* Search Suggestions */}
-                                                            <div className="inbox-search-suggestions" style={{
-                                                                zIndex: 10,
-                                                                animation: 'dropdown-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                                                            <div className={`inbox-search-suggestions ${showInboxSearchSuggestions && inboxSearchResults.length > 0 ? 'show' : ''}`} style={{
+                                                                zIndex: 10
                                                             }}>
                                                                 {inboxSearchResults.map(email => (
                                                                     <div
