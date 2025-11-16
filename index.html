@@ -5331,122 +5331,6 @@ body.dark-mode .dynamic-suggestion-pill:hover {
     }
 }
 
-        /* Mouse Follow Effect - Inbox (Glow) */
-.mouse-follow-inbox {
-    position: relative;
-    overflow: hidden;
-}
-
-.mouse-follow-inbox::before {
-    content: '';
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    transform: translate(-50%, -50%);
-    left: var(--mouse-x, 50%);
-    top: var(--mouse-y, 50%);
-}
-
-.mouse-follow-inbox.active::before {
-    opacity: 1;
-}
-
-body.dark-mode .mouse-follow-inbox::before {
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-}
-
-/* Mouse Follow Effect - AI Writer (Line Trail with Text) */
-.mouse-follow-writer {
-    position: relative;
-    overflow: hidden;
-}
-
-/* White Line Trail for AI Writer */
-.mouse-trail-line {
-    position: absolute;
-    width: 200px;
-    height: 3px;
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%);
-    pointer-events: none;
-    animation: lineTrailFade 1.5s ease-out forwards;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
-                0 0 25px rgba(255, 255, 255, 0.5);
-    border-radius: 2px;
-    transform-origin: left center;
-}
-
-/* Trail Text */
-.mouse-trail-text {
-    position: absolute;
-    white-space: nowrap;
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
-    pointer-events: none;
-    animation: textTrailFade 1.5s ease-out forwards;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-                 0 0 20px rgba(255, 255, 255, 0.5),
-                 0 2px 4px rgba(0, 0, 0, 0.3);
-    z-index: 101;
-}
-
-.mouse-trail-text.line-1 {
-    margin-top: -25px;
-}
-
-.mouse-trail-text.line-2 {
-    margin-top: 10px;
-    font-size: 12px;
-    opacity: 0.9;
-}
-
-@keyframes lineTrailFade {
-    0% {
-        opacity: 1;
-        width: 200px;
-    }
-    70% {
-        opacity: 0.6;
-        width: 150px;
-    }
-    100% {
-        opacity: 0;
-        width: 50px;
-    }
-}
-
-@keyframes textTrailFade {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    70% {
-        opacity: 0.8;
-        transform: translateY(-2px);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-}
-
-body.dark-mode .mouse-trail-line {
-    background: linear-gradient(90deg, transparent 0%, rgba(200, 200, 220, 0.9) 50%, transparent 100%);
-    box-shadow: 0 0 15px rgba(200, 200, 220, 0.8),
-                0 0 25px rgba(200, 200, 220, 0.5);
-}
-
-body.dark-mode .mouse-trail-text {
-    color: rgba(220, 220, 240, 1);
-    text-shadow: 0 0 10px rgba(200, 200, 220, 0.8),
-                 0 0 20px rgba(200, 200, 220, 0.5),
-                 0 2px 4px rgba(0, 0, 0, 0.5);
-}
 
         /* Priority Email Glow Effect */
 .priority-email-stacked {
@@ -6056,171 +5940,6 @@ useEffect(() => {
                 }
             }, [currentPage, newEmailCount]);
 
-            // Mouse follow effect - Different for inbox and AI writer
-useEffect(() => {
-    const inboxContainers = document.querySelectorAll('.mouse-follow-inbox');
-    const writerContainers = document.querySelectorAll('.mouse-follow-writer');
-
-    let isTyping = false;
-    let typingTimeout = null;
-
-    // Track if containers have content or if user is typing/switching
-    const checkInboxContent = () => {
-        return gmailEmails.length > 0 || outlookEmails.length > 0 || inboxViewMode !== 'tabs';
-    };
-
-    const checkWriterContent = () => {
-        // Hide trail when user starts typing or has content
-        return emailText.length > 0 || customPrompt.length > 0 || uploadedFile !== null || isTyping;
-    };
-
-    // Detect typing in input fields
-    const handleTyping = () => {
-        isTyping = true;
-        // Fade out all existing trails immediately
-        const existingTrails = document.querySelectorAll('.mouse-trail-line, .mouse-trail-text');
-        existingTrails.forEach(trail => {
-            trail.style.animation = 'lineTrailFade 0.3s ease-out forwards, textTrailFade 0.3s ease-out forwards';
-        });
-
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            isTyping = false;
-        }, 1000);
-    };
-
-    // Add typing detection to all input fields
-    const inputFields = document.querySelectorAll('input, textarea');
-    inputFields.forEach(field => {
-        field.addEventListener('input', handleTyping);
-        field.addEventListener('focus', handleTyping);
-    });
-
-    // Inbox glow effect
-    const handleInboxMouseMove = (e) => {
-        const container = e.currentTarget;
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const hasContent = checkInboxContent();
-
-        if (!hasContent) {
-            container.style.setProperty('--mouse-x', `${x}px`);
-            container.style.setProperty('--mouse-y', `${y}px`);
-            container.classList.add('active');
-        } else {
-            container.classList.remove('active');
-        }
-    };
-
-    const handleInboxMouseLeave = (e) => {
-        e.currentTarget.classList.remove('active');
-    };
-
-    // AI Writer line trail effect
-    let lastTrailTime = 0;
-    const trailInterval = 50; // milliseconds between trail lines
-    let trailCount = 0;
-
-    const handleWriterMouseMove = (e) => {
-        const container = e.currentTarget;
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const hasContent = checkWriterContent();
-
-        if (!hasContent) {
-            // Create line trail
-            const now = Date.now();
-            if (now - lastTrailTime > trailInterval) {
-                // Create white line
-                const line = document.createElement('div');
-                line.className = 'mouse-trail-line';
-                line.style.left = `${x}px`;
-                line.style.top = `${y}px`;
-                container.appendChild(line);
-
-                // Add text every few trails
-                trailCount++;
-                if (trailCount % 3 === 0) {
-                    // Create "Ai email writer" text
-                    const text1 = document.createElement('div');
-                    text1.className = 'mouse-trail-text line-1';
-                    text1.textContent = 'Ai email writer';
-                    text1.style.left = `${x}px`;
-                    text1.style.top = `${y}px`;
-                    container.appendChild(text1);
-
-                    // Create "InkMind does the job" text
-                    const text2 = document.createElement('div');
-                    text2.className = 'mouse-trail-text line-2';
-                    text2.textContent = 'InkMind does the job';
-                    text2.style.left = `${x}px`;
-                    text2.style.top = `${y}px`;
-                    container.appendChild(text2);
-
-                    // Remove text after animation
-                    setTimeout(() => {
-                        text1.remove();
-                        text2.remove();
-                    }, 1500);
-                }
-
-                // Remove line after animation
-                setTimeout(() => line.remove(), 1500);
-                lastTrailTime = now;
-            }
-        } else {
-            // Fade out all existing trails when typing starts
-            const existingTrails = container.querySelectorAll('.mouse-trail-line, .mouse-trail-text');
-            existingTrails.forEach(trail => {
-                trail.style.animation = 'lineTrailFade 0.3s ease-out forwards, textTrailFade 0.3s ease-out forwards';
-            });
-        }
-    };
-
-    const handleWriterMouseLeave = (e) => {
-        const container = e.currentTarget;
-        // Fade out trails on mouse leave
-        const existingTrails = container.querySelectorAll('.mouse-trail-line, .mouse-trail-text');
-        existingTrails.forEach(trail => {
-            trail.style.animation = 'lineTrailFade 0.5s ease-out forwards, textTrailFade 0.5s ease-out forwards';
-        });
-    };
-
-    // Add event listeners
-    inboxContainers.forEach(container => {
-        container.addEventListener('mousemove', handleInboxMouseMove);
-        container.addEventListener('mouseleave', handleInboxMouseLeave);
-    });
-
-    writerContainers.forEach(container => {
-        container.addEventListener('mousemove', handleWriterMouseMove);
-        container.addEventListener('mouseleave', handleWriterMouseLeave);
-    });
-
-    // Cleanup
-    return () => {
-        inboxContainers.forEach(container => {
-            container.removeEventListener('mousemove', handleInboxMouseMove);
-            container.removeEventListener('mouseleave', handleInboxMouseLeave);
-        });
-
-        writerContainers.forEach(container => {
-            container.removeEventListener('mousemove', handleWriterMouseMove);
-            container.removeEventListener('mouseleave', handleWriterMouseLeave);
-        });
-
-        inputFields.forEach(field => {
-            field.removeEventListener('input', handleTyping);
-            field.removeEventListener('focus', handleTyping);
-        });
-
-        clearTimeout(typingTimeout);
-    };
-}, [emailText, customPrompt, uploadedFile, gmailEmails, outlookEmails, inboxViewMode]);
 
             // Rotate welcome messages
             useEffect(() => {
@@ -8722,7 +8441,7 @@ const generateAiDraft = async (email) => {
                                     <div className="desktop-inbox-layout">
                                         {/* Left Sidebar - Inbox */}
                                         {/* Left Sidebar - Inbox */}
-                                         <div className="inbox-sidebar mouse-follow-inbox">
+                                         <div className="inbox-sidebar">
                                             {/* Header with Title and Buttons */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
@@ -9297,7 +9016,7 @@ const generateAiDraft = async (email) => {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                        className={`email-content-area mouse-follow-inbox ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
@@ -9729,7 +9448,7 @@ const generateAiDraft = async (email) => {
                                 )}
 
                                 {/* AI Writer Container - Always show (CSS handles visibility based on screen size and connection) */}
-                                <div className="ai-writer-container mouse-follow-writer rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
+                                <div className="ai-writer-container rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
                                         {/* Tab Switches */}
                                         <div className="flex justify-center mb-8">
                                             <div className="tab-container tab-button-container">
