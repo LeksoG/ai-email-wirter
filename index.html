@@ -9159,47 +9159,6 @@ Make it concise but complete.`,
                         </div>
                     </div>
                 )}
-                    </>
-                ) : (
-                    /* Original Home Page Layout when not connected */
-                    <div className="ai-writer-container rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
-                        {/* Tab Switches */}
-                        <div className="flex justify-center mb-8">
-                            <div className="tab-container tab-button-container">
-                                <div
-                                    className="tab-slider"
-                                    style={{
-                                        width: '50%',
-                                        height: 'calc(100% - 12px)',
-                                        top: '6px',
-                                        left: activeView === 'writer' ? '6px' : 'calc(50% - 6px)',
-                                    }}
-                                ></div>
-                                <button
-                                    onClick={() => setActiveView('writer')}
-                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                        activeView === 'writer' ? (darkMode ? 'text-white' : 'text-gray-900') : 'text-gray-700 hover:text-gray-800'
-                                    }`}
-                                >
-                                    ✍️ AI Writer
-                                </button>
-                                <button
-                                    onClick={() => setActiveView('results')}
-                                    className={`relative z-10 px-8 py-3 rounded-full font-medium transition-all ${
-                                        activeView === 'results' ? (darkMode ? 'text-white' : 'text-gray-900') : 'text-gray-700 hover:text-gray-800'
-                                    }`}
-                                >
-                                    ✨ Results
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Content Area */}
-                        <div className="min-h-[500px]">
-                            {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
-                        </div>
-                    </div>
-                )}
 
                     {/* Undo Delete Button */}
                     {showUndoDelete && (
