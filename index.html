@@ -8462,7 +8462,8 @@ const generateAiDraft = async (email) => {
                                     <>
                                     <div className="desktop-inbox-layout">
                                         {/* Left Sidebar - Inbox */}
-                                        <div className="inbox-sidebar">
+                                        {/* Left Sidebar - Inbox */}
+                                         <div className="inbox-sidebar mouse-follow-container">
                                             {/* Header with Title and Buttons */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
@@ -9037,7 +9038,7 @@ const generateAiDraft = async (email) => {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                            className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+                                        className={`email-content-area mouse-follow-container ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
@@ -9468,7 +9469,7 @@ const generateAiDraft = async (email) => {
                                     </>
                                 ) : (
                                     /* Original Home Page Layout when not connected */
-                                    <div className="ai-writer-container rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
+                                     <div className="ai-writer-container mouse-follow-container rounded-3xl p-8 relative" style={{marginTop: showWelcomeAnimation ? '0' : '2rem'}}>
                                         {/* Tab Switches */}
                                         <div className="flex justify-center mb-8">
                                             <div className="tab-container tab-button-container">
