@@ -585,7 +585,8 @@
             margin-bottom: 24px;
             border: 2px solid rgba(99, 102, 241, 0.2);
             box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
             gap: 16px;
             animation: slideIn 0.4s ease-out;
@@ -4733,6 +4734,215 @@ body.dark-mode .ai-send-button {
 .ai-writer-container {
     display: block;
 }
+
+/* Fullscreen Email Viewer */
+.fullscreen-email-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.fullscreen-email-container {
+    width: 100%;
+    max-width: 900px;
+    height: 90vh;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(249, 250, 251, 0.95));
+    border-radius: 24px;
+    border: 2px solid white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUpScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.dark-mode .fullscreen-email-container {
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(30, 30, 30, 0.95));
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+@keyframes slideUpScale {
+    from {
+        opacity: 0;
+        transform: translateY(60px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.fullscreen-email-header {
+    padding: 20px 24px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fullscreen-close-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen-close-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+}
+
+.fullscreen-email-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.fullscreen-email-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #374151;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+body.dark-mode .fullscreen-email-text {
+    color: #e5e5e5;
+}
+
+.fullscreen-prompt-container {
+    padding: 20px 24px;
+    border-top: 2px solid rgba(99, 102, 241, 0.15);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(249, 250, 251, 0.85));
+}
+
+body.dark-mode .fullscreen-prompt-container {
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.85));
+}
+
+/* Dynamic Stacked Suggestions */
+.dynamic-suggestions-stack {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: slideUpFade 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dynamic-suggestion-pill {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(249, 250, 251, 0.95));
+    border: 2px solid white;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4f46e5;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    animation: pillBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.dark-mode .dynamic-suggestion-pill {
+    background: linear-gradient(135deg, rgba(55, 55, 65, 0.98), rgba(45, 45, 55, 0.95));
+    border-color: rgba(99, 102, 241, 0.4);
+    color: #a5b4fc;
+}
+
+.dynamic-suggestion-pill:hover {
+    transform: translateX(8px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.6);
+}
+
+@keyframes pillBounce {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px) scale(0.8);
+    }
+    60% {
+        transform: translateX(4px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Live typing animation */
+.typing-line {
+    opacity: 0;
+    animation: typingFadeIn 0.2s ease-out forwards;
+}
+
+@keyframes typingFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* View Email Button */
+.view-email-btn {
+    margin-top: 16px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-email-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+}
+
     </style>
 </head>
 <body>
@@ -4836,6 +5046,16 @@ body.dark-mode .ai-send-button {
             const [touchCurrentX, setTouchCurrentX] = useState(0);
             const [isSwiping, setIsSwiping] = useState(false);
             const [inboxViewMode, setInboxViewMode] = useState('tabs'); // 'tabs', 'received', 'sent'
+
+            // Fullscreen email viewer states
+            const [showFullscreenEmail, setShowFullscreenEmail] = useState(false);
+            const [fullscreenEmailText, setFullscreenEmailText] = useState('');
+            const [fullscreenPrompt, setFullscreenPrompt] = useState('');
+            const [isEditingFullscreen, setIsEditingFullscreen] = useState(false);
+
+            // Dynamic suggestions states
+            const [dynamicSuggestions, setDynamicSuggestions] = useState([]);
+            const [showDynamicSuggestions, setShowDynamicSuggestions] = useState(false)
 
             // Version modal state
             const [showVersionModal, setShowVersionModal] = useState(false);
@@ -7070,6 +7290,17 @@ const fetchOutlookEmails = async (accessToken) => {
                                 <div className="glass-dark rounded-2xl p-6">
                                     <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-relaxed text-left text-base"></pre>
                                 </div>
+                                {/* View Email Button */}
+                                <button
+                                    onClick={() => {
+                                        setFullscreenEmailText(result);
+                                        setShowFullscreenEmail(true);
+                                    }}
+                                    className="view-email-btn"
+                                >
+                                    <span>👁️</span>
+                                    <span>View Email</span>
+                                </button>
                             </div>
                         </div>
                     );
@@ -8101,69 +8332,6 @@ const fetchOutlookEmails = async (accessToken) => {
                                     </div>
                                 )}
                             </>
-                        )}
-
-                        {/* Stats Section - Separate Container Below Inbox and AI Writer */}
-                        {currentPage !== 'settings' && (
-                            <div className="stats-section fade-in">
-                                <h2 className="stats-header">
-                                    Analytics Dashboard
-                                </h2>
-
-                                <div className="stats-grid">
-                                    <div className="stat-card">
-                                        <div className="stat-value">{sentEmails.length}</div>
-                                        <div className="stat-label">Emails Sent</div>
-                                    </div>
-                                    <div className="stat-card">
-                                        <div className="stat-value">{gmailEmails.filter(e => !e.read).length}</div>
-                                        <div className="stat-label">Unread Emails</div>
-                                    </div>
-                                    <div className="stat-card">
-                                        <div className="stat-value">{priorityEmails.length}</div>
-                                        <div className="stat-label">Priority Items</div>
-                                    </div>
-                                    <div className="stat-card">
-                                        <div className="stat-value">{gmailEmails.length + outlookEmails.length}</div>
-                                        <div className="stat-label">Total Received</div>
-                                    </div>
-                                </div>
-
-                                {/* AI Priority Suggestions */}
-                                <div className="priority-list">
-                                    <h3 className="priority-list-header">
-                                        AI Priority Suggestions
-                                    </h3>
-                                    {priorityEmails.length > 0 ? (
-                                        priorityEmails.slice(0, 3).map((email, index) => (
-                                            <div
-                                                key={index}
-                                                className="priority-item"
-                                                onClick={() => setViewingEmail(email)}
-                                            >
-                                                <span className={`priority-badge priority-${email.priority === 'high' ? 'high' : email.priority === 'medium' ? 'medium' : 'low'}`}>
-                                                    {email.priority ? email.priority.toUpperCase() : 'MEDIUM'} PRIORITY
-                                                </span>
-                                                <div style={{fontSize: '14px', fontWeight: '600', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px'}}>
-                                                    {email.subject}
-                                                </div>
-                                                <div style={{fontSize: '12px', color: darkMode ? '#9ca3af' : '#6b7280'}}>
-                                                    From: {email.from}
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div style={{
-                                            padding: '24px',
-                                            textAlign: 'center',
-                                            color: darkMode ? '#9ca3af' : '#6b7280',
-                                            fontSize: '14px'
-                                        }}>
-                                            No priority emails yet. Connect your email to see AI-powered priority suggestions.
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
                         )}
                     </div>
 
