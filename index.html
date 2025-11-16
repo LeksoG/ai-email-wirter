@@ -2626,87 +2626,84 @@
             }
         }
 
-        /* Improved Email Container Design */
-        .modern-email-item {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
-            border: 2px solid rgba(99, 102, 241, 0.2);
-            border-radius: 20px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
-            animation: emailAppearGlow 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+        /* Enhanced Email Container */
+.modern-email-item {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+}
 
-        @keyframes emailAppearGlow {
-            0% {
-                opacity: 0;
-                transform: translateY(30px) translateX(-20px);
-                box-shadow: 0 0 0 rgba(99, 102, 241, 0);
-            }
-            50% {
-                box-shadow: 0 0 25px rgba(99, 102, 241, 0.4), 0 0 50px rgba(139, 92, 246, 0.3);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) translateX(0);
-                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
-            }
-        }
+.modern-email-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-        /* Ladder animation for sequential email appearance */
-        .modern-email-item:nth-child(1) {
-            animation-delay: 0s;
-        }
-        .modern-email-item:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-        .modern-email-item:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-        .modern-email-item:nth-child(4) {
-            animation-delay: 0.3s;
-        }
-        .modern-email-item:nth-child(5) {
-            animation-delay: 0.4s;
-        }
-        .modern-email-item:nth-child(n+6) {
-            animation-delay: 0.5s;
-        }
+.modern-email-item:hover::before {
+    left: 100%;
+}
 
-        .modern-email-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.15), transparent);
-            transition: left 0.5s;
-        }
+.modern-email-item:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.18),
+                0 4px 12px rgba(99, 102, 241, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+    border-color: rgba(99, 102, 241, 0.4);
+}
 
-        .modern-email-item:hover::before {
-            left: 100%;
-        }
+body.dark-mode .modern-email-item {
+    background: linear-gradient(135deg, rgba(40, 40, 45, 0.98) 0%, rgba(30, 30, 35, 0.95) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+                0 1px 3px rgba(0, 0, 0, 0.2);
+}
 
-        .modern-email-item:hover {
-            transform: translateY(-5px) translateX(5px) scale(1.01);
-            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.25);
-            border-color: rgba(99, 102, 241, 0.5);
-        }
+body.dark-mode .modern-email-item:hover {
+    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.3),
+                0 4px 12px rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.6);
+}
 
-        body.dark-mode .modern-email-item {
-            background: linear-gradient(135deg, rgba(40, 40, 45, 0.98) 0%, rgba(30, 30, 35, 0.95) 100%);
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
+/* Ladder Animation */
+.modern-email-item {
+    animation: emailLadderAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
 
-        body.dark-mode .modern-email-item:hover {
-            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
-            border-color: rgba(99, 102, 241, 0.6);
-        }
+.modern-email-item:nth-child(1) { animation-delay: 0s; }
+.modern-email-item:nth-child(2) { animation-delay: 0.08s; }
+.modern-email-item:nth-child(3) { animation-delay: 0.16s; }
+.modern-email-item:nth-child(4) { animation-delay: 0.24s; }
+.modern-email-item:nth-child(5) { animation-delay: 0.32s; }
+.modern-email-item:nth-child(n+6) { animation-delay: 0.4s; }
+
+@keyframes emailLadderAppear {
+    0% {
+        opacity: 0;
+        transform: translateX(-40px) translateY(20px) scale(0.9);
+        filter: blur(8px);
+    }
+    60% {
+        transform: translateX(5px) translateY(-5px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
 
         /* Priority Preview Containers */
         .priority-preview-grid {
@@ -5295,6 +5292,89 @@ body.dark-mode .dynamic-suggestion-pill:hover {
         filter: blur(0);
     }
 }
+
+        /* Mouse Follow Effect */
+.mouse-follow-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.mouse-follow-container::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    transform: translate(-50%, -50%);
+}
+
+.mouse-follow-container:hover::before {
+    opacity: 1;
+}
+
+body.dark-mode .mouse-follow-container::before {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+}
+
+        /* Priority Email Glow Effect */
+.priority-email-stacked {
+    animation: stack-appear-glow 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes stack-appear-glow {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+        box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+    }
+    30% {
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.8),
+                    0 0 80px rgba(139, 92, 246, 0.6),
+                    0 0 120px rgba(167, 139, 250, 0.4);
+    }
+    60% {
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.6),
+                    0 0 80px rgba(139, 92, 246, 0.4);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+        /* Enhanced Language Dropdown */
+.custom-language-select option {
+    background: white;
+    color: #374151;
+    padding: 16px 20px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    transition: all 0.2s ease;
+}
+
+.custom-language-select option:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+body.dark-mode .custom-language-select option {
+    background: rgba(40, 40, 40, 0.98);
+    color: #e5e5e5;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+body.dark-mode .custom-language-select option:hover {
+    background: rgba(60, 60, 70, 0.95);
+}
+
+       .mouse-follow-container::before {
+    left: var(--before-left, 50%);
+    top: var(--before-top, 50%);
+} 
     </style>
 </head>
 <body>
@@ -5847,6 +5927,41 @@ useEffect(() => {
                     return () => clearTimeout(timer);
                 }
             }, [currentPage, newEmailCount]);
+
+            // Mouse follow effect
+useEffect(() => {
+    const containers = document.querySelectorAll('.mouse-follow-container');
+    
+    const handleMouseMove = (e) => {
+        const container = e.currentTarget;
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Check if container has content (typed text or emails)
+        const hasContent = container.querySelector('textarea')?.value.length > 0 ||
+                          container.querySelector('.modern-email-item') ||
+                          container.querySelector('.sidebar-email-item');
+        
+        if (!hasContent) {
+            container.style.setProperty('--mouse-x', `${x}px`);
+            container.style.setProperty('--mouse-y', `${y}px`);
+            const before = window.getComputedStyle(container, '::before');
+            container.style.setProperty('--before-left', `${x}px`);
+            container.style.setProperty('--before-top', `${y}px`);
+        }
+    };
+    
+    containers.forEach(container => {
+        container.addEventListener('mousemove', handleMouseMove);
+    });
+    
+    return () => {
+        containers.forEach(container => {
+            container.removeEventListener('mousemove', handleMouseMove);
+        });
+    };
+}, [emailText, gmailEmails, outlookEmails]);
 
             // Rotate welcome messages
             useEffect(() => {
@@ -7681,8 +7796,8 @@ const generateAiDraft = async (email) => {
                                                     }}
                                                 >
                                                     {[
-                                                        { name: 'Ink 2.0', description: 'Fast & efficient - Mistral AI Small Latest' },
-                                                        { name: 'Ink 2.5', description: 'More powerful & detailed - Mistral AI Medium' }
+                                                        { name: 'Ink 2.0', description: 'Fast & efficient - best for small email tasks' },
+                                                        { name: 'Ink 2.5', description: 'More powerful & detailed - best for more complex email tasks' }
                                                     ].map((model) => (
                                                         <button
                                                             key={model.name}
@@ -8459,13 +8574,83 @@ const generateAiDraft = async (email) => {
                                             {/* Email List Area */}
                                             <div className={`inbox-scroll-area ${showInboxSearchSuggestions && inboxSearchResults.length > 0 ? 'inbox-content-blur' : 'inbox-content-normal'}`}>
                                                 {inboxViewMode === 'tabs' ? (
-                                                    /* Provider Selection View */
-                                                    <div className="text-center py-12 fade-in">
-                                                        <div className="text-6xl mb-6">📮</div>
-                                                        <h3 className="text-xl font-bold text-gray-800 mb-3">Select Email Provider</h3>
-                                                        <p className="text-sm text-gray-600 mb-8">Choose a provider to view your emails</p>
-                                                    </div>
-                                                ) : (
+    /* Provider Selection View with Examples */
+    <div className="text-center py-12 fade-in" style={{maxWidth: '600px', margin: '0 auto'}}>
+        <div className="text-6xl mb-6" style={{animation: 'float 3s ease-in-out infinite'}}>📮</div>
+        <h3 className="text-2xl font-bold text-gray-800 mb-3" style={{
+            background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+        }}>
+            Select Email Provider
+        </h3>
+        <p className="text-sm text-gray-600 mb-8">Choose a provider to unlock AI-powered email management</p>
+        
+        {/* Example Demos */}
+        <div className="space-y-4 text-left" style={{animation: 'fadeIn 0.6s ease-out 0.3s backwards'}}>
+            <div style={{
+                padding: '16px 20px',
+                background: darkMode 
+                    ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
+                    : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                borderRadius: '16px',
+                border: '2px solid rgba(99, 102, 241, 0.3)',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div style={{fontSize: '12px', fontWeight: '700', color: '#6366f1', marginBottom: '8px'}}>
+                    ✨ AI Summarization
+                </div>
+                <div style={{fontSize: '13px', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px', fontWeight: '600'}}>
+                    "Meeting Tomorrow at 2 PM"
+                </div>
+                <div style={{fontSize: '12px', color: darkMode ? '#a0a0a0' : '#6b7280', fontStyle: 'italic'}}>
+                    → "Quick reminder about tomorrow's project sync meeting"
+                </div>
+            </div>
+
+            <div style={{
+                padding: '16px 20px',
+                background: darkMode 
+                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)'
+                    : 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.05) 100%)',
+                borderRadius: '16px',
+                border: '2px solid rgba(16, 185, 129, 0.3)',
+                animation: 'fadeIn 0.6s ease-out 0.5s backwards'
+            }}>
+                <div style={{fontSize: '12px', fontWeight: '700', color: '#10b981', marginBottom: '8px'}}>
+                    ⚡ Priority Detection
+                </div>
+                <div style={{fontSize: '13px', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px', fontWeight: '600'}}>
+                    "URGENT: Server Issue"
+                </div>
+                <div style={{fontSize: '12px', color: darkMode ? '#a0a0a0' : '#6b7280', fontStyle: 'italic'}}>
+                    → Automatically moved to top of your inbox
+                </div>
+            </div>
+
+            <div style={{
+                padding: '16px 20px',
+                background: darkMode 
+                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)'
+                    : 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.05) 100%)',
+                borderRadius: '16px',
+                border: '2px solid rgba(245, 158, 11, 0.3)',
+                animation: 'fadeIn 0.6s ease-out 0.7s backwards'
+            }}>
+                <div style={{fontSize: '12px', fontWeight: '700', color: '#f59e0b', marginBottom: '8px'}}>
+                    ✍️ AI Reply Generation
+                </div>
+                <div style={{fontSize: '13px', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px', fontWeight: '600'}}>
+                    Smart drafts in seconds
+                </div>
+                <div style={{fontSize: '12px', color: darkMode ? '#a0a0a0' : '#6b7280', fontStyle: 'italic'}}>
+                    → Professional responses with your tone
+                </div>
+            </div>
+        </div>
+    </div>
+) : (
                                                     /* Email List View */
                                                     <div className={`${activeProvider === 'outlook' ? 'outlook-slide-enter' : 'gmail-slide-enter'}`} style={{
                                                         animation: 'fadeIn 0.4s ease-out'
