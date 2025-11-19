@@ -6020,7 +6020,7 @@ body.dark-mode .custom-language-select option:hover {
 
             // Version modal state
             const [showVersionModal, setShowVersionModal] = useState(false);
-            const CURRENT_VERSION = '3.0';
+            const CURRENT_VERSION = '3.5';
 
             // Language settings state
             const [selectedLanguage, setSelectedLanguage] = useState('english');
@@ -10896,14 +10896,32 @@ const generateAiDraft = async (email) => {
                                     <div className="version-section major-update">
                                         <div className="version-section-header">
                                             <span className="version-section-icon">⭐</span>
-                                            <h3 className="version-section-title">Major Update</h3>
+                                            <h3 className="version-section-title">New Features</h3>
                                         </div>
                                         <div className="version-update-item">
-                                            <div className="update-icon">📮</div>
+                                            <div className="update-icon">⚙️</div>
                                             <div className="update-content">
-                                                <div className="update-title">Outlook Connection</div>
+                                                <div className="update-title">AI Preferences</div>
                                                 <div className="update-description">
-                                                    Connect your Outlook account alongside Gmail! Access all your emails from both providers in one place.
+                                                    New AI preferences for users to toggle on how AI behaves - customize your experience!
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="version-update-item">
+                                            <div className="update-icon">✨</div>
+                                            <div className="update-content">
+                                                <div className="update-title">AI Email Drafts</div>
+                                                <div className="update-description">
+                                                    Get AI-generated drafts for your received emails automatically.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="version-update-item">
+                                            <div className="update-icon">✅</div>
+                                            <div className="update-content">
+                                                <div className="update-title">Grammar Check</div>
+                                                <div className="update-description">
+                                                    Real-time grammar checking with 4-second delay for better accuracy.
                                                 </div>
                                             </div>
                                         </div>
@@ -10918,11 +10936,7 @@ const generateAiDraft = async (email) => {
                                         <div className="version-update-list">
                                             <div className="version-update-item-small">
                                                 <span className="update-bullet">🎨</span>
-                                                <span>Refreshed UI design with smoother animations</span>
-                                            </div>
-                                            <div className="version-update-item-small">
-                                                <span className="update-bullet">⚡</span>
-                                                <span>Enhanced performance and faster load times</span>
+                                                <span>UI tweaks and visual improvements</span>
                                             </div>
                                             <div className="version-update-item-small">
                                                 <span className="update-bullet">🔧</span>
@@ -10930,7 +10944,7 @@ const generateAiDraft = async (email) => {
                                             </div>
                                             <div className="version-update-item-small">
                                                 <span className="update-bullet">📱</span>
-                                                <span>Better mobile responsiveness</span>
+                                                <span>Mobile optimizations for better responsiveness</span>
                                             </div>
                                         </div>
                                     </div>
