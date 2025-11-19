@@ -6075,10 +6075,11 @@ if (tokensParam) {
             setShowConnectionAnimation(true);
 
             // Load and play the connection sound
-    const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
+            const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
 
-    connectionSound.play().catch(err => {
-        console.log('Connection sound failed:', err);
+            connectionSound.play().catch(err => {
+                console.log('Connection sound failed:', err);
+            });
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
