@@ -45,10 +45,24 @@ export default async function handler(req, res) {
         console.log('Response status:', response.status);
 
         if (!response.ok) {
-            const errorData = await response.json();
-            console.error('❌ Outlook send failed:', errorData);
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch (e) {
+                errorData = { error: 'Unable to parse error response' };
+            }
+            console.error('❌ Outlook send failed:', response.status, errorData);
+
+            // Provide more helpful error messages
+            let errorMessage = 'Failed to send email';
+            if (response.status === 403) {
+                errorMessage = 'Access token expired or invalid. Please reconnect your Outlook account.';
+            } else if (response.status === 401) {
+                errorMessage = 'Unauthorized. Please reconnect your Outlook account.';
+            }
+
             return res.status(response.status).json({
-                message: 'Failed to send email',
+                message: errorMessage,
                 details: errorData
             });
         }
