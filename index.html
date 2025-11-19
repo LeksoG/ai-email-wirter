@@ -6411,10 +6411,10 @@ useEffect(() => {
                         clearTimeout(grammarCheckTimeout);
                     }
 
-                    // Set new timeout to check grammar after 3 seconds of no typing
+                    // Set new timeout to check grammar after 10 seconds of no typing (reduced API calls)
                     const timeout = setTimeout(() => {
                         checkGrammarInText(emailText, false);
-                    }, 3000);
+                    }, 10000);
 
                     setGrammarCheckTimeout(timeout);
 
@@ -6431,10 +6431,10 @@ useEffect(() => {
                         clearTimeout(grammarCheckTimeout);
                     }
 
-                    // Set new timeout to check grammar after 3 seconds of no typing
+                    // Set new timeout to check grammar after 10 seconds of no typing (reduced API calls)
                     const timeout = setTimeout(() => {
                         checkGrammarInText(emailReply, true);
-                    }, 3000);
+                    }, 10000);
 
                     setGrammarCheckTimeout(timeout);
 
@@ -7312,7 +7312,10 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
             // Grammar check function
             const checkGrammarInText = async (text, isReplyText = false) => {
-                if (!checkGrammar || !text || text.trim().length === 0) return;
+                if (!checkGrammar || !text || text.trim().length === 0 || isCheckingGrammar) return;
+
+                // Only check if text is long enough (at least 10 characters)
+                if (text.trim().length < 10) return;
 
                 setIsCheckingGrammar(true);
                 try {
@@ -7325,6 +7328,19 @@ const fetchOutlookSentEmails = async (accessToken) => {
                             temperature: 0.3
                         })
                     });
+
+                    // Handle rate limiting
+                    if (response.status === 429) {
+                        console.log('⚠️ Rate limit reached, skipping grammar check');
+                        setIsCheckingGrammar(false);
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        console.error('❌ Grammar check failed:', response.status);
+                        setIsCheckingGrammar(false);
+                        return;
+                    }
 
                     const data = await response.json();
                     const correctedText = data.result?.trim();
@@ -8371,7 +8387,7 @@ const generateAiDraft = async (email) => {
                                                     ✅ Auto Grammar Check
                                                 </div>
                                                 <div className="text-xs" style={{color: darkMode ? '#aaa' : '#666', marginTop: '4px'}}>
-                                                    Automatically detect and correct grammar mistakes as you type
+                                                    Automatically detect and correct grammar after you finish typing (10 sec delay)
                                                 </div>
                                             </div>
                                             <button
