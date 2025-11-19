@@ -668,134 +668,171 @@
             border-color: rgba(239, 68, 68, 0.5);
         }
 
-        /* Account Details Container */
-        .account-details-container {
+        /* Unified Account Details Section */
+        .account-details-section-unified {
+            background: linear-gradient(135deg, rgba(30, 30, 35, 0.95), rgba(20, 20, 25, 0.9));
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        body.dark-mode .account-details-section-unified {
+            background: linear-gradient(135deg, rgba(30, 30, 35, 0.95), rgba(20, 20, 25, 0.9));
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .account-header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
             margin-bottom: 24px;
         }
 
-        /* Email Connections Section in Account */
-        .account-connections {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid rgba(99, 102, 241, 0.1);
+        @media (max-width: 768px) {
+            .account-header {
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+                gap: 12px;
+            }
+
+            .account-logout-btn {
+                grid-column: 1 / -1;
+                justify-self: center;
+                width: 100%;
+            }
         }
 
-        body.dark-mode .account-connections {
-            border-top-color: rgba(99, 102, 241, 0.2);
+        /* Email Connections Section in Account */
+        .account-connections-unified {
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .connection-label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
-            color: #6b7280;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        body.dark-mode .connection-label {
             color: #9ca3af;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .connection-buttons-row {
+        .connection-buttons-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
 
         @media (max-width: 768px) {
-            .connection-buttons-row {
+            .connection-buttons-grid {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 12px;
             }
         }
 
-        .connection-btn {
+        /* Connection Buttons - Unified Dark Theme */
+        .connection-btn-unified {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 2px solid;
+            gap: 10px;
+            padding: 14px 20px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(40, 40, 45, 0.5);
+            backdrop-filter: blur(10px);
         }
 
-        .connection-btn.gmail-btn {
-            background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1));
-            border-color: rgba(66, 133, 244, 0.3);
+        .connection-btn-unified:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(50, 50, 55, 0.7);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .gmail-btn-unified {
             color: #4285F4;
         }
 
-        .connection-btn.gmail-btn:hover {
-            background: linear-gradient(135deg, rgba(66, 133, 244, 0.2), rgba(52, 168, 83, 0.2));
-            border-color: rgba(66, 133, 244, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
+        .gmail-btn-unified:hover {
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
         }
 
-        .connection-btn.outlook-btn {
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.1), rgba(0, 90, 158, 0.1));
-            border-color: rgba(0, 120, 212, 0.3);
+        .outlook-btn-unified {
             color: #0078D4;
         }
 
-        .connection-btn.outlook-btn:hover {
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.2), rgba(0, 90, 158, 0.2));
-            border-color: rgba(0, 120, 212, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
+        .outlook-btn-unified:hover {
+            box-shadow: 0 8px 20px rgba(0, 120, 212, 0.3);
         }
 
-        .connection-btn.connected {
-            cursor: default;
-            border-color: rgba(16, 185, 129, 0.3);
+        .connected-unified {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: rgba(40, 40, 45, 0.5);
+            backdrop-filter: blur(10px);
         }
 
-        .connection-btn.gmail-connected {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-            color: #10b981;
+        .gmail-connected-unified {
+            color: #4285F4;
+            border-color: rgba(66, 133, 244, 0.3);
         }
 
-        .connection-btn.outlook-connected {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-            color: #10b981;
+        .outlook-connected-unified {
+            color: #0078D4;
+            border-color: rgba(0, 120, 212, 0.3);
         }
 
-        .connection-icon {
-            width: 20px;
-            height: 20px;
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .connection-icon-unified {
+            width: 22px;
+            height: 22px;
             flex-shrink: 0;
         }
 
-        .disconnect-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            font-size: 16px;
+        .connection-text {
+            font-size: 14px;
             font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
         }
 
-        .disconnect-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.5);
-            transform: translateY(-50%) scale(1.1);
+        /* Disconnect Button - Oval with White Outline */
+        .disconnect-btn-unified {
+            padding: 6px 16px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: #e5e5e5;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .disconnect-btn-unified:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
 
         /* Connection Animation Popup */
@@ -6030,7 +6067,7 @@ if (tokensParam) {
             setShowConnectionAnimation(true);
 
             // Play connection sound
-            const connectionSound = new Audio('/sounds/effect-for-logo-intro-186595.mp3');
+            const connectionSound = new Audio('/sounds/connection.mp3');
             connectionSound.play().catch(err => console.log('Sound play failed:', err));
 
             // Close animation after 2 seconds and show notification
@@ -7077,6 +7114,13 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
         console.log('📡 Outlook sent API response status:', response.status);
 
+        // Handle 404 before trying to parse JSON
+        if (response.status === 404) {
+            console.warn('⚠️ Outlook sent endpoint not available yet');
+            setOutlookSentEmails([]);
+            return;
+        }
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -7092,13 +7136,6 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 setOutlookConnected(false);
                 setOutlookSentEmails([]);
                 showNotification('⚠️ Outlook session expired. Please reconnect.');
-                return;
-            }
-
-            // If endpoint doesn't exist yet, just return empty array
-            if (response.status === 404) {
-                console.warn('⚠️ Outlook sent endpoint not available yet');
-                setOutlookSentEmails([]);
                 return;
             }
 
@@ -7787,8 +7824,9 @@ const generateAiDraft = async (email) => {
 
                             {/* Account Details Section - Show when logged in */}
                             {isLoggedIn && userData && (
-                                <div className="account-details-container">
-                                    <div className="account-details-section">
+                                <div className="account-details-section-unified">
+                                    {/* User Profile Header */}
+                                    <div className="account-header">
                                         <div className="account-profile-icon">
                                             {userData.name.charAt(0).toUpperCase()}
                                         </div>
@@ -7805,26 +7843,28 @@ const generateAiDraft = async (email) => {
                                     </div>
 
                                     {/* Email Connection Buttons */}
-                                    <div className="account-connections">
-                                        <div className="connection-label">Email Accounts</div>
-                                        <div className="connection-buttons-row">
+                                    <div className="account-connections-unified">
+                                        <div className="connection-label">Connected Email Accounts</div>
+                                        <div className="connection-buttons-grid">
                                             {/* Gmail Connection Button */}
                                             {!emailConnected ? (
                                                 <button
                                                     onClick={handleGmailConnect}
-                                                    className="connection-btn gmail-btn"
+                                                    className="connection-btn-unified gmail-btn-unified"
                                                 >
-                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#4285F4">
+                                                    <svg className="connection-icon-unified" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                                     </svg>
-                                                    <span>Connect Gmail</span>
+                                                    <span className="connection-text">Connect Gmail</span>
                                                 </button>
                                             ) : (
-                                                <div className="connection-btn connected gmail-connected">
-                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#10b981">
-                                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
-                                                    </svg>
-                                                    <span>Gmail Connected</span>
+                                                <div className="connection-btn-unified connected-unified gmail-connected-unified">
+                                                    <div className="connection-status">
+                                                        <svg className="connection-icon-unified" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                                                        </svg>
+                                                        <span className="connection-text">Gmail</span>
+                                                    </div>
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -7836,9 +7876,9 @@ const generateAiDraft = async (email) => {
                                                             setSentEmails([]);
                                                             setUserEmail('');
                                                         }}
-                                                        className="disconnect-btn"
+                                                        className="disconnect-btn-unified"
                                                     >
-                                                        ×
+                                                        Disconnect
                                                     </button>
                                                 </div>
                                             )}
@@ -7847,21 +7887,23 @@ const generateAiDraft = async (email) => {
                                             {!outlookConnected ? (
                                                 <button
                                                     onClick={handleOutlookConnect}
-                                                    className="connection-btn outlook-btn"
+                                                    className="connection-btn-unified outlook-btn-unified"
                                                 >
-                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#0078D4">
+                                                    <svg className="connection-icon-unified" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#0078D4"/>
+                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="currentColor"/>
                                                     </svg>
-                                                    <span>Connect Outlook</span>
+                                                    <span className="connection-text">Connect Outlook</span>
                                                 </button>
                                             ) : (
-                                                <div className="connection-btn connected outlook-connected">
-                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#10b981">
-                                                        <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#10b981"/>
-                                                    </svg>
-                                                    <span>Outlook Connected</span>
+                                                <div className="connection-btn-unified connected-unified outlook-connected-unified">
+                                                    <div className="connection-status">
+                                                        <svg className="connection-icon-unified" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                                            <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="currentColor"/>
+                                                        </svg>
+                                                        <span className="connection-text">Outlook</span>
+                                                    </div>
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -7870,9 +7912,9 @@ const generateAiDraft = async (email) => {
                                                             localStorage.removeItem('outlookTokens');
                                                             setOutlookEmails([]);
                                                         }}
-                                                        className="disconnect-btn"
+                                                        className="disconnect-btn-unified"
                                                     >
-                                                        ×
+                                                        Disconnect
                                                     </button>
                                                 </div>
                                             )}
