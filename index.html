@@ -668,6 +668,343 @@
             border-color: rgba(239, 68, 68, 0.5);
         }
 
+        /* Account Details Container */
+        .account-details-container {
+            margin-bottom: 24px;
+        }
+
+        /* Email Connections Section in Account */
+        .account-connections {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(99, 102, 241, 0.1);
+        }
+
+        body.dark-mode .account-connections {
+            border-top-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .connection-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b7280;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark-mode .connection-label {
+            color: #9ca3af;
+        }
+
+        .connection-buttons-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .connection-buttons-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .connection-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .connection-btn.gmail-btn {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1));
+            border-color: rgba(66, 133, 244, 0.3);
+            color: #4285F4;
+        }
+
+        .connection-btn.gmail-btn:hover {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.2), rgba(52, 168, 83, 0.2));
+            border-color: rgba(66, 133, 244, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
+        }
+
+        .connection-btn.outlook-btn {
+            background: linear-gradient(135deg, rgba(0, 120, 212, 0.1), rgba(0, 90, 158, 0.1));
+            border-color: rgba(0, 120, 212, 0.3);
+            color: #0078D4;
+        }
+
+        .connection-btn.outlook-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 120, 212, 0.2), rgba(0, 90, 158, 0.2));
+            border-color: rgba(0, 120, 212, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 120, 212, 0.2);
+        }
+
+        .connection-btn.connected {
+            cursor: default;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .connection-btn.gmail-connected {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            color: #10b981;
+        }
+
+        .connection-btn.outlook-connected {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            color: #10b981;
+        }
+
+        .connection-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .disconnect-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .disconnect-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Connection Animation Popup */
+        .connection-animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .connection-animation-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(249, 250, 251, 0.9));
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body.dark-mode .connection-animation-container {
+            background: linear-gradient(135deg, rgba(40, 40, 40, 0.95), rgba(30, 30, 30, 0.9));
+        }
+
+        .connection-animation-content {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .connection-account-logo,
+        .connection-provider-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-circle,
+        .provider-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .account-circle {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: 4px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .provider-circle {
+            border: 4px solid;
+        }
+
+        .gmail-circle {
+            background: linear-gradient(135deg, #4285F4 0%, #34a853 100%);
+            border-color: rgba(66, 133, 244, 0.3);
+            box-shadow: 0 0 30px rgba(66, 133, 244, 0.4);
+        }
+
+        .outlook-circle {
+            background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
+            border-color: rgba(0, 120, 212, 0.3);
+            box-shadow: 0 0 30px rgba(0, 120, 212, 0.4);
+        }
+
+        .provider-circle svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .account-label,
+        .provider-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        body.dark-mode .account-label,
+        body.dark-mode .provider-label {
+            color: #9ca3af;
+        }
+
+        .connection-line-container {
+            position: relative;
+            width: 120px;
+            height: 4px;
+        }
+
+        .connection-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 2px;
+            animation: lineGrow 2s ease-in-out infinite;
+        }
+
+        .connection-pulse {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            background: #8b5cf6;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 20px #8b5cf6;
+            animation: pulseMoveRight 2s ease-in-out infinite;
+        }
+
+        .connection-status-text {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            animation: fadeInOut 2s ease-in-out infinite;
+        }
+
+        body.dark-mode .connection-status-text {
+            color: #e5e5e5;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes lineGrow {
+            0% {
+                width: 0;
+                opacity: 0.5;
+            }
+            50% {
+                width: 100%;
+                opacity: 1;
+            }
+            100% {
+                width: 0;
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes pulseMoveRight {
+            0% {
+                left: 0;
+                opacity: 0;
+            }
+            50% {
+                left: 50%;
+                opacity: 1;
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
         /* Shake animation for error messages */
         @keyframes shake {
             0%, 100% {
@@ -5589,6 +5926,10 @@ body.dark-mode .custom-language-select option:hover {
             const [isSwiping, setIsSwiping] = useState(false);
             const [inboxViewMode, setInboxViewMode] = useState('tabs'); // 'tabs', 'received', 'sent'
 
+            // Connection animation states
+            const [showConnectionAnimation, setShowConnectionAnimation] = useState(false);
+            const [connectionProvider, setConnectionProvider] = useState(null); // 'gmail' or 'outlook'
+
             // Fullscreen email viewer states
             const [showFullscreenEmail, setShowFullscreenEmail] = useState(false);
             const [fullscreenEmailText, setFullscreenEmailText] = useState('');
@@ -5671,11 +6012,11 @@ if (tokensParam) {
 
         if (provider === 'outlook') {
             console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
-            
+
             localStorage.setItem('outlookTokens', JSON.stringify(tokens));
             localStorage.setItem('outlookConnected', 'true');
             localStorage.removeItem('oauth_in_progress');
-            
+
             setOutlookConnected(true);
             setActiveProvider('outlook');
 
@@ -5683,15 +6024,24 @@ if (tokensParam) {
             fetchOutlookSentEmails(tokens.access_token);
 
             console.log('✅ Outlook connected!');
-            
-            // Show bottom notification instead of alert
+
+            // Show connection animation popup
+            setConnectionProvider('outlook');
+            setShowConnectionAnimation(true);
+
+            // Play connection sound
+            const connectionSound = new Audio('/sounds/connection.mp3');
+            connectionSound.play().catch(err => console.log('Sound play failed:', err));
+
+            // Close animation after 2 seconds and show notification
             setTimeout(() => {
+                setShowConnectionAnimation(false);
                 showNotification('📮 Outlook connected successfully!');
-            }, 500);
-            
+            }, 2000);
+
         } else if (provider === 'gmail' || !provider) {
             console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
-            
+
             localStorage.setItem('gmailTokens', JSON.stringify(tokens));
             localStorage.setItem('emailConnected', 'true');
             localStorage.removeItem('oauth_in_progress');
@@ -5712,19 +6062,28 @@ if (tokensParam) {
                 setUserName(name);
                 localStorage.setItem('userName', name);
             })
-            .catch(function(err) { 
-                console.error('Error fetching user info:', err); 
+            .catch(function(err) {
+                console.error('Error fetching user info:', err);
             });
 
             fetchGmailEmails(tokens.access_token);
             fetchSentEmails(tokens.access_token);
-            
+
             console.log('✅ Gmail connected!');
-            
-            // Show bottom notification instead of alert
+
+            // Show connection animation popup
+            setConnectionProvider('gmail');
+            setShowConnectionAnimation(true);
+
+            // Play connection sound
+            const connectionSound = new Audio('/sounds/connection.mp3');
+            connectionSound.play().catch(err => console.log('Sound play failed:', err));
+
+            // Close animation after 2 seconds and show notification
             setTimeout(() => {
+                setShowConnectionAnimation(false);
                 showNotification('📧 Gmail connected successfully!');
-            }, 500);
+            }, 2000);
         }
 
         // Clean URL
@@ -7428,20 +7787,97 @@ const generateAiDraft = async (email) => {
 
                             {/* Account Details Section - Show when logged in */}
                             {isLoggedIn && userData && (
-                                <div className="account-details-section">
-                                    <div className="account-profile-icon">
-                                        {userData.name.charAt(0).toUpperCase()}
+                                <div className="account-details-container">
+                                    <div className="account-details-section">
+                                        <div className="account-profile-icon">
+                                            {userData.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="account-info">
+                                            <div className="account-name">{userData.name}</div>
+                                            <div className="account-email">{userData.email}</div>
+                                        </div>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="account-logout-btn"
+                                        >
+                                            Logout
+                                        </button>
                                     </div>
-                                    <div className="account-info">
-                                        <div className="account-name">{userData.name}</div>
-                                        <div className="account-email">{userData.email}</div>
+
+                                    {/* Email Connection Buttons */}
+                                    <div className="account-connections">
+                                        <div className="connection-label">Email Accounts</div>
+                                        <div className="connection-buttons-row">
+                                            {/* Gmail Connection Button */}
+                                            {!emailConnected ? (
+                                                <button
+                                                    onClick={handleGmailConnect}
+                                                    className="connection-btn gmail-btn"
+                                                >
+                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#4285F4">
+                                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                                                    </svg>
+                                                    <span>Connect Gmail</span>
+                                                </button>
+                                            ) : (
+                                                <div className="connection-btn connected gmail-connected">
+                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#10b981">
+                                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                                                    </svg>
+                                                    <span>Gmail Connected</span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setEmailConnected(false);
+                                                            localStorage.removeItem('emailConnected');
+                                                            localStorage.removeItem('gmailTokens');
+                                                            localStorage.removeItem('userEmail');
+                                                            setGmailEmails([]);
+                                                            setSentEmails([]);
+                                                            setUserEmail('');
+                                                        }}
+                                                        className="disconnect-btn"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* Outlook Connection Button */}
+                                            {!outlookConnected ? (
+                                                <button
+                                                    onClick={handleOutlookConnect}
+                                                    className="connection-btn outlook-btn"
+                                                >
+                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#0078D4">
+                                                        <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#0078D4"/>
+                                                    </svg>
+                                                    <span>Connect Outlook</span>
+                                                </button>
+                                            ) : (
+                                                <div className="connection-btn connected outlook-connected">
+                                                    <svg className="connection-icon" viewBox="0 0 24 24" fill="#10b981">
+                                                        <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#10b981"/>
+                                                    </svg>
+                                                    <span>Outlook Connected</span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setOutlookConnected(false);
+                                                            localStorage.removeItem('outlookConnected');
+                                                            localStorage.removeItem('outlookTokens');
+                                                            setOutlookEmails([]);
+                                                        }}
+                                                        className="disconnect-btn"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="account-logout-btn"
-                                    >
-                                        Logout
-                                    </button>
                                 </div>
                             )}
 
@@ -7694,101 +8130,6 @@ const generateAiDraft = async (email) => {
                                             </div>
                                             {autoPrioritize && <div className="mode-checkmark">✓ Active</div>}
                                         </button>
-                                    </div>
-                                </div>
-
-                                {/* Email Connections Section */}
-                                <div className="pt-6 border-t border-gray-300">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                        📧 Email Connections
-                                    </label>
-                                    <p className="text-xs text-gray-600 mb-4">
-                                        Connect your email accounts to access and transform your messages
-                                    </p>
-
-                                    {/* Gmail Connection */}
-                                    <div className="mb-4">
-                                        <div className="text-xs font-semibold text-gray-600 mb-2">Gmail</div>
-                                        {!emailConnected ? (
-                                            <button
-                                                onClick={handleGmailConnect}
-                                                className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
-                                            >
-                                                <svg className="gmail-icon gmail-connecting" viewBox="0 0 24 24" fill="#4285F4">
-                                                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
-                                                </svg>
-                                                Connect Gmail
-                                            </button>
-                                        ) : (
-                                            <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
-                                                <div className="flex items-center gap-3">
-                                                    <svg className="gmail-icon gmail-connected" viewBox="0 0 24 24" fill="#10b981">
-                                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
-                                                    </svg>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-medium text-gray-700">Connected to Gmail</span>
-                                                        {userEmail && <span className="text-xs text-gray-600 mt-1">{userEmail}</span>}
-                                                    </div>
-                                                </div>
-                                                <button
-                                                    onClick={() => {
-                                                        setEmailConnected(false);
-                                                        localStorage.removeItem('emailConnected');
-                                                        localStorage.removeItem('gmailTokens');
-                                                        localStorage.removeItem('userEmail');
-                                                        setGmailEmails([]);
-                                                        setSentEmails([]);
-                                                        setUserEmail('');
-                                                        console.log('📧 Gmail disconnected');
-                                                    }}
-                                                    className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
-                                                >
-                                                    Disconnect
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Outlook Connection */}
-                                    <div>
-                                        <div className="text-xs font-semibold text-gray-600 mb-2">Outlook</div>
-                                        {!outlookConnected ? (
-                                            <button
-                                                onClick={handleOutlookConnect}
-                                                className="w-full px-6 py-3 glass-effect rounded-full font-medium transition-all oval-button flex items-center justify-center gap-3 unified-button border-2 border-white text-gray-800"
-                                            >
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#0078D4">
-                                                    <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                                    <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#0078D4"/>
-                                                </svg>
-                                                Connect Outlook
-                                            </button>
-                                        ) : (
-                                            <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
-                                                <div className="flex items-center gap-3">
-                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#10b981">
-                                                        <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#10b981"/>
-                                                    </svg>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-sm font-medium text-gray-700">Connected to Outlook</span>
-                                                        <span className="text-xs text-gray-600 mt-1">Account connected</span>
-                                                    </div>
-                                                </div>
-                                                <button
-                                                    onClick={() => {
-                                                        setOutlookConnected(false);
-                                                        localStorage.removeItem('outlookConnected');
-                                                        localStorage.removeItem('outlookTokens');
-                                                        setOutlookEmails([]);
-                                                        console.log('📮 Outlook disconnected');
-                                                    }}
-                                                    className="px-4 py-2 glass-effect rounded-full text-red-600 hover:text-red-700 text-xs font-medium transition-all unified-button border-2 border-white"
-                                                >
-                                                    Disconnect
-                                                </button>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -10020,6 +10361,56 @@ const generateAiDraft = async (email) => {
                                     <button onClick={handleCloseVersionModal} className="version-cta-btn">
                                         Got it! Let's go 🎉
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Connection Animation Popup */}
+                    {showConnectionAnimation && (
+                        <div className="connection-animation-overlay">
+                            <div className="connection-animation-container">
+                                <div className="connection-animation-content">
+                                    {/* User Account Logo */}
+                                    <div className="connection-account-logo">
+                                        <div className="account-circle">
+                                            {userData && userData.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div className="account-label">Your Account</div>
+                                    </div>
+
+                                    {/* Connection Line Animation */}
+                                    <div className="connection-line-container">
+                                        <div className="connection-line"></div>
+                                        <div className="connection-pulse"></div>
+                                    </div>
+
+                                    {/* Email Provider Logo */}
+                                    <div className="connection-provider-logo">
+                                        {connectionProvider === 'gmail' ? (
+                                            <>
+                                                <div className="provider-circle gmail-circle">
+                                                    <svg viewBox="0 0 24 24" fill="#fff">
+                                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                                                    </svg>
+                                                </div>
+                                                <div className="provider-label">Gmail</div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="provider-circle outlook-circle">
+                                                    <svg viewBox="0 0 24 24" fill="#fff">
+                                                        <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#fff"/>
+                                                    </svg>
+                                                </div>
+                                                <div className="provider-label">Outlook</div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="connection-status-text">
+                                    Connecting to {connectionProvider === 'gmail' ? 'Gmail' : 'Outlook'}...
                                 </div>
                             </div>
                         </div>
