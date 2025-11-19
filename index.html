@@ -7253,7 +7253,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
                         },
                         body: JSON.stringify({
                             prompt: prompt,
-                            text: text
+                            text: text,
+                            model: selectedModel
                         })
                     });
 
@@ -7336,7 +7337,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
                         body: JSON.stringify({
                             prompt: 'Check this text for grammar errors and return ONLY the corrected version without any explanations or additional text. If there are no errors, return the text unchanged.',
                             text: textToCheck,
-                            temperature: 0.3
+                            temperature: 0.3,
+                            model: selectedModel
                         })
                     });
 
@@ -7894,7 +7896,8 @@ const generateAiDraft = async (email) => {
             body: JSON.stringify({
                 prompt: `Write a professional and friendly email reply to this. Start with "${greeting}" and end with "${closing}". Address their main points in a warm, helpful tone.`,
                 text: contextText,
-                temperature: 0.7
+                temperature: 0.7,
+                model: selectedModel
             })
         });
 
@@ -7941,7 +7944,8 @@ const generateAiDraft = async (email) => {
                         body: JSON.stringify({
                             prompt: finalPrompt,
                             text: emailReply,
-                            temperature: 0.7
+                            temperature: 0.7,
+                            model: selectedModel
                         })
                     });
 
@@ -8650,7 +8654,8 @@ const generateAiDraft = async (email) => {
                                                 >
                                                     {[
                                                         { name: 'Ink 2.0', description: 'Fast & efficient - best for small email tasks' },
-                                                        { name: 'Ink 2.5', description: 'More powerful & detailed - best for more complex email tasks' }
+                                                        { name: 'Ink 2.5', description: 'More powerful & detailed - best for more complex email tasks' },
+                                                        { name: 'Ink 3.5', description: 'Advanced AI using Gemini - most powerful for all tasks' }
                                                     ].map((model) => (
                                                         <button
                                                             key={model.name}
@@ -10736,7 +10741,8 @@ const generateAiDraft = async (email) => {
                                                     <div className="inline-model-dropdown">
                                                         {[
                                                             { name: 'Ink 2.0', description: 'Fast & efficient - Mistral AI Small Latest' },
-                                                            { name: 'Ink 2.5', description: 'More powerful & detailed - Mistral AI Medium' }
+                                                            { name: 'Ink 2.5', description: 'More powerful & detailed - Mistral AI Medium' },
+                                                            { name: 'Ink 3.5', description: 'Advanced AI using Gemini - most powerful' }
                                                         ].map((model) => (
                                                             <button
                                                                 key={model.name}
