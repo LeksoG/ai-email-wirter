@@ -694,6 +694,14 @@
         }
 
         @media (max-width: 768px) {
+            .account-details-section-unified {
+                padding: 20px;
+                margin-left: -12px;
+                margin-right: -12px;
+                width: calc(100% + 24px);
+                border-radius: 16px;
+            }
+
             .account-header {
                 grid-template-columns: auto 1fr;
                 grid-template-rows: auto auto;
@@ -1585,6 +1593,17 @@
         .send-button-float:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Mobile: Make send button smaller */
+        @media (max-width: 768px) {
+            .send-button-float {
+                padding: 10px 16px;
+                font-size: 13px;
+                bottom: 12px;
+                right: 12px;
+                gap: 6px;
+            }
         }
 
         @keyframes float-in {
@@ -6419,10 +6438,10 @@ useEffect(() => {
                         clearTimeout(grammarCheckTimeout);
                     }
 
-                    // Set new timeout to check grammar after 10 seconds of no typing (reduced API calls)
+                    // Set new timeout to check grammar after 4 seconds of no typing (reduced API calls)
                     const timeout = setTimeout(() => {
                         checkGrammarInText(emailText, false);
-                    }, 10000);
+                    }, 4000);
 
                     setGrammarCheckTimeout(timeout);
 
@@ -6439,10 +6458,10 @@ useEffect(() => {
                         clearTimeout(grammarCheckTimeout);
                     }
 
-                    // Set new timeout to check grammar after 10 seconds of no typing (reduced API calls)
+                    // Set new timeout to check grammar after 4 seconds of no typing (reduced API calls)
                     const timeout = setTimeout(() => {
                         checkGrammarInText(emailReply, true);
-                    }, 10000);
+                    }, 4000);
 
                     setGrammarCheckTimeout(timeout);
 
@@ -9076,7 +9095,7 @@ const generateAiDraft = async (email) => {
            return (
     <div className="min-h-screen relative">
         {/* Mobile Inbox Button */}
-        {(emailConnected || outlookConnected) && (
+        {(emailConnected || outlookConnected) && currentPage === 'home' && (
             <button
                 className={`mobile-inbox-button ${newEmailCount > 0 ? 'has-new' : ''}`}
                 onClick={() => setMobileInboxOpen(true)}
@@ -9099,7 +9118,7 @@ const generateAiDraft = async (email) => {
         )}
 
         {/* Mobile Inbox Fullscreen */}
-        {(emailConnected || outlookConnected) && (
+        {(emailConnected || outlookConnected) && currentPage === 'home' && (
             <div className={`mobile-inbox-fullscreen ${mobileInboxOpen ? 'active' : ''}`}>
                 {/* Header with Close Button */}
                 <div className="mobile-inbox-header">
@@ -9344,7 +9363,7 @@ const generateAiDraft = async (email) => {
                                 )}
 
                               {/* Desktop Layout: Inbox Sidebar + Content Area */}
-                                {(emailConnected || outlookConnected) && (
+                                {(emailConnected || outlookConnected) && currentPage === 'home' && (
                                     <>
                                     <div className="desktop-inbox-layout">
                                         {/* Left Sidebar - Inbox */}
