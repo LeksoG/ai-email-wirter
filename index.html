@@ -6074,11 +6074,11 @@ if (tokensParam) {
             setConnectionProvider('outlook');
             setShowConnectionAnimation(true);
 
-            // CONNECTION SOUND - Add your custom connection sound file here
-            // Example: Place your sound file (e.g., effect-for-logo-intro-186595.mp3) in the root directory
-            // Then uncomment and update the line below:
-            // const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
-            // connectionSound.play().catch(err => console.log('Connection sound failed:', err));
+            // Load and play the connection sound
+    const connectionSound = new Audio('effect-for-logo-intro-186595.mp3');
+
+    connectionSound.play().catch(err => {
+        console.log('Connection sound failed:', err);
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
