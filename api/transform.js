@@ -49,8 +49,8 @@ module.exports = async function handler(req, res) {
 
       console.log('Calling Gemini API...');
 
-      // Call Gemini API
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+      // Call Gemini API (using v1 endpoint)
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -149,4 +149,3 @@ module.exports = async function handler(req, res) {
   }
 
 };
-
