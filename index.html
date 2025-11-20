@@ -297,6 +297,57 @@
             overflow: hidden;
         }
 
+        .greeting-container {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .greeting-container.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-10px);
+            pointer-events: none;
+        }
+
+        .greeting-oval {
+            padding: 10px 24px;
+            border-radius: 50px;
+            background: transparent;
+            display: inline-block;
+            animation: expand-text 0.3s ease-out;
+            max-width: 600px;
+        }
+
+        @keyframes expand-text {
+            0% {
+                max-width: 0;
+                opacity: 0;
+            }
+            100% {
+                max-width: 600px;
+                opacity: 1;
+            }
+        }
+
+        /* Ladder animation for cards */
+        .ladder-item {
+            animation: ladder-slide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+
+        @keyframes ladder-slide {
+            0% {
+                opacity: 0;
+                transform: translateX(-100px) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) rotate(0deg);
+            }
+        }
+
         /* Profile Customization Popup */
         .profile-popup-overlay {
             position: fixed;
@@ -380,30 +431,89 @@
             margin: 20px 0;
         }
 
-        .profile-image-option {
+        .profile-texture-option {
             width: 100%;
             aspect-ratio: 1;
             border-radius: 12px;
             cursor: pointer;
             border: 3px solid transparent;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(99, 102, 241, 0.1);
+            background-size: 200% 200%;
+            animation: texture-shift 8s ease infinite;
+            position: relative;
+            overflow: hidden;
         }
 
-        .profile-image-option:hover {
+        @keyframes texture-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .profile-texture-option::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: inherit;
+            filter: brightness(1.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-texture-option:hover::before {
+            opacity: 0.5;
+        }
+
+        .profile-texture-option:hover {
             transform: scale(1.15);
-            background: rgba(99, 102, 241, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .profile-image-option.selected {
+        .profile-texture-option.selected {
             border-color: white;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
             transform: scale(1.1);
-            background: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Animated texture patterns */
+        .texture-gradient-wave {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #667eea 75%, #764ba2 100%);
+        }
+
+        .texture-ocean {
+            background: linear-gradient(45deg, #2193b0 0%, #6dd5ed 25%, #2193b0 50%, #6dd5ed 75%, #2193b0 100%);
+        }
+
+        .texture-sunset {
+            background: linear-gradient(45deg, #ff6b6b 0%, #feca57 25%, #ee5a6f 50%, #ff6b6b 75%, #feca57 100%);
+        }
+
+        .texture-forest {
+            background: linear-gradient(45deg, #134e5e 0%, #71b280 25%, #134e5e 50%, #71b280 75%, #134e5e 100%);
+        }
+
+        .texture-cosmic {
+            background: linear-gradient(45deg, #360033 0%, #0b8793 25%, #360033 50%, #0b8793 75%, #360033 100%);
+        }
+
+        .texture-aurora {
+            background: linear-gradient(45deg, #00c9ff 0%, #92fe9d 25%, #00c9ff 50%, #92fe9d 75%, #00c9ff 100%);
+        }
+
+        .texture-fire {
+            background: linear-gradient(45deg, #f12711 0%, #f5af19 25%, #f12711 50%, #f5af19 75%, #f12711 100%);
+        }
+
+        .texture-neon {
+            background: linear-gradient(45deg, #fa709a 0%, #fee140 25%, #fa709a 50%, #fee140 75%, #fa709a 100%);
+        }
+
+        /* Profile ring with animated texture */
+        .account-profile-icon.with-texture {
+            background-size: 200% 200% !important;
+            animation: texture-shift 8s ease infinite !important;
         }
 
         .profile-popup-buttons {
@@ -6647,6 +6757,21 @@ useEffect(() => {
     }
 }, [outlookConnected]);
 
+            // Click outside to close inbox search
+            useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (showInboxSearchSuggestions) {
+                        const searchContainer = document.querySelector('.inbox-search-container');
+                        if (searchContainer && !searchContainer.contains(event.target)) {
+                            setShowInboxSearchSuggestions(false);
+                        }
+                    }
+                };
+
+                document.addEventListener('mousedown', handleClickOutside);
+                return () => document.removeEventListener('mousedown', handleClickOutside);
+            }, [showInboxSearchSuggestions]);
+
             // Grammar check for main email text (debounced)
             useEffect(() => {
                 if (checkGrammar && emailText && emailText.trim().length > 0) {
@@ -8211,9 +8336,9 @@ const generateAiDraft = async (email) => {
                                     {/* User Profile Header */}
                                     <div className="account-header">
                                         <div
-                                            className="account-profile-icon"
+                                            className={`account-profile-icon ${selectedProfileIcon ? 'with-texture ' + selectedProfileIcon : ''}`}
                                             style={{
-                                                background: selectedProfileColor,
+                                                background: selectedProfileIcon ? undefined : selectedProfileColor,
                                                 cursor: 'pointer',
                                                 transition: 'all 0.3s ease'
                                             }}
@@ -8229,7 +8354,7 @@ const generateAiDraft = async (email) => {
                                                 e.currentTarget.style.transform = 'scale(1)';
                                             }}
                                         >
-                                            {selectedProfileIcon || userData.name.charAt(0).toUpperCase()}
+                                            {userData.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="account-info">
                                             <div className="account-name">{userData.name}</div>
@@ -8846,28 +8971,20 @@ const generateAiDraft = async (email) => {
                                 </div>
 
                                 {/* Dynamic Greeting with Typing Effect */}
-                                {currentGreeting && (
-                                    <div style={{
-                                        marginBottom: '16px',
-                                        padding: '12px 20px',
-                                        background: darkMode
-                                            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
-                                            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%)',
-                                        borderRadius: '12px',
-                                        border: darkMode ? '2px solid rgba(99, 102, 241, 0.3)' : '2px solid rgba(99, 102, 241, 0.2)',
-                                        textAlign: 'center',
-                                        animation: 'fadeIn 0.5s ease-out'
-                                    }}>
-                                        <span className="typing-text" style={{
-                                            fontSize: '16px',
-                                            fontWeight: '600',
-                                            color: darkMode ? '#ffffff' : '#374151',
-                                            display: 'inline-block'
-                                        }}>
-                                            {currentGreeting}
-                                        </span>
-                                    </div>
-                                )}
+                                <div className={`greeting-container ${emailText.trim().length > 0 ? 'hidden' : ''}`}>
+                                    {currentGreeting && (
+                                        <div className="greeting-oval">
+                                            <span className="typing-text" style={{
+                                                fontSize: '16px',
+                                                fontWeight: '600',
+                                                color: darkMode ? '#ffffff' : '#374151',
+                                                display: 'inline-block'
+                                            }}>
+                                                {currentGreeting}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
 
                                 {/* Current Tool Indicator */}
                                 <div className="flex items-center justify-between">
@@ -9749,7 +9866,7 @@ const generateAiDraft = async (email) => {
 
         {/* Example Demos */}
         <div className="space-y-4 text-left">
-            <div className="splash-card" style={{
+            <div className="ladder-item" style={{
                 padding: '16px 20px',
                 background: darkMode
                     ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
@@ -9758,7 +9875,7 @@ const generateAiDraft = async (email) => {
                 border: '2px solid rgba(99, 102, 241, 0.3)',
                 position: 'relative',
                 overflow: 'hidden',
-                animationDelay: '0.3s'
+                animationDelay: '0s'
             }}>
                 <div style={{fontSize: '12px', fontWeight: '700', color: '#6366f1', marginBottom: '8px'}}>
                     ✨ AI Summarization
@@ -9771,14 +9888,14 @@ const generateAiDraft = async (email) => {
                 </div>
             </div>
 
-            <div className="splash-card" style={{
+            <div className="ladder-item" style={{
                 padding: '16px 20px',
                 background: darkMode
                     ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)'
                     : 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.05) 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(16, 185, 129, 0.3)',
-                animationDelay: '0.5s'
+                animationDelay: '0.15s'
             }}>
                 <div style={{fontSize: '12px', fontWeight: '700', color: '#10b981', marginBottom: '8px'}}>
                     ⚡ Priority Detection
@@ -9791,14 +9908,14 @@ const generateAiDraft = async (email) => {
                 </div>
             </div>
 
-            <div className="splash-card" style={{
+            <div className="ladder-item" style={{
                 padding: '16px 20px',
                 background: darkMode
                     ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)'
                     : 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.05) 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(245, 158, 11, 0.3)',
-                animationDelay: '0.7s'
+                animationDelay: '0.3s'
             }}>
                 <div style={{fontSize: '12px', fontWeight: '700', color: '#f59e0b', marginBottom: '8px'}}>
                     ✍️ AI Reply Generation
@@ -11354,7 +11471,7 @@ const generateAiDraft = async (email) => {
                                     </div>
                                 </div>
 
-                                {/* Icon Selection */}
+                                {/* Texture Selection */}
                                 <div style={{marginBottom: '24px'}}>
                                     <h3 style={{
                                         fontSize: '16px',
@@ -11362,16 +11479,32 @@ const generateAiDraft = async (email) => {
                                         marginBottom: '12px',
                                         color: darkMode ? '#c7d2fe' : '#374151'
                                     }}>
-                                        Profile Avatar
+                                        Animated Textures
                                     </h3>
                                     <div className="profile-image-grid">
-                                        {['', '👨', '👩', '🧑', '👤', '🦊', '🐱', '🐼', '🦁', '🦄', '🤖', '👾'].map((icon, index) => (
+                                        {[
+                                            { name: 'None', class: '' },
+                                            { name: 'Wave', class: 'texture-gradient-wave' },
+                                            { name: 'Ocean', class: 'texture-ocean' },
+                                            { name: 'Sunset', class: 'texture-sunset' },
+                                            { name: 'Forest', class: 'texture-forest' },
+                                            { name: 'Cosmic', class: 'texture-cosmic' },
+                                            { name: 'Aurora', class: 'texture-aurora' },
+                                            { name: 'Fire', class: 'texture-fire' },
+                                            { name: 'Neon', class: 'texture-neon' }
+                                        ].map((texture, index) => (
                                             <div
                                                 key={index}
-                                                className={`profile-image-option ${tempProfileIcon === icon ? 'selected' : ''}`}
-                                                onClick={() => setTempProfileIcon(icon)}
+                                                className={`profile-texture-option ${texture.class} ${tempProfileIcon === texture.class ? 'selected' : ''}`}
+                                                onClick={() => setTempProfileIcon(texture.class)}
+                                                style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '600',
+                                                    color: texture.class ? '#ffffff' : (darkMode ? '#e5e5e5' : '#374151'),
+                                                    textShadow: texture.class ? '0 1px 2px rgba(0,0,0,0.5)' : 'none'
+                                                }}
                                             >
-                                                {icon || (userData ? userData.name.charAt(0).toUpperCase() : 'A')}
+                                                {texture.class === '' ? (userData ? userData.name.charAt(0).toUpperCase() : 'A') : texture.name}
                                             </div>
                                         ))}
                                     </div>
