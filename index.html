@@ -255,6 +255,176 @@
             }
         }
 
+        /* Splash Animation for Inbox Container */
+        @keyframes splash-paint {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+                border-radius: 50%;
+            }
+            30% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 0.8;
+                border-radius: 40%;
+            }
+            60% {
+                transform: scale(0.95) rotate(270deg);
+                opacity: 1;
+                border-radius: 30%;
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+                border-radius: 16px;
+            }
+        }
+
+        .splash-container {
+            animation: splash-paint 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center;
+        }
+
+        .splash-card {
+            animation: splash-card-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+
+        @keyframes splash-card-reveal {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.8) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+        }
+
+        /* Profile Customization Popup */
+        .profile-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .profile-popup {
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.95) 0%,
+                rgba(249, 250, 251, 0.9) 100%);
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: popup-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body.dark-mode .profile-popup {
+            background: linear-gradient(135deg,
+                rgba(30, 30, 35, 0.95) 0%,
+                rgba(20, 20, 25, 0.9) 100%);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes popup-scale {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .profile-color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .profile-color-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .profile-color-option:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+            transform: scale(1.1);
+        }
+
+        .profile-image-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .profile-image-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .profile-image-option:hover {
+            transform: scale(1.15);
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .profile-image-option.selected {
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+            transform: scale(1.1);
+            background: rgba(99, 102, 241, 0.3);
+        }
+
+        .profile-popup-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .profile-popup-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+
         /* Navigation tab with underline glow */
         .nav-tab {
             position: relative;
@@ -5986,6 +6156,13 @@ body.dark-mode .custom-language-select option:hover {
             const [showConnectionAnimation, setShowConnectionAnimation] = useState(false);
             const [connectionProvider, setConnectionProvider] = useState(null); // 'gmail' or 'outlook'
 
+            // Profile customization states
+            const [showProfilePopup, setShowProfilePopup] = useState(false);
+            const [selectedProfileColor, setSelectedProfileColor] = useState('linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)');
+            const [selectedProfileIcon, setSelectedProfileIcon] = useState('');
+            const [tempProfileColor, setTempProfileColor] = useState('linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)');
+            const [tempProfileIcon, setTempProfileIcon] = useState('');
+
             // AI Preferences states
             const [useSignature, setUseSignature] = useState(false);
             const [showQuickReplies, setShowQuickReplies] = useState(false);
@@ -7993,8 +8170,26 @@ const generateAiDraft = async (email) => {
                                 <div className="account-details-section-unified">
                                     {/* User Profile Header */}
                                     <div className="account-header">
-                                        <div className="account-profile-icon">
-                                            {userData.name.charAt(0).toUpperCase()}
+                                        <div
+                                            className="account-profile-icon"
+                                            style={{
+                                                background: selectedProfileColor,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                            onClick={() => {
+                                                setTempProfileColor(selectedProfileColor);
+                                                setTempProfileIcon(selectedProfileIcon);
+                                                setShowProfilePopup(true);
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform = 'scale(1.1)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = 'scale(1)';
+                                            }}
+                                        >
+                                            {selectedProfileIcon || userData.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="account-info">
                                             <div className="account-name">{userData.name}</div>
@@ -9481,7 +9676,7 @@ const generateAiDraft = async (email) => {
                                             <div className={`inbox-scroll-area ${showInboxSearchSuggestions && inboxSearchResults.length > 0 ? 'inbox-content-blur' : 'inbox-content-normal'}`}>
                                                 {inboxViewMode === 'tabs' ? (
     /* Provider Selection View with Examples */
-    <div className="text-center py-12 fade-in" style={{maxWidth: '600px', margin: '0 auto'}}>
+    <div className="text-center py-12 splash-container" style={{maxWidth: '600px', margin: '0 auto'}}>
         <div className="text-6xl mb-6" style={{animation: 'float 3s ease-in-out infinite'}}>📮</div>
         <h3 className="text-2xl font-bold text-gray-800 mb-3" style={{
             background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
@@ -9491,18 +9686,19 @@ const generateAiDraft = async (email) => {
             Select Email Provider
         </h3>
         <p className="text-sm text-gray-600 mb-8">Choose a provider to unlock AI-powered email management</p>
-        
+
         {/* Example Demos */}
-        <div className="space-y-4 text-left" style={{animation: 'fadeIn 0.6s ease-out 0.3s backwards'}}>
-            <div style={{
+        <div className="space-y-4 text-left">
+            <div className="splash-card" style={{
                 padding: '16px 20px',
-                background: darkMode 
+                background: darkMode
                     ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
                     : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(99, 102, 241, 0.3)',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                animationDelay: '0.3s'
             }}>
                 <div style={{fontSize: '12px', fontWeight: '700', color: '#6366f1', marginBottom: '8px'}}>
                     ✨ AI Summarization
@@ -9515,14 +9711,14 @@ const generateAiDraft = async (email) => {
                 </div>
             </div>
 
-            <div style={{
+            <div className="splash-card" style={{
                 padding: '16px 20px',
-                background: darkMode 
+                background: darkMode
                     ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)'
                     : 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.05) 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(16, 185, 129, 0.3)',
-                animation: 'fadeIn 0.6s ease-out 0.5s backwards'
+                animationDelay: '0.5s'
             }}>
                 <div style={{fontSize: '12px', fontWeight: '700', color: '#10b981', marginBottom: '8px'}}>
                     ⚡ Priority Detection
@@ -9535,14 +9731,14 @@ const generateAiDraft = async (email) => {
                 </div>
             </div>
 
-            <div style={{
+            <div className="splash-card" style={{
                 padding: '16px 20px',
-                background: darkMode 
+                background: darkMode
                     ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)'
                     : 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.05) 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(245, 158, 11, 0.3)',
-                animation: 'fadeIn 0.6s ease-out 0.7s backwards'
+                animationDelay: '0.7s'
             }}>
                 <div style={{fontSize: '12px', fontWeight: '700', color: '#f59e0b', marginBottom: '8px'}}>
                     ✍️ AI Reply Generation
@@ -11037,6 +11233,115 @@ const generateAiDraft = async (email) => {
                                         }}
                                     >
                                         Go to Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Profile Customization Popup */}
+                    {showProfilePopup && (
+                        <div className="profile-popup-overlay" onClick={() => setShowProfilePopup(false)}>
+                            <div className="profile-popup" onClick={(e) => e.stopPropagation()}>
+                                <h2 style={{
+                                    fontSize: '24px',
+                                    fontWeight: '700',
+                                    marginBottom: '8px',
+                                    color: darkMode ? '#e5e5e5' : '#374151',
+                                    textAlign: 'center'
+                                }}>
+                                    Customize Profile
+                                </h2>
+                                <p style={{
+                                    fontSize: '14px',
+                                    color: darkMode ? '#a0a0a0' : '#6b7280',
+                                    marginBottom: '24px',
+                                    textAlign: 'center'
+                                }}>
+                                    Choose a color and icon for your profile
+                                </p>
+
+                                {/* Color Selection */}
+                                <div style={{marginBottom: '24px'}}>
+                                    <h3 style={{
+                                        fontSize: '16px',
+                                        fontWeight: '600',
+                                        marginBottom: '12px',
+                                        color: darkMode ? '#c7d2fe' : '#374151'
+                                    }}>
+                                        Profile Color
+                                    </h3>
+                                    <div className="profile-color-grid">
+                                        {[
+                                            'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                            'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)',
+                                            'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                            'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                            'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                            'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                                            'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+                                            'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                                            'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)',
+                                            'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)'
+                                        ].map((color, index) => (
+                                            <div
+                                                key={index}
+                                                className={`profile-color-option ${tempProfileColor === color ? 'selected' : ''}`}
+                                                style={{background: color}}
+                                                onClick={() => setTempProfileColor(color)}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Icon Selection */}
+                                <div style={{marginBottom: '24px'}}>
+                                    <h3 style={{
+                                        fontSize: '16px',
+                                        fontWeight: '600',
+                                        marginBottom: '12px',
+                                        color: darkMode ? '#c7d2fe' : '#374151'
+                                    }}>
+                                        Profile Icon
+                                    </h3>
+                                    <div className="profile-image-grid">
+                                        {['', '😊', '🚀', '⚡', '🎨', '💎', '🌟', '🔥', '🎯', '👑', '💼', '🎓'].map((icon, index) => (
+                                            <div
+                                                key={index}
+                                                className={`profile-image-option ${tempProfileIcon === icon ? 'selected' : ''}`}
+                                                onClick={() => setTempProfileIcon(icon)}
+                                            >
+                                                {icon || (userData ? userData.name.charAt(0).toUpperCase() : 'A')}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Buttons */}
+                                <div className="profile-popup-buttons">
+                                    <button
+                                        className="profile-popup-btn unified-button"
+                                        style={{
+                                            background: 'rgba(239, 68, 68, 0.1)',
+                                            color: '#ef4444'
+                                        }}
+                                        onClick={() => setShowProfilePopup(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="profile-popup-btn unified-button"
+                                        style={{
+                                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                            color: 'white'
+                                        }}
+                                        onClick={() => {
+                                            setSelectedProfileColor(tempProfileColor);
+                                            setSelectedProfileIcon(tempProfileIcon);
+                                            setShowProfilePopup(false);
+                                        }}
+                                    >
+                                        Save
                                     </button>
                                 </div>
                             </div>
