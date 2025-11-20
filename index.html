@@ -256,47 +256,45 @@
         }
 
         /* Splash Animation for Inbox Container */
-        @keyframes splash-paint {
-            0% {
-                transform: scale(0) rotate(0deg);
-                opacity: 0;
-                border-radius: 50%;
-            }
-            30% {
-                transform: scale(1.2) rotate(180deg);
-                opacity: 0.8;
-                border-radius: 40%;
-            }
-            60% {
-                transform: scale(0.95) rotate(270deg);
-                opacity: 1;
-                border-radius: 30%;
-            }
-            100% {
-                transform: scale(1) rotate(360deg);
-                opacity: 1;
-                border-radius: 16px;
-            }
+        .splash-container {
+            animation: container-fade-in 0.8s ease-out;
         }
 
-        .splash-container {
-            animation: splash-paint 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform-origin: center;
+        @keyframes container-fade-in {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
         }
 
         .splash-card {
-            animation: splash-card-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+            animation: card-slide-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
         }
 
-        @keyframes splash-card-reveal {
+        @keyframes card-slide-up {
             0% {
                 opacity: 0;
-                transform: translateY(30px) scale(0.8) rotate(-5deg);
+                transform: translateY(50px);
             }
             100% {
                 opacity: 1;
-                transform: translateY(0) scale(1) rotate(0deg);
+                transform: translateY(0);
             }
+        }
+
+        /* Typing effect for greeting */
+        @keyframes blink-caret {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: currentColor; }
+        }
+
+        .typing-text {
+            border-right: 2px solid;
+            animation: blink-caret 1s step-end infinite;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         /* Profile Customization Popup */
@@ -6158,10 +6156,18 @@ body.dark-mode .custom-language-select option:hover {
 
             // Profile customization states
             const [showProfilePopup, setShowProfilePopup] = useState(false);
-            const [selectedProfileColor, setSelectedProfileColor] = useState('linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)');
-            const [selectedProfileIcon, setSelectedProfileIcon] = useState('');
+            const [selectedProfileColor, setSelectedProfileColor] = useState(() => {
+                return localStorage.getItem('profileColor') || 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)';
+            });
+            const [selectedProfileIcon, setSelectedProfileIcon] = useState(() => {
+                return localStorage.getItem('profileIcon') || '';
+            });
             const [tempProfileColor, setTempProfileColor] = useState('linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)');
             const [tempProfileIcon, setTempProfileIcon] = useState('');
+
+            // Greeting state for typing effect
+            const [currentGreeting, setCurrentGreeting] = useState('');
+            const [greetingIndex, setGreetingIndex] = useState(0);
 
             // AI Preferences states
             const [useSignature, setUseSignature] = useState(false);
@@ -6594,6 +6600,40 @@ useEffect(() => {
         }
     }
 }, [autoPrioritize, gmailEmails.length, outlookEmails.length, currentPage, inboxViewMode, activeProvider]);
+
+            // Typing effect for greeting messages
+useEffect(() => {
+    const greetings = [
+        `How can I help you${userData ? ', ' + userData.name.split(' ')[0] : ''}?`,
+        `Let's write some emails${userData ? ', ' + userData.name.split(' ')[0] : ''}!`,
+        'Ready to craft the perfect message?',
+        'What email magic shall we create today?',
+        'Your AI email assistant is ready!',
+        'Time to make your emails shine!',
+        'Let\'s turn your thoughts into words!'
+    ];
+
+    let charIndex = 0;
+    let currentText = '';
+    const message = greetings[greetingIndex % greetings.length];
+
+    const typeInterval = setInterval(() => {
+        if (charIndex < message.length) {
+            currentText += message[charIndex];
+            setCurrentGreeting(currentText);
+            charIndex++;
+        } else {
+            clearInterval(typeInterval);
+            // Wait 3 seconds before cycling to next greeting
+            setTimeout(() => {
+                setCurrentGreeting('');
+                setGreetingIndex((prev) => prev + 1);
+            }, 3000);
+        }
+    }, 50); // Typing speed
+
+    return () => clearInterval(typeInterval);
+}, [greetingIndex, userData]);
 
             // GOOD - checks which provider
 useEffect(() => {
@@ -8805,13 +8845,33 @@ const generateAiDraft = async (email) => {
                                     )}
                                 </div>
 
+                                {/* Dynamic Greeting with Typing Effect */}
+                                {currentGreeting && (
+                                    <div style={{
+                                        marginBottom: '16px',
+                                        padding: '12px 20px',
+                                        background: darkMode
+                                            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
+                                            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                                        borderRadius: '12px',
+                                        border: darkMode ? '2px solid rgba(99, 102, 241, 0.3)' : '2px solid rgba(99, 102, 241, 0.2)',
+                                        textAlign: 'center',
+                                        animation: 'fadeIn 0.5s ease-out'
+                                    }}>
+                                        <span className="typing-text" style={{
+                                            fontSize: '16px',
+                                            fontWeight: '600',
+                                            color: darkMode ? '#ffffff' : '#374151',
+                                            display: 'inline-block'
+                                        }}>
+                                            {currentGreeting}
+                                        </span>
+                                    </div>
+                                )}
+
                                 {/* Current Tool Indicator */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="glass-dark rounded-full px-4 py-2 inline-flex items-center gap-2">
-                                            <span className="text-xl">✉️</span>
-                                            <span className="text-sm font-semibold text-gray-700">InkMind</span>
-                                        </div>
 
                                         {/* AI Model Switcher - Moved to inline prompt container */}
                                         <div style={{position: 'relative', display: 'none'}}>
@@ -11302,10 +11362,10 @@ const generateAiDraft = async (email) => {
                                         marginBottom: '12px',
                                         color: darkMode ? '#c7d2fe' : '#374151'
                                     }}>
-                                        Profile Icon
+                                        Profile Avatar
                                     </h3>
                                     <div className="profile-image-grid">
-                                        {['', '😊', '🚀', '⚡', '🎨', '💎', '🌟', '🔥', '🎯', '👑', '💼', '🎓'].map((icon, index) => (
+                                        {['', '👨', '👩', '🧑', '👤', '🦊', '🐱', '🐼', '🦁', '🦄', '🤖', '👾'].map((icon, index) => (
                                             <div
                                                 key={index}
                                                 className={`profile-image-option ${tempProfileIcon === icon ? 'selected' : ''}`}
@@ -11322,8 +11382,9 @@ const generateAiDraft = async (email) => {
                                     <button
                                         className="profile-popup-btn unified-button"
                                         style={{
-                                            background: 'rgba(239, 68, 68, 0.1)',
-                                            color: '#ef4444'
+                                            background: darkMode ? 'rgba(20, 20, 20, 0.8)' : 'rgba(239, 68, 68, 0.1)',
+                                            color: '#ef4444',
+                                            border: darkMode ? '2px solid rgba(239, 68, 68, 0.3)' : '2px solid white'
                                         }}
                                         onClick={() => setShowProfilePopup(false)}
                                     >
@@ -11332,12 +11393,15 @@ const generateAiDraft = async (email) => {
                                     <button
                                         className="profile-popup-btn unified-button"
                                         style={{
-                                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                            color: 'white'
+                                            background: darkMode ? 'rgba(0, 0, 0, 0.9)' : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                            color: darkMode ? '#10b981' : 'white',
+                                            border: darkMode ? '2px solid rgba(16, 185, 129, 0.3)' : '2px solid white'
                                         }}
                                         onClick={() => {
                                             setSelectedProfileColor(tempProfileColor);
                                             setSelectedProfileIcon(tempProfileIcon);
+                                            localStorage.setItem('profileColor', tempProfileColor);
+                                            localStorage.setItem('profileIcon', tempProfileIcon);
                                             setShowProfilePopup(false);
                                         }}
                                     >
