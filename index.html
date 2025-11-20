@@ -298,18 +298,18 @@
         }
 
         .greeting-container {
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin: 0 auto 20px auto;
+            text-align: center;
             z-index: 10;
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: all 0.3s ease;
+            width: 100%;
         }
 
         .greeting-container.hidden {
             opacity: 0;
-            transform: translateX(-50%) translateY(-10px);
-            pointer-events: none;
+            max-height: 0;
+            margin-bottom: 0;
+            overflow: hidden;
         }
 
         .greeting-oval {
@@ -317,17 +317,19 @@
             border-radius: 50px;
             background: transparent;
             display: inline-block;
-            animation: expand-text 0.3s ease-out;
-            max-width: 600px;
+            animation: expand-text 0.5s ease-out;
+            max-width: 100%;
+            width: auto;
+            min-width: fit-content;
         }
 
         @keyframes expand-text {
             0% {
-                max-width: 0;
+                transform: scale(0.8);
                 opacity: 0;
             }
             100% {
-                max-width: 600px;
+                transform: scale(1);
                 opacity: 1;
             }
         }
@@ -479,35 +481,35 @@
 
         /* Animated texture patterns */
         .texture-gradient-wave {
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #667eea 75%, #764ba2 100%);
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #667eea 75%, #764ba2 100%) !important;
         }
 
         .texture-ocean {
-            background: linear-gradient(45deg, #2193b0 0%, #6dd5ed 25%, #2193b0 50%, #6dd5ed 75%, #2193b0 100%);
+            background: linear-gradient(45deg, #2193b0 0%, #6dd5ed 25%, #2193b0 50%, #6dd5ed 75%, #2193b0 100%) !important;
         }
 
         .texture-sunset {
-            background: linear-gradient(45deg, #ff6b6b 0%, #feca57 25%, #ee5a6f 50%, #ff6b6b 75%, #feca57 100%);
+            background: linear-gradient(45deg, #ff6b6b 0%, #feca57 25%, #ee5a6f 50%, #ff6b6b 75%, #feca57 100%) !important;
         }
 
         .texture-forest {
-            background: linear-gradient(45deg, #134e5e 0%, #71b280 25%, #134e5e 50%, #71b280 75%, #134e5e 100%);
+            background: linear-gradient(45deg, #134e5e 0%, #71b280 25%, #134e5e 50%, #71b280 75%, #134e5e 100%) !important;
         }
 
         .texture-cosmic {
-            background: linear-gradient(45deg, #360033 0%, #0b8793 25%, #360033 50%, #0b8793 75%, #360033 100%);
+            background: linear-gradient(45deg, #360033 0%, #0b8793 25%, #360033 50%, #0b8793 75%, #360033 100%) !important;
         }
 
         .texture-aurora {
-            background: linear-gradient(45deg, #00c9ff 0%, #92fe9d 25%, #00c9ff 50%, #92fe9d 75%, #00c9ff 100%);
+            background: linear-gradient(45deg, #00c9ff 0%, #92fe9d 25%, #00c9ff 50%, #92fe9d 75%, #00c9ff 100%) !important;
         }
 
         .texture-fire {
-            background: linear-gradient(45deg, #f12711 0%, #f5af19 25%, #f12711 50%, #f5af19 75%, #f12711 100%);
+            background: linear-gradient(45deg, #f12711 0%, #f5af19 25%, #f12711 50%, #f5af19 75%, #f12711 100%) !important;
         }
 
         .texture-neon {
-            background: linear-gradient(45deg, #fa709a 0%, #fee140 25%, #fa709a 50%, #fee140 75%, #fa709a 100%);
+            background: linear-gradient(45deg, #fa709a 0%, #fee140 25%, #fa709a 50%, #fee140 75%, #fa709a 100%) !important;
         }
 
         /* Profile ring with animated texture */
@@ -4835,6 +4837,194 @@ body.dark-mode .mobile-inbox-fullscreen {
     }
 }
 
+/* Mobile Email Viewer Fullscreen */
+.mobile-email-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+    backdrop-filter: blur(30px);
+    z-index: 1100;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+body.dark-mode .mobile-email-viewer {
+    background: linear-gradient(135deg, rgba(20, 20, 25, 0.98) 0%, rgba(15, 15, 20, 0.95) 100%);
+}
+
+.mobile-email-viewer.active {
+    transform: translateY(0);
+}
+
+.mobile-email-header {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    z-index: 10;
+    padding: 16px 20px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+body.dark-mode .mobile-email-header {
+    background: linear-gradient(135deg, rgba(20, 20, 25, 0.95) 0%, rgba(15, 15, 20, 0.9) 100%);
+}
+
+.mobile-email-close-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+}
+
+.mobile-email-close-indicator {
+    width: 40px;
+    height: 4px;
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 2px;
+}
+
+.mobile-email-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-email-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.mobile-email-subject {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+body.dark-mode .mobile-email-subject {
+    color: #e5e5e5;
+}
+
+.mobile-email-from {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 4px;
+}
+
+body.dark-mode .mobile-email-from {
+    color: #9ca3af;
+}
+
+.mobile-email-date {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+body.dark-mode .mobile-email-date {
+    color: #6b7280;
+}
+
+.mobile-email-body {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+    margin-bottom: 24px;
+}
+
+body.dark-mode .mobile-email-body {
+    color: #d1d5db;
+}
+
+.mobile-email-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px solid rgba(99, 102, 241, 0.1);
+}
+
+.mobile-email-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body.dark-mode .mobile-email-section-title {
+    color: #e5e5e5;
+}
+
+.mobile-ai-draft-container {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+body.dark-mode .mobile-ai-draft-container {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.mobile-reply-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 12px;
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    font-size: 14px;
+    resize: vertical;
+    background: rgba(255, 255, 255, 0.9);
+    color: #1f2937;
+}
+
+body.dark-mode .mobile-reply-textarea {
+    background: rgba(30, 30, 35, 0.9);
+    color: #e5e5e5;
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.mobile-quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.mobile-quick-reply-btn {
+    padding: 8px 16px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 20px;
+    color: #6366f1;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mobile-quick-reply-btn:active {
+    transform: scale(0.95);
+    background: rgba(99, 102, 241, 0.2);
+}
+
         @media (max-width: 1024px) {
     .desktop-inbox-layout {
         display: none !important;
@@ -6255,6 +6445,9 @@ body.dark-mode .custom-language-select option:hover {
             const [showBottomNotification, setShowBottomNotification] = useState(false);
             const [bottomNotificationText, setBottomNotificationText] = useState('');
             const [mobileInboxOpen, setMobileInboxOpen] = useState(false);
+            const [mobileEmailViewerOpen, setMobileEmailViewerOpen] = useState(false);
+            const [mobileViewerStartY, setMobileViewerStartY] = useState(0);
+            const [mobileViewerCurrentY, setMobileViewerCurrentY] = useState(0);
             const [prioritizedCollapsed, setPrioritizedCollapsed] = useState(false);
             const [touchCurrentX, setTouchCurrentX] = useState(0);
             const [isSwiping, setIsSwiping] = useState(false);
@@ -8970,22 +9163,6 @@ const generateAiDraft = async (email) => {
                                     )}
                                 </div>
 
-                                {/* Dynamic Greeting with Typing Effect */}
-                                <div className={`greeting-container ${emailText.trim().length > 0 ? 'hidden' : ''}`}>
-                                    {currentGreeting && (
-                                        <div className="greeting-oval">
-                                            <span className="typing-text" style={{
-                                                fontSize: '16px',
-                                                fontWeight: '600',
-                                                color: darkMode ? '#ffffff' : '#374151',
-                                                display: 'inline-block'
-                                            }}>
-                                                {currentGreeting}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
                                 {/* Current Tool Indicator */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
@@ -9594,6 +9771,7 @@ const generateAiDraft = async (email) => {
                                                     onClick={() => {
                                                         setViewingEmail(email);
                                                         setMobileInboxOpen(false);
+                                                        setMobileEmailViewerOpen(true);
                                                     }}
                                                     className="modern-email-item"
                                                     style={{animationDelay: `${index * 0.05}s`}}
@@ -9618,6 +9796,7 @@ const generateAiDraft = async (email) => {
                                                     onClick={() => {
                                                         setViewingEmail(email);
                                                         setMobileInboxOpen(false);
+                                                        setMobileEmailViewerOpen(true);
                                                     }}
                                                     className="modern-email-item"
                                                     style={{animationDelay: `${index * 0.05}s`}}
@@ -9643,6 +9822,7 @@ const generateAiDraft = async (email) => {
                                                 onClick={() => {
                                                     setViewingEmail(email);
                                                     setMobileInboxOpen(false);
+                                                    setMobileEmailViewerOpen(true);
                                                 }}
                                                 className="modern-email-item"
                                                 style={{animationDelay: `${index * 0.05}s`}}
@@ -9666,6 +9846,238 @@ const generateAiDraft = async (email) => {
                 </div>
             </div>
         )}
+
+                    {/* Mobile Email Viewer Fullscreen */}
+                    {(emailConnected || outlookConnected) && viewingEmail && (
+                        <div
+                            className={`mobile-email-viewer ${mobileEmailViewerOpen ? 'active' : ''}`}
+                            onTouchStart={(e) => {
+                                const header = e.target.closest('.mobile-email-header');
+                                if (header) {
+                                    setMobileViewerStartY(e.touches[0].clientY);
+                                }
+                            }}
+                            onTouchMove={(e) => {
+                                const header = e.target.closest('.mobile-email-header');
+                                if (header && mobileViewerStartY > 0) {
+                                    const deltaY = e.touches[0].clientY - mobileViewerStartY;
+                                    if (deltaY > 0) {
+                                        setMobileViewerCurrentY(deltaY);
+                                        e.currentTarget.style.transform = `translateY(${deltaY}px)`;
+                                    }
+                                }
+                            }}
+                            onTouchEnd={(e) => {
+                                const header = e.target.closest('.mobile-email-header');
+                                if (header && mobileViewerCurrentY > 100) {
+                                    setMobileEmailViewerOpen(false);
+                                    setTimeout(() => {
+                                        setViewingEmail(null);
+                                        e.currentTarget.style.transform = '';
+                                    }, 400);
+                                } else {
+                                    e.currentTarget.style.transform = '';
+                                }
+                                setMobileViewerStartY(0);
+                                setMobileViewerCurrentY(0);
+                            }}
+                        >
+                            {/* Header with Close Indicator and Actions */}
+                            <div className="mobile-email-header">
+                                <div
+                                    className="mobile-email-close-bar"
+                                    onClick={() => {
+                                        setMobileEmailViewerOpen(false);
+                                        setTimeout(() => setViewingEmail(null), 400);
+                                    }}
+                                >
+                                    <div className="mobile-email-close-indicator"></div>
+                                </div>
+                                <div className="mobile-email-actions">
+                                    <button
+                                        onClick={() => {
+                                            setMobileEmailViewerOpen(false);
+                                            setTimeout(() => setViewingEmail(null), 400);
+                                        }}
+                                        className="px-4 py-2 glass-effect rounded-full text-sm font-medium unified-button border-2 border-white"
+                                        style={{color: darkMode ? '#e5e5e5' : '#374151'}}
+                                    >
+                                        ← Close
+                                    </button>
+                                    <button
+                                        onClick={() => handleSummarizeEmail(viewingEmail)}
+                                        className="px-4 py-2 glass-effect rounded-full text-sm font-medium unified-button border-2 border-white"
+                                        style={{color: darkMode ? '#e5e5e5' : '#374151'}}
+                                    >
+                                        ✨ Summarize
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Email Content */}
+                            <div className="mobile-email-content">
+                                {/* Subject and Metadata */}
+                                <div className="mobile-email-subject">{viewingEmail.subject}</div>
+                                <div className="mobile-email-from">From: {viewingEmail.from}</div>
+                                <div className="mobile-email-date">{viewingEmail.date}</div>
+
+                                {/* Email Body */}
+                                <div className="mobile-email-body">{viewingEmail.snippet}</div>
+
+                                {/* Summary Section */}
+                                {summarizingEmail === viewingEmail.id && (
+                                    <div className="mobile-email-section">
+                                        {isSummarizing ? (
+                                            <div style={{textAlign: 'center', padding: '20px'}}>
+                                                <div className="animate-spin rounded-full h-8 w-8 border-3 border-indigo-600 border-t-transparent" style={{margin: '0 auto 12px'}}></div>
+                                                <span style={{fontSize: '14px', color: darkMode ? '#e5e5e5' : '#374151', fontWeight: '600'}}>Summarizing...</span>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <div className="mobile-email-section-title">
+                                                    <span>✨ Summary</span>
+                                                    <button
+                                                        onClick={() => setSummaryHidden(!summaryHidden)}
+                                                        style={{
+                                                            marginLeft: 'auto',
+                                                            padding: '4px 12px',
+                                                            background: 'rgba(99, 102, 241, 0.1)',
+                                                            border: '2px solid rgba(99, 102, 241, 0.3)',
+                                                            borderRadius: '12px',
+                                                            color: '#6366f1',
+                                                            fontSize: '12px',
+                                                            fontWeight: '600',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        {summaryHidden ? 'Show' : 'Hide'}
+                                                    </button>
+                                                </div>
+                                                {!summaryHidden && (
+                                                    <p style={{fontSize: '14px', lineHeight: '1.6', color: darkMode ? '#d1d5db' : '#374151'}}>
+                                                        {summaryText}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* AI Draft Section */}
+                                {hasDraft && (
+                                    <div className="mobile-email-section">
+                                        <div className="mobile-email-section-title">
+                                            ✨ AI-Generated Draft
+                                        </div>
+                                        <div className="mobile-ai-draft-container">
+                                            <p style={{fontSize: '14px', lineHeight: '1.6', color: darkMode ? '#d1d5db' : '#374151', marginBottom: '12px'}}>
+                                                {aiDraft}
+                                            </p>
+                                            <button
+                                                onClick={() => {
+                                                    setEmailReply(aiDraft);
+                                                    playNotificationSound();
+                                                }}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '12px',
+                                                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    borderRadius: '12px',
+                                                    fontSize: '14px',
+                                                    fontWeight: '600',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                Use This Draft
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Reply Section */}
+                                <div className="mobile-email-section">
+                                    <div className="mobile-email-section-title">
+                                        ✍️ Write Reply
+                                    </div>
+
+                                    {/* Quick Reply Suggestions */}
+                                    {showQuickReplies && (
+                                        <div className="mobile-quick-replies">
+                                            <button
+                                                className="mobile-quick-reply-btn"
+                                                onClick={() => {
+                                                    const greeting = useSignature ? `Hi ${viewingEmail.from.split(' ')[0]},\n\n` : 'Hi,\n\n';
+                                                    const closing = useSignature ? `\n\nBest regards,\n${userData?.name?.split(' ')[0] || 'there'}` : '\n\nBest regards,\n[Your name]';
+                                                    setEmailReply(greeting + 'Thank you for your email. I appreciate you reaching out!' + closing);
+                                                    playNotificationSound();
+                                                }}
+                                            >
+                                                🙏 Thank You
+                                            </button>
+                                            <button
+                                                className="mobile-quick-reply-btn"
+                                                onClick={() => {
+                                                    const greeting = useSignature ? `Hi ${viewingEmail.from.split(' ')[0]},\n\n` : 'Hi,\n\n';
+                                                    const closing = useSignature ? `\n\nBest regards,\n${userData?.name?.split(' ')[0] || 'there'}` : '\n\nBest regards,\n[Your name]';
+                                                    setEmailReply(greeting + 'That sounds great! I\'m happy to help with this.' + closing);
+                                                    playNotificationSound();
+                                                }}
+                                            >
+                                                👍 Sounds Good
+                                            </button>
+                                            <button
+                                                className="mobile-quick-reply-btn"
+                                                onClick={() => {
+                                                    const greeting = useSignature ? `Hi ${viewingEmail.from.split(' ')[0]},\n\n` : 'Hi,\n\n';
+                                                    const closing = useSignature ? `\n\nBest regards,\n${userData?.name?.split(' ')[0] || 'there'}` : '\n\nBest regards,\n[Your name]';
+                                                    setEmailReply(greeting + 'Let me check my calendar and get back to you shortly.' + closing);
+                                                    playNotificationSound();
+                                                }}
+                                            >
+                                                📅 Check Calendar
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Reply Textarea */}
+                                    <textarea
+                                        className="mobile-reply-textarea"
+                                        value={emailReply}
+                                        onChange={(e) => setEmailReply(e.target.value)}
+                                        placeholder="Type your reply here..."
+                                    />
+
+                                    {/* Send Button */}
+                                    <button
+                                        onClick={async () => {
+                                            if (emailReply.trim()) {
+                                                // Send reply logic here
+                                                alert('Reply sent! (Demo mode)');
+                                                setEmailReply('');
+                                            }
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            padding: '14px',
+                                            marginTop: '12px',
+                                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '12px',
+                                            fontSize: '15px',
+                                            fontWeight: '700',
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                                        }}
+                                    >
+                                        📤 Send Reply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Mobile Inbox components and modals would go here - keeping code length manageable */}
 
@@ -10937,6 +11349,24 @@ const generateAiDraft = async (email) => {
                                                             </div>
                                                         </div>
 
+                                                        {/* Dynamic Greeting with Typing Effect */}
+                                                        {activeView === 'writer' && (
+                                                            <div className={`greeting-container ${emailText.trim().length > 0 ? 'hidden' : ''}`}>
+                                                                {currentGreeting && (
+                                                                    <div className="greeting-oval">
+                                                                        <span className="typing-text" style={{
+                                                                            fontSize: '16px',
+                                                                            fontWeight: '600',
+                                                                            color: darkMode ? '#ffffff' : '#374151',
+                                                                            display: 'inline-block'
+                                                                        }}>
+                                                                            {currentGreeting}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+
                                                         {/* Content Area */}
                                                         <div className="min-h-[500px]">
                                                             {activeView === 'writer' ? renderWriterContent() : renderResultsContent()}
@@ -10981,6 +11411,24 @@ const generateAiDraft = async (email) => {
                                                 </button>
                                             </div>
                                         </div>
+
+                                        {/* Dynamic Greeting with Typing Effect */}
+                                        {activeView === 'writer' && (
+                                            <div className={`greeting-container ${emailText.trim().length > 0 ? 'hidden' : ''}`}>
+                                                {currentGreeting && (
+                                                    <div className="greeting-oval">
+                                                        <span className="typing-text" style={{
+                                                            fontSize: '16px',
+                                                            fontWeight: '600',
+                                                            color: darkMode ? '#ffffff' : '#374151',
+                                                            display: 'inline-block'
+                                                        }}>
+                                                            {currentGreeting}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {/* Content Area */}
                                         <div className="min-h-[500px]">
