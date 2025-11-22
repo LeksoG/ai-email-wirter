@@ -352,6 +352,149 @@
             min-width: fit-content;
         }
 
+        /* Word-by-word blur reveal for greeting */
+        .greeting-word {
+            display: inline-block;
+            opacity: 0;
+            filter: blur(12px);
+            transform: translateY(8px) scale(0.95);
+            animation: greeting-word-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes greeting-word-reveal {
+            0% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: translateY(8px) scale(0.95);
+            }
+            60% {
+                opacity: 0.8;
+                filter: blur(4px);
+                transform: translateY(-2px) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0);
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .greeting-word-out {
+            animation: greeting-word-out 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes greeting-word-out {
+            0% {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                filter: blur(10px);
+                transform: scale(0.9);
+            }
+        }
+
+        /* Prompt Suggestions Container - Blur Background */
+        .prompt-suggestions-container {
+            position: absolute;
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            padding: 16px 20px;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
+            animation: suggestions-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        body.dark-mode .prompt-suggestions-container {
+            background: rgba(30, 30, 35, 0.85);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(99, 102, 241, 0.1);
+        }
+
+        @keyframes suggestions-appear {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px) scale(0.95);
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .prompt-suggestions-container .suggestion-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        body.dark-mode .prompt-suggestions-container .suggestion-title {
+            color: #9ca3af;
+        }
+
+        .prompt-suggestions-container .suggestion-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .prompt-suggestions-container .suggestion-pill {
+            padding: 8px 14px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            font-size: 12px;
+            font-weight: 500;
+            color: #4f46e5;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: pill-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+
+        .prompt-suggestions-container .suggestion-pill:nth-child(1) { animation-delay: 0.05s; }
+        .prompt-suggestions-container .suggestion-pill:nth-child(2) { animation-delay: 0.1s; }
+        .prompt-suggestions-container .suggestion-pill:nth-child(3) { animation-delay: 0.15s; }
+        .prompt-suggestions-container .suggestion-pill:nth-child(4) { animation-delay: 0.2s; }
+
+        @keyframes pill-appear {
+            0% {
+                opacity: 0;
+                transform: translateY(8px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .prompt-suggestions-container .suggestion-pill:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        body.dark-mode .prompt-suggestions-container .suggestion-pill {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+        }
+
         /* Ladder animation for cards */
         .ladder-item {
             animation: ladder-slide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
@@ -5149,18 +5292,27 @@ body.dark-mode .ai-generation-container {
 @keyframes generation-container-lift {
     0% {
         opacity: 0;
-        transform: scale(0.7) translateY(100px);
+        transform: scale(0.85) translateY(150px);
         box-shadow: 0 5px 20px rgba(99, 102, 241, 0.1);
+        filter: blur(8px);
     }
-    50% {
-        opacity: 0.8;
-        transform: scale(0.95) translateY(-20px);
-        box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+    40% {
+        opacity: 0.9;
+        transform: scale(0.95) translateY(0);
+        box-shadow: 0 15px 50px rgba(99, 102, 241, 0.2);
+        filter: blur(2px);
+    }
+    70% {
+        opacity: 1;
+        transform: scale(1.02) translateY(-10px);
+        box-shadow: 0 25px 80px rgba(99, 102, 241, 0.25);
+        filter: blur(0);
     }
     100% {
         opacity: 1;
         transform: scale(1) translateY(0);
         box-shadow: 0 30px 100px rgba(99, 102, 241, 0.3);
+        filter: blur(0);
     }
 }
 
@@ -5241,21 +5393,23 @@ body.dark-mode .grammar-check-btn {
     color: #4ade80;
 }
 
-/* Wave Animation for Grammar Check */
+/* Wave Animation for Grammar Check - Word by Word */
 .grammar-wave-container {
     position: relative;
     overflow: hidden;
 }
 
 .grammar-wave-word {
-    display: inline;
-    transition: all 0.15s ease-out;
+    display: inline-block;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
 .grammar-wave-word.wave-active {
     color: #6366f1;
-    text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-    transform: translateY(-2px);
+    text-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+    transform: translateY(-3px) scale(1.02);
+    filter: brightness(1.1);
 }
 
 .grammar-wave-line {
@@ -5289,16 +5443,9 @@ body.dark-mode .grammar-check-btn {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(180deg,
-        rgba(99, 102, 241, 0.08) 0%,
-        transparent 30%,
-        transparent 70%,
-        rgba(99, 102, 241, 0.08) 100%
-    );
-    background-size: 100% 300%;
-    animation: wave-vertical 3s ease-in-out infinite;
     pointer-events: none;
     border-radius: 16px;
+    background: transparent;
 }
 
 @keyframes wave-vertical {
@@ -5310,19 +5457,35 @@ body.dark-mode .grammar-check-btn {
     }
 }
 
+/* Word-by-word wave animation */
+.ai-wave-text .grammar-word {
+    display: inline-block;
+    opacity: 1;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-wave-text .grammar-word.wave-highlight {
+    color: #6366f1;
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 40px rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
+    animation: word-pulse 0.4s ease-out;
+}
+
+@keyframes word-pulse {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-4px) scale(1.05);
+    }
+    100% {
+        transform: translateY(-2px) scale(1);
+    }
+}
+
 /* Apple Intelligence style wave */
 .ai-wave-text {
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(99, 102, 241, 0.3) 45%,
-        rgba(139, 92, 246, 0.5) 50%,
-        rgba(99, 102, 241, 0.3) 55%,
-        transparent 100%
-    );
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    animation: apple-wave 3s linear infinite;
+    position: relative;
 }
 
 @keyframes apple-wave {
@@ -5332,6 +5495,30 @@ body.dark-mode .grammar-check-btn {
     100% {
         background-position: -100% 0;
     }
+}
+
+/* Word-by-word wave animation for grammar check */
+@keyframes word-wave {
+    0%, 100% {
+        color: inherit;
+        transform: translateY(0);
+        text-shadow: none;
+    }
+    15% {
+        color: #6366f1;
+        transform: translateY(-3px);
+        text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+    }
+    30% {
+        color: inherit;
+        transform: translateY(0);
+        text-shadow: none;
+    }
+}
+
+.grammar-word {
+    display: inline;
+    transition: all 0.2s ease-out;
 }
 
 /* Hide scrollbar in grammar wave container */
@@ -5364,36 +5551,100 @@ body.dark-mode .ai-generation-prompt {
     padding: 40px 20px;
 }
 
-.ai-generation-dots {
+/* Status List Container - 4 Oval Items */
+.ai-generation-status-list {
+    position: relative;
     display: flex;
-    gap: 8px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 20px;
+    perspective: 1000px;
 }
 
-.ai-generation-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    animation: generation-dot-pulse 1.4s ease-in-out infinite;
+.ai-generation-status-item {
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    position: relative;
 }
 
-.ai-generation-dot:nth-child(2) {
-    animation-delay: 0.2s;
+.ai-generation-status-item.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    border: 2px solid rgba(99, 102, 241, 0.4);
+    color: #6366f1;
+    transform: scale(1.05) translateZ(20px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
+    z-index: 4;
 }
 
-.ai-generation-dot:nth-child(3) {
-    animation-delay: 0.4s;
+.ai-generation-status-item.behind-1 {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+    border: 1.5px solid rgba(99, 102, 241, 0.2);
+    color: #9ca3af;
+    transform: scale(0.92) translateY(-8px) translateZ(-10px);
+    opacity: 0.7;
+    z-index: 3;
 }
 
-@keyframes generation-dot-pulse {
-    0%, 80%, 100% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-    40% {
-        transform: scale(1.2);
+.ai-generation-status-item.behind-2 {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    color: #d1d5db;
+    transform: scale(0.84) translateY(-16px) translateZ(-20px);
+    opacity: 0.4;
+    z-index: 2;
+}
+
+.ai-generation-status-item.behind-3 {
+    background: rgba(99, 102, 241, 0.02);
+    border: 1px solid rgba(99, 102, 241, 0.05);
+    color: #e5e7eb;
+    transform: scale(0.76) translateY(-24px) translateZ(-30px);
+    opacity: 0.2;
+    z-index: 1;
+}
+
+.ai-generation-status-item.hidden {
+    opacity: 0;
+    transform: scale(0.6) translateY(20px);
+}
+
+body.dark-mode .ai-generation-status-item.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.25) 100%);
+    border-color: rgba(99, 102, 241, 0.6);
+    color: #a5b4fc;
+}
+
+body.dark-mode .ai-generation-status-item.behind-1 {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #6b7280;
+}
+
+body.dark-mode .ai-generation-status-item.behind-2 {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
+    border-color: rgba(99, 102, 241, 0.15);
+    color: #4b5563;
+}
+
+body.dark-mode .ai-generation-status-item.behind-3 {
+    background: rgba(99, 102, 241, 0.03);
+    border-color: rgba(99, 102, 241, 0.08);
+    color: #374151;
+}
+
+@keyframes status-cycle {
+    0% {
+        transform: scale(1.05) translateZ(20px);
         opacity: 1;
+    }
+    100% {
+        transform: scale(0.76) translateY(-24px) translateZ(-30px);
+        opacity: 0.2;
     }
 }
 
@@ -5459,27 +5710,34 @@ body.dark-mode .ai-generation-status {
     font-weight: 500;
     color: #4f46e5;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: chip-fade-in 0.4s ease-out backwards;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: chip-fade-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
     position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.ai-suggestion-chip:nth-child(1) { animation-delay: 0.1s; }
-.ai-suggestion-chip:nth-child(2) { animation-delay: 0.2s; }
-.ai-suggestion-chip:nth-child(3) { animation-delay: 0.3s; }
-.ai-suggestion-chip:nth-child(4) { animation-delay: 0.4s; }
+.ai-suggestion-chip:nth-child(1) { animation-delay: 0.08s; }
+.ai-suggestion-chip:nth-child(2) { animation-delay: 0.16s; }
+.ai-suggestion-chip:nth-child(3) { animation-delay: 0.24s; }
+.ai-suggestion-chip:nth-child(4) { animation-delay: 0.32s; }
 
 @keyframes chip-fade-in {
     0% {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(15px) scale(0.9);
+        filter: blur(4px);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-3px) scale(1.02);
+        filter: blur(0);
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        filter: blur(0);
     }
 }
 
@@ -5496,21 +5754,24 @@ body.dark-mode .ai-suggestion-chip {
 
 /* Suggestion chip removal animation */
 .ai-suggestion-chip.removing {
-    animation: chip-remove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: chip-remove 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes chip-remove {
     0% {
         opacity: 1;
         transform: scale(1);
+        filter: blur(0);
     }
-    50% {
-        opacity: 0.5;
-        transform: scale(0.9);
+    40% {
+        opacity: 0.6;
+        transform: scale(0.95) translateY(-5px);
+        filter: blur(2px);
     }
     100% {
         opacity: 0;
-        transform: scale(0.8) translateY(-10px);
+        transform: scale(0.7) translateY(-15px);
+        filter: blur(8px);
         width: 0;
         padding: 0;
         margin: 0;
@@ -5519,15 +5780,21 @@ body.dark-mode .ai-suggestion-chip {
 
 /* Suggestion chip shift animation */
 .ai-suggestion-chip.shifting {
-    animation: chip-shift 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: chip-shift 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes chip-shift {
     0% {
-        transform: translateX(20px);
+        transform: translateX(30px);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translateX(-5px);
+        opacity: 1;
     }
     100% {
         transform: translateX(0);
+        opacity: 1;
     }
 }
 
@@ -7036,6 +7303,7 @@ body.dark-mode .custom-language-select option:hover {
             const [activeView, setActiveView] = useState('writer');
             const [emailText, setEmailText] = useState('');
             const [customPrompt, setCustomPrompt] = useState('');
+            const [showPromptSuggestions, setShowPromptSuggestions] = useState(false);
             const [result, setResult] = useState('');
             const [isProcessing, setIsProcessing] = useState(false);
             const [showSuggestions, setShowSuggestions] = useState(false);
@@ -7600,7 +7868,7 @@ useEffect(() => {
     }
 }, [autoPrioritize, gmailEmails.length, outlookEmails.length, currentPage, inboxViewMode, activeProvider]);
 
-            // Blur reveal effect for greeting messages
+            // Blur reveal effect for greeting messages - Word by Word
 useEffect(() => {
     const greetings = [
         `How can I help you${userData ? ', ' + userData.name.split(' ')[0] : ''}?`,
@@ -7614,13 +7882,13 @@ useEffect(() => {
 
     const message = greetings[greetingIndex % greetings.length];
 
-    // Set the full message immediately with blur-in animation
-    setGreetingAnimationClass('blur-reveal-text');
+    // Set the greeting with word-by-word animation
+    setGreetingAnimationClass('');
     setCurrentGreeting(message);
 
-    // After 4 seconds, start blur-out animation, then cycle to next
+    // After 4 seconds, start word-by-word blur-out animation, then cycle to next
     const cycleTimer = setTimeout(() => {
-        setGreetingAnimationClass('blur-reveal-out');
+        setGreetingAnimationClass('out');
 
         // After blur-out completes, show next greeting
         setTimeout(() => {
@@ -8872,11 +9140,10 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 setAiSuggestions([]);
 
                 const statusMessages = [
-                    '🤔 Thinking about your email...',
-                    '✍️ Writing the email...',
-                    '✨ Polishing the content...',
-                    '🔍 Checking for improvements...',
-                    '📝 Finalizing your email...'
+                    '🤔 Analyzing your request',
+                    '✍️ Writing the email',
+                    '✨ Polishing content',
+                    '📝 Finalizing'
                 ];
 
                 let statusIndex = 0;
@@ -8958,9 +9225,10 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 setAiFollowupPrompt('');
 
                 const statusMessages = [
-                    '🔄 Processing your request...',
-                    '✍️ Updating the email...',
-                    '✨ Applying changes...'
+                    '🤔 Analyzing your request',
+                    '✍️ Writing the email',
+                    '✨ Polishing content',
+                    '📝 Finalizing'
                 ];
 
                 let statusIndex = 0;
@@ -10344,6 +10612,26 @@ const generateAiDraft = async (email) => {
                                      {/* Custom Prompt Input */}
 {/* Custom Prompt Input */}
 <div style={{position: 'relative'}}>
+    {/* Prompt Suggestions Container - Shows when focused and no email text */}
+    {showPromptSuggestions && !emailText.trim() && (
+        <div className="prompt-suggestions-container">
+            <div className="suggestion-title">Quick suggestions</div>
+            <div className="suggestion-pills">
+                {['Write a professional email', 'Send a thank you note', 'Follow up on meeting', 'Request information'].map((suggestion, idx) => (
+                    <button
+                        key={idx}
+                        className="suggestion-pill"
+                        onClick={() => {
+                            setCustomPrompt(suggestion);
+                            setShowPromptSuggestions(false);
+                        }}
+                    >
+                        {suggestion}
+                    </button>
+                ))}
+            </div>
+        </div>
+    )}
     <div className="ai-prompt-container" style={{position: 'relative', paddingLeft: '140px'}}>
         {/* Model Switcher - Bottom Left */}
         <div style={{
@@ -10456,8 +10744,10 @@ const generateAiDraft = async (email) => {
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             className="ai-prompt-input"
-            placeholder="e.g., 'Make it more casual'"
+            placeholder="e.g., 'Write a professional email' or 'Make it more casual'"
             onKeyPress={(e) => e.key === 'Enter' && customPrompt && handleGenerate()}
+            onFocus={() => !emailText.trim() && setShowPromptSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowPromptSuggestions(false), 200)}
         />
         {customPrompt && customPrompt.trim().length > 0 ? (
             <button
@@ -12382,19 +12672,26 @@ const generateAiDraft = async (email) => {
                                             </div>
                                         </div>
 
-                                        {/* Dynamic Greeting with Blur Reveal Effect */}
+                                        {/* Dynamic Greeting with Word-by-Word Blur Reveal Effect */}
                                         {activeView === 'writer' && (
                                             <div className={`greeting-container ${emailText.trim().length > 0 ? 'hidden' : ''}`}>
                                                 {currentGreeting && (
-                                                    <div className="greeting-oval">
-                                                        <span className={greetingAnimationClass} key={greetingIndex} style={{
-                                                            fontSize: '16px',
-                                                            fontWeight: '600',
-                                                            color: darkMode ? '#ffffff' : '#374151',
-                                                            display: 'inline-block'
-                                                        }}>
-                                                            {currentGreeting}
-                                                        </span>
+                                                    <div className="greeting-oval" key={greetingIndex}>
+                                                        {currentGreeting.split(' ').map((word, index) => (
+                                                            <span
+                                                                key={`${greetingIndex}-${index}`}
+                                                                className={`greeting-word ${greetingAnimationClass === 'out' ? 'greeting-word-out' : ''}`}
+                                                                style={{
+                                                                    fontSize: '16px',
+                                                                    fontWeight: '600',
+                                                                    color: darkMode ? '#ffffff' : '#374151',
+                                                                    animationDelay: greetingAnimationClass === 'out' ? `${index * 0.05}s` : `${index * 0.1}s`,
+                                                                    marginRight: '6px'
+                                                                }}
+                                                            >
+                                                                {word}
+                                                            </span>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
@@ -13006,7 +13303,7 @@ const generateAiDraft = async (email) => {
                                             ) : (
                                                 <>
                                                     <span>✓</span>
-                                                    <span>Grammar Check</span>
+                                                    <span>Check Grammar</span>
                                                 </>
                                             )}
                                         </button>
@@ -13021,22 +13318,37 @@ const generateAiDraft = async (email) => {
                                 {/* Generation Animation or Result */}
                                 {isAiGenerating ? (
                                     <div className="ai-generation-animation">
-                                        <div className="ai-generation-dots">
-                                            <div className="ai-generation-dot"></div>
-                                            <div className="ai-generation-dot"></div>
-                                            <div className="ai-generation-dot"></div>
-                                        </div>
-                                        <div className="ai-generation-status" key={aiGenerationStatus}>
-                                            {aiGenerationStatus}
+                                        <div className="ai-generation-status-list">
+                                            {(() => {
+                                                const allStatuses = [
+                                                    '🤔 Analyzing your request',
+                                                    '✍️ Writing the email',
+                                                    '✨ Polishing content',
+                                                    '📝 Finalizing'
+                                                ];
+                                                const currentIdx = allStatuses.findIndex(s => aiGenerationStatus.includes(s.slice(2)));
+                                                return allStatuses.map((status, idx) => {
+                                                    let className = 'ai-generation-status-item';
+                                                    const diff = idx - (currentIdx >= 0 ? currentIdx : 0);
+                                                    if (diff === 0) className += ' active';
+                                                    else if (diff === 1) className += ' behind-1';
+                                                    else if (diff === 2) className += ' behind-2';
+                                                    else if (diff >= 3) className += ' behind-3';
+                                                    else className += ' hidden';
+                                                    return (
+                                                        <div key={idx} className={className}>
+                                                            {status}
+                                                        </div>
+                                                    );
+                                                });
+                                            })()}
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="ai-generation-result">
-                                        {/* Result Text with Wave Animation */}
+                                        {/* Result Text with Wave Animation - Pure oval container */}
                                         <div style={{
-                                            padding: '24px',
-                                            background: darkMode ? 'rgba(30, 30, 35, 0.5)' : 'rgba(249, 250, 251, 0.8)',
-                                            borderRadius: '16px',
+                                            padding: '20px 0',
                                             marginBottom: '20px',
                                             maxHeight: '350px',
                                             overflowY: 'auto',
@@ -13052,9 +13364,32 @@ const generateAiDraft = async (email) => {
                                             {modalGrammarWaveActive && (
                                                 <div className="grammar-checking-overlay"></div>
                                             )}
-                                            {/* Text content */}
+                                            {/* Text content with word-by-word wave animation */}
                                             <div className={modalGrammarWaveActive ? 'ai-wave-text' : ''}>
-                                                {aiGenerationResult}
+                                                {modalGrammarWaveActive ? (
+                                                    (() => {
+                                                        const words = aiGenerationResult.split(/(\s+)/);
+                                                        let wordIndex = 0;
+                                                        return words.map((word, idx) => {
+                                                            if (word.match(/^\s+$/)) {
+                                                                return <span key={idx}>{word}</span>;
+                                                            }
+                                                            const currentWordIdx = wordIndex++;
+                                                            return (
+                                                                <span
+                                                                    key={idx}
+                                                                    className="grammar-word"
+                                                                    style={{
+                                                                        animationDelay: `${currentWordIdx * 0.05}s`,
+                                                                        animation: `word-wave 3s ease-in-out ${currentWordIdx * 0.05}s infinite`
+                                                                    }}
+                                                                >
+                                                                    {word}
+                                                                </span>
+                                                            );
+                                                        });
+                                                    })()
+                                                ) : aiGenerationResult}
                                             </div>
                                         </div>
 
