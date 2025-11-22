@@ -284,32 +284,62 @@
             }
         }
 
-        /* Typing effect for greeting */
-        @keyframes blink-caret {
-            0%, 100% { border-color: transparent; }
-            50% { border-color: currentColor; }
+        /* Smooth blur reveal effect for greeting */
+        .blur-reveal-text {
+            animation: blur-reveal 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            white-space: nowrap;
         }
 
-        .typing-text {
-            border-right: 2px solid;
-            animation: blink-caret 1s step-end infinite;
-            white-space: nowrap;
-            overflow: hidden;
+        @keyframes blur-reveal {
+            0% {
+                opacity: 0;
+                filter: blur(20px);
+                transform: scale(0.9);
+            }
+            50% {
+                opacity: 0.7;
+                filter: blur(8px);
+                transform: scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+        }
+
+        .blur-reveal-out {
+            animation: blur-reveal-out 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes blur-reveal-out {
+            0% {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                filter: blur(15px);
+                transform: scale(0.95);
+            }
         }
 
         .greeting-container {
             margin: 0 auto 20px auto;
             text-align: center;
             z-index: 10;
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease;
             width: 100%;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .greeting-container.hidden {
             opacity: 0;
-            max-height: 0;
-            margin-bottom: 0;
-            overflow: hidden;
+            pointer-events: none;
         }
 
         .greeting-oval {
@@ -317,21 +347,9 @@
             border-radius: 50px;
             background: transparent;
             display: inline-block;
-            animation: expand-text 0.5s ease-out;
             max-width: 100%;
             width: auto;
             min-width: fit-content;
-        }
-
-        @keyframes expand-text {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
         }
 
         /* Ladder animation for cards */
@@ -5074,6 +5092,405 @@ body.dark-mode .mobile-reply-textarea {
     transform: rotate(90deg) scale(1.1);
 }
 
+/* AI Generation Modal */
+.ai-generation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    animation: overlay-fade-in 0.4s ease-out;
+}
+
+@keyframes overlay-fade-in {
+    0% {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    100% {
+        opacity: 1;
+        backdrop-filter: blur(12px);
+    }
+}
+
+.ai-generation-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 28px;
+    padding: 32px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 80px rgba(99, 102, 241, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    animation: generation-container-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.dark-mode .ai-generation-container {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(20, 20, 25, 0.95) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+@keyframes generation-container-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.ai-generation-prompt {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    padding: 12px 20px;
+    border-radius: 50px;
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4f46e5;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+body.dark-mode .ai-generation-prompt {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    color: #a5b4fc;
+}
+
+.ai-generation-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.ai-generation-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.ai-generation-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    animation: generation-dot-pulse 1.4s ease-in-out infinite;
+}
+
+.ai-generation-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.ai-generation-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes generation-dot-pulse {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+.ai-generation-status {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+    animation: status-fade 0.5s ease-out;
+}
+
+body.dark-mode .ai-generation-status {
+    color: #9ca3af;
+}
+
+@keyframes status-fade {
+    0% {
+        opacity: 0;
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.ai-generation-result {
+    animation: result-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes result-reveal {
+    0% {
+        opacity: 0;
+        filter: blur(10px);
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
+.ai-followup-container {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.ai-suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.ai-suggestion-chip {
+    padding: 10px 18px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    font-size: 13px;
+    font-weight: 500;
+    color: #4f46e5;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: chip-fade-in 0.4s ease-out backwards;
+}
+
+.ai-suggestion-chip:nth-child(1) { animation-delay: 0.1s; }
+.ai-suggestion-chip:nth-child(2) { animation-delay: 0.2s; }
+.ai-suggestion-chip:nth-child(3) { animation-delay: 0.3s; }
+.ai-suggestion-chip:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes chip-fade-in {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ai-suggestion-chip:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+
+body.dark-mode .ai-suggestion-chip {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    color: #a5b4fc;
+}
+
+.ai-followup-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .ai-followup-input-container {
+    background: rgba(40, 40, 45, 0.9);
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.ai-followup-input-container:focus-within {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.ai-followup-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    outline: none;
+    color: #374151;
+}
+
+body.dark-mode .ai-followup-input {
+    color: #e5e5e5;
+}
+
+.ai-followup-input::placeholder {
+    color: rgba(107, 114, 128, 0.6);
+}
+
+/* View Full Email Popup */
+.view-email-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10002;
+    animation: overlay-fade-in 0.3s ease-out;
+}
+
+.view-email-popup {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    padding: 0;
+    max-width: 700px;
+    width: 95%;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+    animation: popup-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+body.dark-mode .view-email-popup {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(20, 20, 25, 0.95) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.view-email-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+body.dark-mode .view-email-header {
+    background: rgba(30, 30, 35, 0.5);
+    border-color: rgba(99, 102, 241, 0.25);
+}
+
+.view-email-close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.view-email-close-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+}
+
+.view-email-content {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.view-email-subject {
+    font-size: 20px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 16px;
+}
+
+body.dark-mode .view-email-subject {
+    color: #e5e5e5;
+}
+
+.view-email-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.view-email-from {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.view-email-date {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+body.dark-mode .view-email-from {
+    color: #d1d5db;
+}
+
+.view-email-body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #4b5563;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+body.dark-mode .view-email-body {
+    color: #d1d5db;
+}
+
+.view-full-email-btn {
+    margin-top: 16px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    color: #4f46e5;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-full-email-btn:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+
+body.dark-mode .view-full-email-btn {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    color: #a5b4fc;
+}
+
 /* AI Prompt Input Improvements for Mobile */
 @media (max-width: 768px) {
     .mobile-inbox-button {
@@ -6468,9 +6885,23 @@ body.dark-mode .custom-language-select option:hover {
             const [tempProfileColor, setTempProfileColor] = useState('linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)');
             const [tempProfileIcon, setTempProfileIcon] = useState('');
 
-            // Greeting state for typing effect
+            // Greeting state for blur reveal effect
             const [currentGreeting, setCurrentGreeting] = useState('');
             const [greetingIndex, setGreetingIndex] = useState(0);
+            const [greetingAnimationClass, setGreetingAnimationClass] = useState('blur-reveal-text');
+
+            // AI Generation Modal states
+            const [showAiGenerationModal, setShowAiGenerationModal] = useState(false);
+            const [aiGenerationPrompt, setAiGenerationPrompt] = useState('');
+            const [aiGenerationStatus, setAiGenerationStatus] = useState('');
+            const [aiGenerationResult, setAiGenerationResult] = useState('');
+            const [isAiGenerating, setIsAiGenerating] = useState(false);
+            const [aiSuggestions, setAiSuggestions] = useState([]);
+            const [aiFollowupPrompt, setAiFollowupPrompt] = useState('');
+
+            // View Full Email Popup states
+            const [showViewEmailPopup, setShowViewEmailPopup] = useState(false);
+            const [viewEmailPopupData, setViewEmailPopupData] = useState(null);
 
             // AI Preferences states
             const [useSignature, setUseSignature] = useState(false);
@@ -6904,7 +7335,7 @@ useEffect(() => {
     }
 }, [autoPrioritize, gmailEmails.length, outlookEmails.length, currentPage, inboxViewMode, activeProvider]);
 
-            // Typing effect for greeting messages
+            // Blur reveal effect for greeting messages
 useEffect(() => {
     const greetings = [
         `How can I help you${userData ? ', ' + userData.name.split(' ')[0] : ''}?`,
@@ -6916,26 +7347,23 @@ useEffect(() => {
         'Let\'s turn your thoughts into words!'
     ];
 
-    let charIndex = 0;
-    let currentText = '';
     const message = greetings[greetingIndex % greetings.length];
 
-    const typeInterval = setInterval(() => {
-        if (charIndex < message.length) {
-            currentText += message[charIndex];
-            setCurrentGreeting(currentText);
-            charIndex++;
-        } else {
-            clearInterval(typeInterval);
-            // Wait 3 seconds before cycling to next greeting
-            setTimeout(() => {
-                setCurrentGreeting('');
-                setGreetingIndex((prev) => prev + 1);
-            }, 3000);
-        }
-    }, 50); // Typing speed
+    // Set the full message immediately with blur-in animation
+    setGreetingAnimationClass('blur-reveal-text');
+    setCurrentGreeting(message);
 
-    return () => clearInterval(typeInterval);
+    // After 4 seconds, start blur-out animation, then cycle to next
+    const cycleTimer = setTimeout(() => {
+        setGreetingAnimationClass('blur-reveal-out');
+
+        // After blur-out completes, show next greeting
+        setTimeout(() => {
+            setGreetingIndex((prev) => prev + 1);
+        }, 600);
+    }, 4000);
+
+    return () => clearTimeout(cycleTimer);
 }, [greetingIndex, userData]);
 
             // GOOD - checks which provider
@@ -7941,7 +8369,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 console.log('🎨 Tone selected:', style);
             };
 
-            const handleGenerate = async () => {
+            const handleGenerate = async (useModal = false) => {
                 if (!selectedTone && !customPrompt) return;
 
                 // Ensure we have text to process
@@ -7951,10 +8379,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                     return;
                 }
 
-                setIsProcessing(true);
-                setResult('');
-                setActiveView('results');
-
+                // Build the prompt
                 let prompt = customPrompt;
 
                 if (selectedTone && !customPrompt) {
@@ -7977,6 +8402,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
                         case 'enthusiastic':
                             prompt = 'Rewrite this email with an energetic and enthusiastic tone';
                             break;
+                        default:
+                            prompt = 'Improve this email';
                     }
                 } else if (selectedTone && customPrompt) {
                     // Combine tone with custom prompt
@@ -8004,6 +8431,17 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 } else {
                     prompt = `${prompt}. End with placeholders like "Best regards,\n[Your name]".`;
                 }
+
+                // Use the AI Generation Modal for enhanced visual experience
+                if (useModal || (textToProcess.length > 50 && customPrompt)) {
+                    handleAiGeneration(prompt, textToProcess);
+                    return;
+                }
+
+                // Standard processing without modal
+                setIsProcessing(true);
+                setResult('');
+                setActiveView('results');
 
                 try {
                     const transformedText = await callAIAPI(prompt, uploadedFile?.content || emailText);
@@ -8158,6 +8596,138 @@ const fetchOutlookSentEmails = async (accessToken) => {
                     setSummaryText('Failed to summarize email');
                     setIsSummarizing(false);
                 }
+            };
+
+            // AI Generation Modal Handler
+            const handleAiGeneration = async (prompt, emailContent) => {
+                setAiGenerationPrompt(prompt);
+                setShowAiGenerationModal(true);
+                setIsAiGenerating(true);
+                setAiGenerationResult('');
+                setAiSuggestions([]);
+
+                const statusMessages = [
+                    '🤔 Thinking about your email...',
+                    '✍️ Writing the email...',
+                    '✨ Polishing the content...',
+                    '🔍 Checking for improvements...',
+                    '📝 Finalizing your email...'
+                ];
+
+                let statusIndex = 0;
+                setAiGenerationStatus(statusMessages[0]);
+
+                // Cycle through status messages
+                const statusInterval = setInterval(() => {
+                    statusIndex = (statusIndex + 1) % statusMessages.length;
+                    setAiGenerationStatus(statusMessages[statusIndex]);
+                }, 1000);
+
+                try {
+                    const result = await callAIAPI(prompt, emailContent);
+
+                    // Wait at least 5 seconds for nice animation
+                    await new Promise(resolve => setTimeout(resolve, Math.max(0, 5000 - (statusIndex * 1000))));
+
+                    clearInterval(statusInterval);
+                    setIsAiGenerating(false);
+                    setAiGenerationResult(result);
+
+                    // Generate suggestions based on the result
+                    generateAiSuggestions(result, prompt);
+                } catch (error) {
+                    clearInterval(statusInterval);
+                    console.error('AI Generation error:', error);
+                    setIsAiGenerating(false);
+                    setAiGenerationResult('Failed to generate email. Please try again.');
+                }
+            };
+
+            // Generate contextual suggestions based on email content
+            const generateAiSuggestions = (emailResult, originalPrompt) => {
+                const lowerContent = emailResult.toLowerCase();
+                const suggestions = [];
+
+                // Context-aware suggestions
+                if (lowerContent.includes('meeting') || lowerContent.includes('schedule')) {
+                    suggestions.push('Add specific time options');
+                    suggestions.push('Include calendar link');
+                }
+                if (lowerContent.includes('thank') || lowerContent.includes('appreciate')) {
+                    suggestions.push('Make it more personal');
+                    suggestions.push('Add specific details');
+                }
+                if (lowerContent.includes('request') || lowerContent.includes('please')) {
+                    suggestions.push('Make it more urgent');
+                    suggestions.push('Soften the tone');
+                }
+                if (lowerContent.includes('follow') || lowerContent.includes('update')) {
+                    suggestions.push('Add deadline');
+                    suggestions.push('Include action items');
+                }
+
+                // Default suggestions
+                if (suggestions.length < 3) {
+                    const defaultSuggestions = [
+                        'Make it shorter',
+                        'Make it more formal',
+                        'Make it friendlier',
+                        'Add a call to action',
+                        'Improve clarity'
+                    ];
+                    for (const sug of defaultSuggestions) {
+                        if (suggestions.length < 4 && !suggestions.includes(sug)) {
+                            suggestions.push(sug);
+                        }
+                    }
+                }
+
+                setAiSuggestions(suggestions.slice(0, 4));
+            };
+
+            // Handle follow-up prompt in AI generation modal
+            const handleAiFollowup = async (followupPrompt) => {
+                if (!followupPrompt.trim()) return;
+
+                setIsAiGenerating(true);
+                setAiFollowupPrompt('');
+
+                const statusMessages = [
+                    '🔄 Processing your request...',
+                    '✍️ Updating the email...',
+                    '✨ Applying changes...'
+                ];
+
+                let statusIndex = 0;
+                setAiGenerationStatus(statusMessages[0]);
+
+                const statusInterval = setInterval(() => {
+                    statusIndex = (statusIndex + 1) % statusMessages.length;
+                    setAiGenerationStatus(statusMessages[statusIndex]);
+                }, 800);
+
+                try {
+                    const result = await callAIAPI(
+                        `${followupPrompt}. Here is the current email: ${aiGenerationResult}`,
+                        ''
+                    );
+
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    clearInterval(statusInterval);
+                    setIsAiGenerating(false);
+                    setAiGenerationResult(result);
+                    generateAiSuggestions(result, followupPrompt);
+                } catch (error) {
+                    clearInterval(statusInterval);
+                    setIsAiGenerating(false);
+                }
+            };
+
+            // Handle View Full Email
+            const handleViewFullEmail = (email) => {
+                setViewEmailPopupData(email);
+                setShowViewEmailPopup(true);
             };
 
             const handleDeleteEmail = (emailId, type = 'inbox') => {
@@ -9922,7 +10492,20 @@ const generateAiDraft = async (email) => {
                                 <div className="mobile-email-date">{viewingEmail.date}</div>
 
                                 {/* Email Body */}
-                                <div className="mobile-email-body">{viewingEmail.snippet}</div>
+                                <div className="mobile-email-body" style={{
+                                    maxHeight: '250px',
+                                    overflow: 'hidden'
+                                }}>{viewingEmail.snippet}</div>
+                                {viewingEmail.snippet && viewingEmail.snippet.length > 300 && (
+                                    <button
+                                        className="view-full-email-btn"
+                                        onClick={() => handleViewFullEmail(viewingEmail)}
+                                        style={{marginTop: '12px'}}
+                                    >
+                                        <span>📖</span>
+                                        <span>View Full Email</span>
+                                    </button>
+                                )}
 
                                 {/* Summary Section */}
                                 {summarizingEmail === viewingEmail.id && (
@@ -10790,7 +11373,22 @@ const generateAiDraft = async (email) => {
                                                         </div>
                                                     </div>
                                                     <div className="prose max-w-none">
-                                                        <p className="text-gray-700 leading-relaxed email-content-formatted">{viewingEmail.snippet}</p>
+                                                        <p className="text-gray-700 leading-relaxed email-content-formatted" style={{
+                                                            maxHeight: '200px',
+                                                            overflow: 'hidden',
+                                                            position: 'relative'
+                                                        }}>
+                                                            {viewingEmail.snippet}
+                                                        </p>
+                                                        {viewingEmail.snippet && viewingEmail.snippet.length > 300 && (
+                                                            <button
+                                                                className="view-full-email-btn"
+                                                                onClick={() => handleViewFullEmail(viewingEmail)}
+                                                            >
+                                                                <span>📖</span>
+                                                                <span>View Full Email</span>
+                                                            </button>
+                                                        )}
                                                     </div>
 
                                                     {/* Summarize Popup in Viewer */}
@@ -11349,12 +11947,12 @@ const generateAiDraft = async (email) => {
                                                             </div>
                                                         </div>
 
-                                                        {/* Dynamic Greeting with Typing Effect */}
+                                                        {/* Dynamic Greeting with Blur Reveal Effect */}
                                                         {activeView === 'writer' && (
                                                             <div className={`greeting-container ${emailText.trim().length > 0 ? 'hidden' : ''}`}>
                                                                 {currentGreeting && (
                                                                     <div className="greeting-oval">
-                                                                        <span className="typing-text" style={{
+                                                                        <span className={greetingAnimationClass} key={greetingIndex} style={{
                                                                             fontSize: '16px',
                                                                             fontWeight: '600',
                                                                             color: darkMode ? '#ffffff' : '#374151',
@@ -11412,12 +12010,12 @@ const generateAiDraft = async (email) => {
                                             </div>
                                         </div>
 
-                                        {/* Dynamic Greeting with Typing Effect */}
+                                        {/* Dynamic Greeting with Blur Reveal Effect */}
                                         {activeView === 'writer' && (
                                             <div className={`greeting-container ${emailText.trim().length > 0 ? 'hidden' : ''}`}>
                                                 {currentGreeting && (
                                                     <div className="greeting-oval">
-                                                        <span className="typing-text" style={{
+                                                        <span className={greetingAnimationClass} key={greetingIndex} style={{
                                                             fontSize: '16px',
                                                             fontWeight: '600',
                                                             color: darkMode ? '#ffffff' : '#374151',
@@ -11988,6 +12586,202 @@ const generateAiDraft = async (email) => {
                                     >
                                         Save
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* AI Generation Modal */}
+                    {showAiGenerationModal && (
+                        <div className="ai-generation-overlay" onClick={(e) => {
+                            if (e.target === e.currentTarget && !isAiGenerating) {
+                                setShowAiGenerationModal(false);
+                            }
+                        }}>
+                            <div className="ai-generation-container">
+                                {/* Prompt Display */}
+                                <div className="ai-generation-prompt">
+                                    "{aiGenerationPrompt}"
+                                </div>
+
+                                {/* Generation Animation or Result */}
+                                {isAiGenerating ? (
+                                    <div className="ai-generation-animation">
+                                        <div className="ai-generation-dots">
+                                            <div className="ai-generation-dot"></div>
+                                            <div className="ai-generation-dot"></div>
+                                            <div className="ai-generation-dot"></div>
+                                        </div>
+                                        <div className="ai-generation-status" key={aiGenerationStatus}>
+                                            {aiGenerationStatus}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="ai-generation-result">
+                                        {/* Result Text */}
+                                        <div style={{
+                                            padding: '20px',
+                                            background: darkMode ? 'rgba(30, 30, 35, 0.5)' : 'rgba(249, 250, 251, 0.8)',
+                                            borderRadius: '16px',
+                                            marginBottom: '20px',
+                                            maxHeight: '300px',
+                                            overflowY: 'auto',
+                                            fontSize: '14px',
+                                            lineHeight: '1.7',
+                                            color: darkMode ? '#e5e5e5' : '#374151',
+                                            whiteSpace: 'pre-wrap'
+                                        }}>
+                                            {aiGenerationResult}
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div style={{display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap'}}>
+                                            <button
+                                                onClick={() => {
+                                                    setEmailText(aiGenerationResult);
+                                                    setShowAiGenerationModal(false);
+                                                }}
+                                                style={{
+                                                    padding: '12px 24px',
+                                                    borderRadius: '50px',
+                                                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                    color: 'white',
+                                                    border: '2px solid white',
+                                                    fontWeight: '600',
+                                                    fontSize: '14px',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                            >
+                                                ✓ Use This Email
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(aiGenerationResult);
+                                                    showNotification('Copied to clipboard!');
+                                                }}
+                                                style={{
+                                                    padding: '12px 24px',
+                                                    borderRadius: '50px',
+                                                    background: darkMode ? 'rgba(40, 40, 45, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                                    color: darkMode ? '#a5b4fc' : '#4f46e5',
+                                                    border: '2px solid rgba(99, 102, 241, 0.3)',
+                                                    fontWeight: '600',
+                                                    fontSize: '14px',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                            >
+                                                📋 Copy
+                                            </button>
+                                            <button
+                                                onClick={() => setShowAiGenerationModal(false)}
+                                                style={{
+                                                    padding: '12px 24px',
+                                                    borderRadius: '50px',
+                                                    background: 'rgba(239, 68, 68, 0.1)',
+                                                    color: '#ef4444',
+                                                    border: '2px solid rgba(239, 68, 68, 0.3)',
+                                                    fontWeight: '600',
+                                                    fontSize: '14px',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                            >
+                                                ✕ Close
+                                            </button>
+                                        </div>
+
+                                        {/* Follow-up Section */}
+                                        <div className="ai-followup-container">
+                                            {/* Suggestion Chips */}
+                                            {aiSuggestions.length > 0 && (
+                                                <div className="ai-suggestion-chips">
+                                                    {aiSuggestions.map((suggestion, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            className="ai-suggestion-chip"
+                                                            onClick={() => handleAiFollowup(suggestion)}
+                                                        >
+                                                            {suggestion}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Follow-up Input */}
+                                            <div className="ai-followup-input-container">
+                                                <input
+                                                    type="text"
+                                                    className="ai-followup-input"
+                                                    placeholder="Ask for changes or improvements..."
+                                                    value={aiFollowupPrompt}
+                                                    onChange={(e) => setAiFollowupPrompt(e.target.value)}
+                                                    onKeyPress={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            handleAiFollowup(aiFollowupPrompt);
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    onClick={() => handleAiFollowup(aiFollowupPrompt)}
+                                                    disabled={!aiFollowupPrompt.trim()}
+                                                    style={{
+                                                        padding: '10px 18px',
+                                                        borderRadius: '50px',
+                                                        background: aiFollowupPrompt.trim()
+                                                            ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                                                            : 'rgba(156, 163, 175, 0.3)',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        fontWeight: '600',
+                                                        fontSize: '14px',
+                                                        cursor: aiFollowupPrompt.trim() ? 'pointer' : 'not-allowed',
+                                                        transition: 'all 0.3s ease'
+                                                    }}
+                                                >
+                                                    →
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* View Full Email Popup */}
+                    {showViewEmailPopup && viewEmailPopupData && (
+                        <div className="view-email-popup-overlay" onClick={(e) => {
+                            if (e.target === e.currentTarget) {
+                                setShowViewEmailPopup(false);
+                                setViewEmailPopupData(null);
+                            }
+                        }}>
+                            <div className="view-email-popup">
+                                <div className="view-email-header">
+                                    <h2 style={{fontSize: '18px', fontWeight: '700', color: darkMode ? '#e5e5e5' : '#374151'}}>
+                                        📧 Full Email
+                                    </h2>
+                                    <button
+                                        className="view-email-close-btn"
+                                        onClick={() => {
+                                            setShowViewEmailPopup(false);
+                                            setViewEmailPopupData(null);
+                                        }}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className="view-email-content">
+                                    <h3 className="view-email-subject">{viewEmailPopupData.subject}</h3>
+                                    <div className="view-email-meta">
+                                        <span className="view-email-from">From: {viewEmailPopupData.from}</span>
+                                        <span className="view-email-date">{viewEmailPopupData.date}</span>
+                                    </div>
+                                    <div className="view-email-body">
+                                        {viewEmailPopupData.snippet || viewEmailPopupData.body || 'No content available'}
+                                    </div>
                                 </div>
                             </div>
                         </div>
