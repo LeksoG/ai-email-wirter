@@ -5099,14 +5099,14 @@ body.dark-mode .mobile-reply-textarea {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10001;
-    animation: overlay-fade-in 0.4s ease-out;
+    animation: overlay-fade-in 0.5s ease-out;
 }
 
 @keyframes overlay-fade-in {
@@ -5116,7 +5116,7 @@ body.dark-mode .mobile-reply-textarea {
     }
     100% {
         opacity: 1;
-        backdrop-filter: blur(12px);
+        backdrop-filter: blur(16px);
     }
 }
 
@@ -5125,13 +5125,20 @@ body.dark-mode .mobile-reply-textarea {
     backdrop-filter: blur(30px);
     border: 2px solid rgba(255, 255, 255, 0.8);
     border-radius: 28px;
-    padding: 32px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 80vh;
+    padding: 40px;
+    max-width: 750px;
+    width: 92%;
+    max-height: 85vh;
     overflow-y: auto;
-    box-shadow: 0 25px 80px rgba(99, 102, 241, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
-    animation: generation-container-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 30px 100px rgba(99, 102, 241, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    animation: generation-container-lift 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.ai-generation-container::-webkit-scrollbar {
+    display: none;
 }
 
 body.dark-mode .ai-generation-container {
@@ -5139,15 +5146,197 @@ body.dark-mode .ai-generation-container {
     border-color: rgba(99, 102, 241, 0.3);
 }
 
-@keyframes generation-container-in {
+@keyframes generation-container-lift {
     0% {
         opacity: 0;
-        transform: scale(0.85) translateY(30px);
+        transform: scale(0.7) translateY(100px);
+        box-shadow: 0 5px 20px rgba(99, 102, 241, 0.1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(0.95) translateY(-20px);
+        box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
     }
     100% {
         opacity: 1;
         transform: scale(1) translateY(0);
+        box-shadow: 0 30px 100px rgba(99, 102, 241, 0.3);
     }
+}
+
+/* Close button in top right */
+.ai-generation-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.ai-generation-close-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Grammar Button */
+.grammar-button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    animation: grammar-btn-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+}
+
+@keyframes grammar-btn-appear {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.grammar-check-btn {
+    padding: 12px 28px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.grammar-check-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.25);
+}
+
+.grammar-check-btn.checking {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #6366f1;
+}
+
+body.dark-mode .grammar-check-btn {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+    color: #4ade80;
+}
+
+/* Wave Animation for Grammar Check */
+.grammar-wave-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.grammar-wave-word {
+    display: inline;
+    transition: all 0.15s ease-out;
+}
+
+.grammar-wave-word.wave-active {
+    color: #6366f1;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    transform: translateY(-2px);
+}
+
+.grammar-wave-line {
+    display: block;
+    transition: all 0.2s ease-out;
+}
+
+.grammar-wave-line.wave-active {
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(99, 102, 241, 0.1) 20%,
+        rgba(139, 92, 246, 0.15) 50%,
+        rgba(99, 102, 241, 0.1) 80%,
+        transparent 100%
+    );
+    border-radius: 4px;
+}
+
+@keyframes wave-sweep {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.grammar-checking-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg,
+        rgba(99, 102, 241, 0.08) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(99, 102, 241, 0.08) 100%
+    );
+    background-size: 100% 300%;
+    animation: wave-vertical 3s ease-in-out infinite;
+    pointer-events: none;
+    border-radius: 16px;
+}
+
+@keyframes wave-vertical {
+    0%, 100% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 0% 100%;
+    }
+}
+
+/* Apple Intelligence style wave */
+.ai-wave-text {
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(99, 102, 241, 0.3) 45%,
+        rgba(139, 92, 246, 0.5) 50%,
+        rgba(99, 102, 241, 0.3) 55%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: apple-wave 3s linear infinite;
+}
+
+@keyframes apple-wave {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+/* Hide scrollbar in grammar wave container */
+.grammar-wave-container::-webkit-scrollbar {
+    display: none;
 }
 
 .ai-generation-prompt {
@@ -5258,6 +5447,7 @@ body.dark-mode .ai-generation-status {
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 16px;
+    position: relative;
 }
 
 .ai-suggestion-chip {
@@ -5269,8 +5459,12 @@ body.dark-mode .ai-generation-status {
     font-weight: 500;
     color: #4f46e5;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: chip-fade-in 0.4s ease-out backwards;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .ai-suggestion-chip:nth-child(1) { animation-delay: 0.1s; }
@@ -5298,6 +5492,72 @@ body.dark-mode .ai-generation-status {
 body.dark-mode .ai-suggestion-chip {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
     color: #a5b4fc;
+}
+
+/* Suggestion chip removal animation */
+.ai-suggestion-chip.removing {
+    animation: chip-remove 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes chip-remove {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-10px);
+        width: 0;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+/* Suggestion chip shift animation */
+.ai-suggestion-chip.shifting {
+    animation: chip-shift 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes chip-shift {
+    0% {
+        transform: translateX(20px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* Remove suggestion button (X) on chip */
+.chip-remove-btn {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.2);
+    border: none;
+    color: #ef4444;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.ai-suggestion-chip:hover .chip-remove-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.chip-remove-btn:hover {
+    background: rgba(239, 68, 68, 0.4);
+    transform: scale(1.1);
 }
 
 .ai-followup-input-container {
@@ -6898,6 +7158,11 @@ body.dark-mode .custom-language-select option:hover {
             const [isAiGenerating, setIsAiGenerating] = useState(false);
             const [aiSuggestions, setAiSuggestions] = useState([]);
             const [aiFollowupPrompt, setAiFollowupPrompt] = useState('');
+            const [isModalGrammarChecking, setIsModalGrammarChecking] = useState(false);
+            const [modalGrammarWaveActive, setModalGrammarWaveActive] = useState(false);
+            const [modalGrammarResult, setModalGrammarResult] = useState('');
+            const [removingSuggestionIndex, setRemovingSuggestionIndex] = useState(null);
+            const [removedSuggestions, setRemovedSuggestions] = useState([]);
 
             // View Full Email Popup states
             const [showViewEmailPopup, setShowViewEmailPopup] = useState(false);
@@ -8722,6 +8987,113 @@ const fetchOutlookSentEmails = async (accessToken) => {
                     clearInterval(statusInterval);
                     setIsAiGenerating(false);
                 }
+            };
+
+            // Modal Grammar Check with Wave Animation (Apple Intelligence style)
+            const handleModalGrammarCheck = async () => {
+                if (!aiGenerationResult || isModalGrammarChecking) return;
+
+                setIsModalGrammarChecking(true);
+                setModalGrammarWaveActive(true);
+                setModalGrammarResult('');
+
+                // Wave animation runs for 3 seconds
+                const waveTimeout = setTimeout(() => {
+                    setModalGrammarWaveActive(false);
+                }, 3000);
+
+                try {
+                    const response = await fetch('/api/transform', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: 'Check this text for grammar and spelling errors. Return ONLY the corrected version without any explanations. If there are no errors, return exactly: NO_ERRORS_FOUND',
+                            text: aiGenerationResult,
+                            temperature: 0.3,
+                            model: selectedModel
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Grammar check failed');
+                    }
+
+                    const data = await response.json();
+                    const correctedText = data.result?.trim();
+
+                    // Wait for wave animation to complete
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+
+                    clearTimeout(waveTimeout);
+                    setModalGrammarWaveActive(false);
+
+                    if (correctedText === 'NO_ERRORS_FOUND' || correctedText === aiGenerationResult) {
+                        setModalGrammarResult('No grammar errors found!');
+                        showNotification('✅ No grammar errors found!');
+                    } else {
+                        setAiGenerationResult(correctedText);
+                        setModalGrammarResult('Grammar corrected!');
+                        showNotification('✅ Grammar corrected!');
+                    }
+
+                    setIsModalGrammarChecking(false);
+
+                    // Clear result message after 3 seconds
+                    setTimeout(() => setModalGrammarResult(''), 3000);
+                } catch (error) {
+                    console.error('Grammar check error:', error);
+                    clearTimeout(waveTimeout);
+                    setModalGrammarWaveActive(false);
+                    setIsModalGrammarChecking(false);
+                    setModalGrammarResult('Failed to check grammar');
+                    setTimeout(() => setModalGrammarResult(''), 3000);
+                }
+            };
+
+            // Handle suggestion click - fill prompt and remove from list
+            const handleSuggestionClick = (suggestion, index) => {
+                // Fill the followup prompt with the suggestion
+                setAiFollowupPrompt(suggestion);
+
+                // Animate removal
+                setRemovingSuggestionIndex(index);
+
+                // After animation, remove from list
+                setTimeout(() => {
+                    setAiSuggestions(prev => prev.filter((_, i) => i !== index));
+                    setRemovedSuggestions(prev => [...prev, { suggestion, index }]);
+                    setRemovingSuggestionIndex(null);
+                }, 400);
+            };
+
+            // Handle suggestion removal (X button)
+            const handleRemoveSuggestion = (e, suggestion, index) => {
+                e.stopPropagation(); // Prevent suggestion click
+
+                setRemovingSuggestionIndex(index);
+
+                setTimeout(() => {
+                    setAiSuggestions(prev => prev.filter((_, i) => i !== index));
+                    setRemovedSuggestions(prev => [...prev, { suggestion, index }]);
+                    setRemovingSuggestionIndex(null);
+                }, 400);
+            };
+
+            // Restore removed suggestion
+            const handleRestoreSuggestion = () => {
+                if (removedSuggestions.length === 0) return;
+
+                const lastRemoved = removedSuggestions[removedSuggestions.length - 1];
+
+                // Add back to suggestions at original position
+                setAiSuggestions(prev => {
+                    const newList = [...prev];
+                    newList.splice(lastRemoved.index, 0, lastRemoved.suggestion);
+                    return newList;
+                });
+
+                // Remove from removed list
+                setRemovedSuggestions(prev => prev.slice(0, -1));
             };
 
             // Handle View Full Email
@@ -12596,11 +12968,53 @@ const generateAiDraft = async (email) => {
                         <div className="ai-generation-overlay" onClick={(e) => {
                             if (e.target === e.currentTarget && !isAiGenerating) {
                                 setShowAiGenerationModal(false);
+                                setRemovedSuggestions([]);
                             }
                         }}>
                             <div className="ai-generation-container">
+                                {/* Close Button - Top Right */}
+                                {!isAiGenerating && (
+                                    <button
+                                        className="ai-generation-close-btn"
+                                        onClick={() => {
+                                            setShowAiGenerationModal(false);
+                                            setRemovedSuggestions([]);
+                                        }}
+                                    >
+                                        ✕
+                                    </button>
+                                )}
+
+                                {/* Grammar Button - Above Container */}
+                                {!isAiGenerating && aiGenerationResult && (
+                                    <div className="grammar-button-container">
+                                        <button
+                                            className={`grammar-check-btn ${isModalGrammarChecking ? 'checking' : ''}`}
+                                            onClick={handleModalGrammarCheck}
+                                            disabled={isModalGrammarChecking}
+                                        >
+                                            {isModalGrammarChecking ? (
+                                                <>
+                                                    <span style={{animation: 'spin 1s linear infinite', display: 'inline-block'}}>⟳</span>
+                                                    <span>Checking grammar...</span>
+                                                </>
+                                            ) : modalGrammarResult ? (
+                                                <>
+                                                    <span>✓</span>
+                                                    <span>{modalGrammarResult}</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>✓</span>
+                                                    <span>Grammar Check</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+
                                 {/* Prompt Display */}
-                                <div className="ai-generation-prompt">
+                                <div className="ai-generation-prompt" style={{marginTop: !isAiGenerating ? '0' : '0'}}>
                                     "{aiGenerationPrompt}"
                                 </div>
 
@@ -12618,20 +13032,30 @@ const generateAiDraft = async (email) => {
                                     </div>
                                 ) : (
                                     <div className="ai-generation-result">
-                                        {/* Result Text */}
+                                        {/* Result Text with Wave Animation */}
                                         <div style={{
-                                            padding: '20px',
+                                            padding: '24px',
                                             background: darkMode ? 'rgba(30, 30, 35, 0.5)' : 'rgba(249, 250, 251, 0.8)',
                                             borderRadius: '16px',
                                             marginBottom: '20px',
-                                            maxHeight: '300px',
+                                            maxHeight: '350px',
                                             overflowY: 'auto',
-                                            fontSize: '14px',
-                                            lineHeight: '1.7',
+                                            fontSize: '15px',
+                                            lineHeight: '1.8',
                                             color: darkMode ? '#e5e5e5' : '#374151',
-                                            whiteSpace: 'pre-wrap'
-                                        }}>
-                                            {aiGenerationResult}
+                                            whiteSpace: 'pre-wrap',
+                                            position: 'relative',
+                                            scrollbarWidth: 'none',
+                                            msOverflowStyle: 'none'
+                                        }} className="grammar-wave-container">
+                                            {/* Wave animation overlay */}
+                                            {modalGrammarWaveActive && (
+                                                <div className="grammar-checking-overlay"></div>
+                                            )}
+                                            {/* Text content */}
+                                            <div className={modalGrammarWaveActive ? 'ai-wave-text' : ''}>
+                                                {aiGenerationResult}
+                                            </div>
                                         </div>
 
                                         {/* Action Buttons */}
@@ -12640,6 +13064,7 @@ const generateAiDraft = async (email) => {
                                                 onClick={() => {
                                                     setEmailText(aiGenerationResult);
                                                     setShowAiGenerationModal(false);
+                                                    setRemovedSuggestions([]);
                                                 }}
                                                 style={{
                                                     padding: '12px 24px',
@@ -12674,38 +13099,55 @@ const generateAiDraft = async (email) => {
                                             >
                                                 📋 Copy
                                             </button>
-                                            <button
-                                                onClick={() => setShowAiGenerationModal(false)}
-                                                style={{
-                                                    padding: '12px 24px',
-                                                    borderRadius: '50px',
-                                                    background: 'rgba(239, 68, 68, 0.1)',
-                                                    color: '#ef4444',
-                                                    border: '2px solid rgba(239, 68, 68, 0.3)',
-                                                    fontWeight: '600',
-                                                    fontSize: '14px',
-                                                    cursor: 'pointer',
-                                                    transition: 'all 0.3s ease'
-                                                }}
-                                            >
-                                                ✕ Close
-                                            </button>
                                         </div>
 
                                         {/* Follow-up Section */}
                                         <div className="ai-followup-container">
-                                            {/* Suggestion Chips */}
+                                            {/* Suggestion Chips with Remove Button */}
                                             {aiSuggestions.length > 0 && (
-                                                <div className="ai-suggestion-chips">
-                                                    {aiSuggestions.map((suggestion, idx) => (
+                                                <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px'}}>
+                                                    <div className="ai-suggestion-chips" style={{flex: 1}}>
+                                                        {aiSuggestions.map((suggestion, idx) => (
+                                                            <button
+                                                                key={`${suggestion}-${idx}`}
+                                                                className={`ai-suggestion-chip ${removingSuggestionIndex === idx ? 'removing' : ''} ${idx > 0 && removingSuggestionIndex === idx - 1 ? 'shifting' : ''}`}
+                                                                onClick={() => handleSuggestionClick(suggestion, idx)}
+                                                            >
+                                                                <span>{suggestion}</span>
+                                                                <span
+                                                                    className="chip-remove-btn"
+                                                                    onClick={(e) => handleRemoveSuggestion(e, suggestion, idx)}
+                                                                >
+                                                                    ✕
+                                                                </span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                    {/* Restore Suggestion Button */}
+                                                    {removedSuggestions.length > 0 && (
                                                         <button
-                                                            key={idx}
-                                                            className="ai-suggestion-chip"
-                                                            onClick={() => handleAiFollowup(suggestion)}
+                                                            onClick={handleRestoreSuggestion}
+                                                            style={{
+                                                                padding: '8px 14px',
+                                                                borderRadius: '50px',
+                                                                background: darkMode ? 'rgba(40, 40, 45, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                                                                color: darkMode ? '#a5b4fc' : '#4f46e5',
+                                                                border: '2px solid rgba(99, 102, 241, 0.3)',
+                                                                fontWeight: '600',
+                                                                fontSize: '12px',
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.3s ease',
+                                                                whiteSpace: 'nowrap',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px'
+                                                            }}
+                                                            title="Restore last removed suggestion"
                                                         >
-                                                            {suggestion}
+                                                            <span>↩</span>
+                                                            <span>Undo</span>
                                                         </button>
-                                                    ))}
+                                                    )}
                                                 </div>
                                             )}
 
@@ -12718,7 +13160,7 @@ const generateAiDraft = async (email) => {
                                                     value={aiFollowupPrompt}
                                                     onChange={(e) => setAiFollowupPrompt(e.target.value)}
                                                     onKeyPress={(e) => {
-                                                        if (e.key === 'Enter') {
+                                                        if (e.key === 'Enter' && aiFollowupPrompt.trim()) {
                                                             handleAiFollowup(aiFollowupPrompt);
                                                         }
                                                     }}
