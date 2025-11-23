@@ -8338,7 +8338,7 @@ body.dark-mode .custom-language-select option:hover {
     top: var(--before-top, 50%);
 } 
 
-        /* New Connection Animation V2 */
+        /* Connection Animation V2 - Morphing Version */
 .connection-animation-overlay-v2 {
     position: fixed;
     top: 0;
@@ -8354,7 +8354,7 @@ body.dark-mode .custom-language-select option:hover {
     animation: fadeIn 0.3s ease-out;
 }
 
-.connection-animation-box {
+.connection-animation-box-v2 {
     width: 500px;
     height: 280px;
     background: white;
@@ -8362,27 +8362,29 @@ body.dark-mode .custom-language-select option:hover {
     padding: 40px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    transition: background 1s ease 0.5s;
+    overflow: hidden;
+    transition: background 1s ease 1.5s;
 }
 
-.connection-animation-box.active {
+.connection-animation-box-v2.active {
     background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(25, 25, 30, 0.95) 100%);
 }
 
-/* User Side */
-.connection-user-side {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    animation: slideInFromLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+/* User Logo - Slides from left */
+.connection-user-logo-v2 {
+    position: absolute;
+    left: -100px;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: slideUserFromLeft 4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    z-index: 2;
 }
 
-.connection-user-avatar {
+.connection-user-avatar-v2 {
     width: 80px;
     height: 80px;
     border-radius: 50%;
@@ -8393,77 +8395,19 @@ body.dark-mode .custom-language-select option:hover {
     font-weight: 700;
     color: white;
     box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-    animation: pulse 2s ease-in-out infinite;
 }
 
-.connection-user-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #6b7280;
-    transition: color 1s ease 0.5s;
+/* Provider Logo - Static on right then merges */
+.connection-provider-logo-v2 {
+    position: absolute;
+    right: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: mergeProvider 4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    z-index: 1;
 }
 
-.connection-animation-box.active .connection-user-label {
-    color: #9ca3af;
-}
-
-/* Connection Line */
-.connection-line-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 0 20px;
-    animation: fadeIn 0.6s ease 0.4s backwards;
-}
-
-.connection-line-animated {
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        #6366f1 25%, 
-        #8b5cf6 50%, 
-        #6366f1 75%, 
-        transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s ease-in-out infinite;
-    border-radius: 2px;
-}
-
-.connection-dots {
-    display: flex;
-    gap: 8px;
-}
-
-.connection-dots span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #6366f1;
-    animation: dotPulse 1.5s ease-in-out infinite;
-}
-
-.connection-dots span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.connection-dots span:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-/* Provider Side */
-.connection-provider-side {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    animation: slideInFromRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
-}
-
-.connection-provider-avatar {
+.connection-provider-avatar-v2 {
     width: 80px;
     height: 80px;
     border-radius: 50%;
@@ -8474,48 +8418,176 @@ body.dark-mode .custom-language-select option:hover {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-.connection-provider-avatar svg {
+.connection-provider-avatar-v2 svg {
     width: 40px;
     height: 40px;
 }
 
-.gmail-avatar {
+.gmail-avatar-v2 {
     background: linear-gradient(135deg, #ea4335 0%, #fbbc04 100%);
 }
 
-.outlook-avatar {
+.outlook-avatar-v2 {
     background: linear-gradient(135deg, #0078d4 0%, #00bcf2 100%);
 }
 
-.connection-provider-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #6b7280;
-    transition: color 1s ease 0.5s;
+/* Final Merged Logo */
+.connection-merged-logo-v2 {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    animation: showMergedLogo 4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    z-index: 3;
 }
 
-.connection-animation-box.active .connection-provider-label {
-    color: #9ca3af;
+.connection-merged-avatar-v2 {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5);
+    position: relative;
+}
+
+/* Connected Badge */
+.connection-badge-v2 {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: 3px solid white;
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 3.5s backwards;
+}
+
+.badge-icon {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
 }
 
 /* Status Text */
 .connection-status-text-v2 {
     position: absolute;
-    bottom: 20px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #6b7280;
-    animation: fadeIn 0.6s ease 0.6s backwards;
-    transition: color 1s ease 0.5s;
+    animation: fadeIn 0.6s ease 0.6s backwards, fadeOut 0.5s ease 3s forwards;
+    transition: color 1s ease 1.5s;
 }
 
-.connection-animation-box.active .connection-status-text-v2 {
+.connection-animation-box-v2.active .connection-status-text-v2 {
     color: #9ca3af;
 }
 
 /* Animations */
+@keyframes slideUserFromLeft {
+    0% {
+        left: -100px;
+        transform: translateY(-50%) scale(1);
+    }
+    40% {
+        left: 40%;
+        transform: translateY(-50%) scale(1);
+    }
+    70% {
+        left: 50%;
+        transform: translateY(-50%) scale(1.1);
+    }
+    85% {
+        left: 50%;
+        transform: translateY(-50%) scale(0.9);
+        opacity: 1;
+    }
+    100% {
+        left: 50%;
+        transform: translateY(-50%) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes mergeProvider {
+    0% {
+        right: 80px;
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+    }
+    40% {
+        right: 80px;
+        transform: translateY(-50%) scale(1);
+        opacity: 1;
+    }
+    70% {
+        right: 50%;
+        transform: translate(50%, -50%) scale(1.1);
+        opacity: 1;
+    }
+    85% {
+        right: 50%;
+        transform: translate(50%, -50%) scale(0.9);
+        opacity: 1;
+    }
+    100% {
+        right: 50%;
+        transform: translate(50%, -50%) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes showMergedLogo {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    85% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes badgePop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.3);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -8527,54 +8599,12 @@ body.dark-mode .custom-language-select option:hover {
     }
 }
 
-@keyframes slideInFromLeft {
+@keyframes fadeOut {
     from {
-        opacity: 0;
-        transform: translateX(-30px);
+        opacity: 1;
     }
     to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInFromRight {
-    from {
         opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
-}
-
-@keyframes dotPulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 0.5;
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
     }
 }
     </style>
@@ -8837,84 +8867,96 @@ if (tokensParam) {
         console.log('🎉 OAuth tokens received for:', provider);
 
         if (provider === 'outlook') {
-            console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
+    console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
 
-            localStorage.setItem('outlookTokens', JSON.stringify(tokens));
-            localStorage.setItem('outlookConnected', 'true');
-            localStorage.removeItem('oauth_in_progress');
+    localStorage.setItem('outlookTokens', JSON.stringify(tokens));
+    localStorage.setItem('outlookConnected', 'true');
+    localStorage.removeItem('oauth_in_progress');
 
-            setOutlookConnected(true);
-            setActiveProvider('outlook');
+    setOutlookConnected(true);
+    setActiveProvider('outlook');
 
-            fetchOutlookEmails(tokens.access_token);
-            fetchOutlookSentEmails(tokens.access_token);
+    fetchOutlookEmails(tokens.access_token);
+    fetchOutlookSentEmails(tokens.access_token);
 
-            console.log('✅ Outlook connected!');
+    console.log('✅ Outlook connected!');
 
-            // Show connection animation popup
-            setConnectionProvider('outlook');
-            setShowConnectionAnimation(true);
+    // Show connection animation popup
+    setConnectionProvider('outlook');
+    setShowConnectionAnimation(true);
 
-            // Play sound immediately
-if (connectionAudioRef.current) {
-    connectionAudioRef.current.currentTime = 0;
-    connectionAudioRef.current.play().catch(err => console.log('Connection sound failed:', err));
-}
+    // Play sound with delay to ensure ref is ready
+    setTimeout(() => {
+        if (connectionAudioRef.current) {
+            connectionAudioRef.current.currentTime = 0;
+            connectionAudioRef.current.play().catch(err => console.log('Sound failed:', err));
+        } else {
+            // Fallback if ref not ready
+            const sound = new Audio('/effect-for-logo-intro-186595.mp3');
+            sound.play().catch(err => console.log('Fallback sound failed:', err));
+        }
+    }, 300);
 
-            // Close animation after 2 seconds and show notification
-            setTimeout(() => {
-                setShowConnectionAnimation(false);
-                showNotification('📮 Outlook connected successfully!');
-            }, 2000);
+    // Close animation after 4 seconds
+    setTimeout(() => {
+        setShowConnectionAnimation(false);
+        showNotification('📮 Outlook connected successfully!');
+    }, 4000);
 
         } else if (provider === 'gmail' || !provider) {
-            console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
+    console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
 
-            localStorage.setItem('gmailTokens', JSON.stringify(tokens));
-            localStorage.setItem('emailConnected', 'true');
-            localStorage.removeItem('oauth_in_progress');
-            setEmailConnected(true);
+    localStorage.setItem('gmailTokens', JSON.stringify(tokens));
+    localStorage.setItem('emailConnected', 'true');
+    localStorage.removeItem('oauth_in_progress');
+    setEmailConnected(true);
 
-            fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                headers: {
-                    Authorization: 'Bearer ' + tokens.access_token
-                }
-            })
-            .then(function(res) { return res.json(); })
-            .then(function(userInfo) {
-                console.log('👤 User:', userInfo.email);
-                setUserEmail(userInfo.email);
-                localStorage.setItem('userEmail', userInfo.email);
-
-                const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
-                setUserName(name);
-                localStorage.setItem('userName', name);
-            })
-            .catch(function(err) {
-                console.error('Error fetching user info:', err);
-            });
-
-            fetchGmailEmails(tokens.access_token);
-            fetchSentEmails(tokens.access_token);
-
-            console.log('✅ Gmail connected!');
-
-            // Show connection animation popup
-            setConnectionProvider('gmail');
-            setShowConnectionAnimation(true);
-
-            // Play sound immediately
-if (connectionAudioRef.current) {
-    connectionAudioRef.current.currentTime = 0;
-    connectionAudioRef.current.play().catch(err => console.log('Connection sound failed:', err));
-}
-
-            // Close animation after 2 seconds and show notification
-            setTimeout(() => {
-                setShowConnectionAnimation(false);
-                showNotification('📧 Gmail connected successfully!');
-            }, 2000);
+    fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+            Authorization: 'Bearer ' + tokens.access_token
         }
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(userInfo) {
+        console.log('👤 User:', userInfo.email);
+        setUserEmail(userInfo.email);
+        localStorage.setItem('userEmail', userInfo.email);
+
+        const name = userInfo.given_name || (userInfo.name ? userInfo.name.split(' ')[0] : 'there');
+        setUserName(name);
+        localStorage.setItem('userName', name);
+    })
+    .catch(function(err) {
+        console.error('Error fetching user info:', err);
+    });
+
+    fetchGmailEmails(tokens.access_token);
+    fetchSentEmails(tokens.access_token);
+
+    console.log('✅ Gmail connected!');
+
+    // Show connection animation popup
+    setConnectionProvider('gmail');
+    setShowConnectionAnimation(true);
+
+    // Play sound with delay to ensure ref is ready
+    setTimeout(() => {
+        if (connectionAudioRef.current) {
+            connectionAudioRef.current.currentTime = 0;
+            connectionAudioRef.current.play().catch(err => console.log('Sound failed:', err));
+        } else {
+            // Fallback if ref not ready
+            const sound = new Audio('/effect-for-logo-intro-186595.mp3');
+            sound.play().catch(err => console.log('Fallback sound failed:', err));
+        }
+    }, 300);
+
+    // Close animation after 4 seconds
+    setTimeout(() => {
+        setShowConnectionAnimation(false);
+        showNotification('📧 Gmail connected successfully!');
+    }, 4000);
+}
 
         // Clean URL
         window.history.replaceState({}, '', '/');
@@ -14754,60 +14796,63 @@ const generateAiDraft = async (email) => {
                         </div>
                     )}
 
-                    {/* Connection Animation Popup - NEW VERSION */}
+                    {/* Connection Animation Popup - NEW MORPHING VERSION */}
 {showConnectionAnimation && (
     <div className="connection-animation-overlay-v2">
-        <div className={`connection-animation-box ${showConnectionAnimation ? 'active' : ''}`}>
-            {/* User Logo - Left Side */}
-            <div className="connection-user-side">
+        <div className={`connection-animation-box-v2 ${showConnectionAnimation ? 'active' : ''}`}>
+            {/* User Logo - Slides from left */}
+            <div className="connection-user-logo-v2">
                 <div 
-                    className={`connection-user-avatar ${selectedProfileIcon ? 'with-texture ' + selectedProfileIcon : ''}`}
+                    className={`connection-user-avatar-v2 ${selectedProfileIcon ? 'with-texture ' + selectedProfileIcon : ''}`}
                     style={{
                         background: selectedProfileIcon ? undefined : selectedProfileColor
                     }}
                 >
                     {userData && userData.name.charAt(0).toUpperCase()}
                 </div>
-                <div className="connection-user-label">Your Account</div>
             </div>
 
-            {/* Connection Line */}
-            <div className="connection-line-wrapper">
-                <div className="connection-line-animated"></div>
-                <div className="connection-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-
-            {/* Provider Logo - Right Side */}
-            <div className="connection-provider-side">
+            {/* Provider Logo - Static on right */}
+            <div className="connection-provider-logo-v2">
                 {connectionProvider === 'gmail' ? (
-                    <>
-                        <div className="connection-provider-avatar gmail-avatar">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
-                            </svg>
-                        </div>
-                        <div className="connection-provider-label">Gmail</div>
-                    </>
+                    <div className="connection-provider-avatar-v2 gmail-avatar-v2">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                        </svg>
+                    </div>
                 ) : (
-                    <>
-                        <div className="connection-provider-avatar outlook-avatar">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z"/>
-                            </svg>
-                        </div>
-                        <div className="connection-provider-label">Outlook</div>
-                    </>
+                    <div className="connection-provider-avatar-v2 outlook-avatar-v2">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                            <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z"/>
+                        </svg>
+                    </div>
                 )}
+            </div>
+
+            {/* Final Merged Logo - Shows after animation */}
+            <div className="connection-merged-logo-v2">
+                <div 
+                    className={`connection-merged-avatar-v2 ${selectedProfileIcon ? 'with-texture ' + selectedProfileIcon : ''}`}
+                    style={{
+                        background: selectedProfileIcon ? undefined : selectedProfileColor
+                    }}
+                >
+                    {userData && userData.name.charAt(0).toUpperCase()}
+                    
+                    {/* Connected Badge */}
+                    <div className="connection-badge-v2">
+                        <span className="badge-icon">✓</span>
+                        <span className="badge-text">
+                            {connectionProvider === 'gmail' ? 'Gmail' : 'Outlook'}
+                        </span>
+                    </div>
+                </div>
             </div>
 
             {/* Status Text */}
             <div className="connection-status-text-v2">
-                Connecting...
+                Connecting to {connectionProvider === 'gmail' ? 'Gmail' : 'Outlook'}...
             </div>
         </div>
     </div>
