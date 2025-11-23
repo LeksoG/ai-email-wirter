@@ -7162,6 +7162,26 @@ body.dark-mode .ai-writer-centered-mode {
     100% { opacity: 1; }
 }
 
+/* Wave animation for AI response words */
+.ai-response-word {
+    display: inline;
+    opacity: 0;
+    animation: word-wave-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes word-wave-in {
+    0% {
+        opacity: 0;
+        transform: translateY(8px);
+        filter: blur(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
 /* Centered mode header with buttons */
 .centered-mode-header {
     display: flex;
@@ -8468,6 +8488,7 @@ body.dark-mode .custom-language-select option:hover {
             const [centeredWriterResult, setCenteredWriterResult] = useState('');
             const [isCenteredGenerating, setIsCenteredGenerating] = useState(false);
             const [centeredGenerationStatus, setCenteredGenerationStatus] = useState('');
+            const [isReplyOnlyMode, setIsReplyOnlyMode] = useState(false); // For reply rewrite - no layout shift
 
             // Logout Confirmation state
             const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -8593,9 +8614,11 @@ if (tokensParam) {
             setConnectionProvider('outlook');
             setShowConnectionAnimation(true);
 
-            
-            const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
-            connectionSound.play().catch(err => console.log('Sound failed:', err));
+            // Play sound slightly after animation starts for better sync
+            setTimeout(() => {
+                const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
+                connectionSound.play().catch(err => console.log('Sound failed:', err));
+            }, 200);
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
@@ -8639,9 +8662,11 @@ if (tokensParam) {
             setConnectionProvider('gmail');
             setShowConnectionAnimation(true);
 
-            // CONNECTION SOUND - Play sound on Gmail connection
-            const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
-            connectionSound.play().catch(err => console.log('Connection sound failed:', err));
+            // CONNECTION SOUND - Play sound slightly after animation starts for better sync
+            setTimeout(() => {
+                const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
+                connectionSound.play().catch(err => console.log('Connection sound failed:', err));
+            }, 200);
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
@@ -8859,9 +8884,11 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
             }, [customPrompt, showSuggestionsEnabled]);
 
             // Initialize audio with local files
-            useEffect(() => {     
-                 audioRef.current = new Audio('/effect-for-logo-intro-186595.mp3');
-                audioRef.current.load();
+            useEffect(() => {
+                // Notification sound - disabled for now (was using whoosh incorrectly)
+                // Add your notification sound file here if needed
+                // audioRef.current = new Audio('/your-notification-sound.mp3');
+                // audioRef.current.load();
 
                 // Send email sound - whoosh (only plays when sending emails)
                 sendAudioRef.current = new Audio('/whoosh-motion-405445.mp3');
@@ -10197,6 +10224,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
             // AI Generation Handler - Now uses centered writer mode instead of popup modal
             const handleAiGeneration = async (prompt, emailContent) => {
                 // Use the new centered writer mode
+                // Not reply-only mode, so layout shift will happen
+                setIsReplyOnlyMode(false);
                 setCenteredWriterPrompt(prompt);
                 setShowCenteredWriter(true);
                 setIsCenteredGenerating(true);
@@ -10246,6 +10275,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 setCenteredWriterResult('');
                 setIsCenteredGenerating(false);
                 setAiSuggestions([]);
+                setIsReplyOnlyMode(false);
             };
 
             // Handle follow-up in centered writer mode
@@ -10328,6 +10358,38 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 }
 
                 setAiSuggestions(suggestions.slice(0, 4));
+            };
+
+            // Render text with wave animation - words appear one by one
+            const renderWaveText = (text) => {
+                if (!text) return null;
+
+                // Split by newlines first to preserve line breaks
+                const lines = text.split('\n');
+                let wordIndex = 0;
+
+                return lines.map((line, lineIndex) => (
+                    <React.Fragment key={lineIndex}>
+                        {line.split(/(\s+)/).map((part, partIndex) => {
+                            if (part.match(/^\s+$/)) {
+                                // Just whitespace, render as-is
+                                return part;
+                            }
+                            if (part.length === 0) return null;
+                            const currentWordIndex = wordIndex++;
+                            return (
+                                <span
+                                    key={`${lineIndex}-${partIndex}`}
+                                    className="ai-response-word"
+                                    style={{ animationDelay: `${currentWordIndex * 0.02}s` }}
+                                >
+                                    {part}
+                                </span>
+                            );
+                        })}
+                        {lineIndex < lines.length - 1 && <br />}
+                    </React.Fragment>
+                ));
             };
 
             // Generate dynamic prompt suggestions based on email content and user typing
@@ -10888,6 +10950,8 @@ const generateAiDraft = async (email) => {
                 playNotificationSound();
 
                 // Use centered writer mode for smooth animation and suggestions
+                // Set reply-only mode so we don't trigger layout shift
+                setIsReplyOnlyMode(true);
                 setCenteredWriterPrompt(finalPrompt);
                 setShowCenteredWriter(true);
                 setIsCenteredGenerating(true);
@@ -12694,10 +12758,10 @@ const generateAiDraft = async (email) => {
                               {/* Desktop Layout: Inbox Sidebar + Content Area */}
                                 {(emailConnected || outlookConnected) && currentPage === 'home' && (
                                     <>
-                                    <div className={`desktop-inbox-layout ${isCenteredGenerating ? 'generating-mode' : ''}`}>
+                                    <div className={`desktop-inbox-layout ${(isCenteredGenerating && !isReplyOnlyMode) ? 'generating-mode' : ''}`}>
                                         {/* Left Sidebar - Inbox */}
                                         {/* Left Sidebar - Inbox */}
-                                         <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''} ${isCenteredGenerating ? 'generating-hidden' : ''}`}>
+                                         <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''} ${(isCenteredGenerating && !isReplyOnlyMode) ? 'generating-hidden' : ''}`}>
                                             {/* Header with Title and Buttons */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
@@ -13294,7 +13358,7 @@ const generateAiDraft = async (email) => {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''} ${aiWritingMode ? 'ai-mode-centered' : ''} ${aiWritingModeClosing ? 'ai-mode-normal' : ''} ${isCenteredGenerating ? 'generating-centered' : ''}`}
+                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''} ${aiWritingMode ? 'ai-mode-centered' : ''} ${aiWritingModeClosing ? 'ai-mode-normal' : ''} ${(isCenteredGenerating && !isReplyOnlyMode) ? 'generating-centered' : ''}`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
@@ -13506,17 +13570,16 @@ const generateAiDraft = async (email) => {
                                                         </div>
                                                     ) : (
                                                         <>
-                                                            {/* Result display */}
+                                                            {/* Result display with wave animation */}
                                                             <div style={{
                                                                 padding: '20px',
                                                                 background: darkMode ? 'rgba(40, 40, 45, 0.5)' : 'rgba(249, 250, 251, 0.8)',
                                                                 borderRadius: '16px',
                                                                 fontSize: '15px',
                                                                 lineHeight: '1.7',
-                                                                color: darkMode ? '#e5e5e5' : '#374151',
-                                                                whiteSpace: 'pre-wrap'
+                                                                color: darkMode ? '#e5e5e5' : '#374151'
                                                             }}>
-                                                                {centeredWriterResult}
+                                                                {renderWaveText(centeredWriterResult)}
                                                             </div>
 
                                                             {/* Follow-up suggestions */}
