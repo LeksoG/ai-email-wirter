@@ -8866,54 +8866,43 @@ if (tokensParam) {
         const tokens = JSON.parse(decodeURIComponent(tokensParam));
         console.log('🎉 OAuth tokens received for:', provider);
 
-        // ENHANCED SOUND FUNCTION - No annoying alerts
-const playConnectionSound = () => {
-    console.log('🔊 Attempting to play connection sound...');
-    
-    // Try to play sound, but don't alert on failure (browser autoplay policy)
-    const attemptPlay = (audioElement) => {
-        // Reset to beginning in case it was already played
-        audioElement.currentTime = 0;
-        audioElement.volume = 0.7; // Set volume to 70%
+        // ENHANCED SOUND FUNCTION - Works after audio is unlocked on button click
+        const playConnectionSound = () => {
+            console.log('🔊 Attempting to play connection sound...');
 
-        return audioElement.play()
-            .then(() => {
-                console.log('✅ Sound played successfully');
-                return true;
-            })
-            .catch(err => {
-                // NotAllowedError is expected due to browser autoplay policy
-                if (err.name === 'NotAllowedError') {
-                    console.log('ℹ️ Sound blocked by browser autoplay policy (retrying...)');
-                    // Try again after a short delay
-                    setTimeout(() => {
-                        audioElement.play().catch(() => {
-                            console.log('ℹ️ Second attempt also blocked');
-                        });
-                    }, 500);
-                } else {
-                    console.warn('⚠️ Sound failed:', err.message);
+            const attemptPlay = (audioElement) => {
+                audioElement.currentTime = 0;
+                audioElement.volume = 0.7;
+
+                return audioElement.play()
+                    .then(() => {
+                        console.log('✅ Sound played successfully');
+                        return true;
+                    })
+                    .catch(err => {
+                        if (err.name === 'NotAllowedError') {
+                            console.log('ℹ️ Sound blocked - audio was not unlocked on user interaction');
+                        } else {
+                            console.warn('⚠️ Sound failed:', err.message);
+                        }
+                        return false;
+                    });
+            };
+
+            if (connectionAudioRef.current) {
+                console.log('✓ Using audio ref');
+                attemptPlay(connectionAudioRef.current);
+            } else {
+                console.log('🔄 Using fallback method');
+                try {
+                    const sound = new Audio('/effect-for-logo-intro-186595.mp3');
+                    sound.load();
+                    attemptPlay(sound);
+                } catch (err) {
+                    console.log('ℹ️ Could not create audio element:', err.message);
                 }
-                return false;
-            });
-    };
-
-    // Method 1: Try ref first
-    if (connectionAudioRef.current) {
-        console.log('✓ Using audio ref');
-        attemptPlay(connectionAudioRef.current);
-    } else {
-        // Method 2: Fallback to new Audio
-        console.log('🔄 Using fallback method');
-        try {
-            const sound = new Audio('/effect-for-logo-intro-186595.mp3');
-            sound.load(); // Pre-load the audio
-            attemptPlay(sound);
-        } catch (err) {
-            console.log('ℹ️ Could not create audio element:', err.message);
-        }
-    }
-};
+            }
+        };
 
         if (provider === 'outlook') {
             console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
@@ -9750,6 +9739,23 @@ useEffect(() => {
         return;
     }
 
+    // UNLOCK AUDIO on user click to enable sound after OAuth
+    if (connectionAudioRef.current) {
+        console.log('🔓 Unlocking audio on user interaction...');
+        const audio = connectionAudioRef.current;
+        audio.volume = 0.01; // Very quiet
+        audio.currentTime = 0;
+        audio.play()
+            .then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+                console.log('✅ Audio unlocked for later playback');
+            })
+            .catch(() => {
+                console.log('ℹ️ Audio unlock attempted (may retry)');
+            });
+    }
+
     try {
         console.log('🔐 Initiating Gmail OAuth...');
 
@@ -9777,27 +9783,44 @@ useEffect(() => {
         return;
     }
 
+    // UNLOCK AUDIO on user click to enable sound after OAuth
+    if (connectionAudioRef.current) {
+        console.log('🔓 Unlocking audio on user interaction...');
+        const audio = connectionAudioRef.current;
+        audio.volume = 0.01; // Very quiet
+        audio.currentTime = 0;
+        audio.play()
+            .then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+                console.log('✅ Audio unlocked for later playback');
+            })
+            .catch(() => {
+                console.log('ℹ️ Audio unlock attempted (may retry)');
+            });
+    }
+
     try {
         console.log('🔐 Initiating Outlook OAuth...');
 
         const response = await fetch('/api/outlook-auth');
-        
+
         if (!response.ok) {
             const errorText = await response.text();
             console.error('❌ Auth endpoint failed:', response.status, errorText);
             throw new Error('Failed to get auth URL: ' + response.status);
         }
-        
+
         const data = await response.json();
         console.log('📦 Auth response:', data);
-        
+
         if (!data.success || !data.authUrl) {
             throw new Error('Invalid response from auth endpoint');
         }
-        
+
         console.log('📮 Redirect URI generated:', data.redirectUri);
         console.log('📮 Redirecting to Microsoft OAuth...');
-        
+
         // NO CONFIRM DIALOG - Direct redirect
         localStorage.setItem('oauth_in_progress', 'outlook');
         window.location.href = data.authUrl;
