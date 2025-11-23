@@ -8338,189 +8338,243 @@ body.dark-mode .custom-language-select option:hover {
     top: var(--before-top, 50%);
 } 
 
-        /* Connection Animation Container */
-.connection-animation-overlay {
+        /* New Connection Animation V2 */
+.connection-animation-overlay-v2 {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
+    z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
     animation: fadeIn 0.3s ease-out;
 }
 
 .connection-animation-box {
     width: 500px;
-    height: 200px;
-    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    height: 280px;
+    background: white;
     border-radius: 24px;
+    padding: 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: boxAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
-    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: background 1s ease 0.5s;
 }
 
-/* Theme transition animation */
-.connection-animation-box.transitioning {
-    animation: themeDarken 1s ease-out 1s forwards;
+.connection-animation-box.active {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(25, 25, 30, 0.95) 100%);
 }
 
-@keyframes boxAppear {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+/* User Side */
+.connection-user-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: slideInFromLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
 }
 
-@keyframes themeDarken {
-    from {
-        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-    }
-    to {
-        background: linear-gradient(135deg, #1e1e23 0%, #191919 100%);
-    }
-}
-
-/* User Logo Animation - Left Side */
-.connection-user-logo {
+.connection-user-avatar {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 700;
     color: white;
-    animation: logoSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
-    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    animation: pulse 2s ease-in-out infinite;
 }
 
-@keyframes logoSlideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-100px) scale(0.5);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-    }
+.connection-user-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    transition: color 1s ease 0.5s;
 }
 
-/* Provider Logo Animation - Right Side */
-.connection-provider-logo {
+.connection-animation-box.active .connection-user-label {
+    color: #9ca3af;
+}
+
+/* Connection Line */
+.connection-line-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+    animation: fadeIn 0.6s ease 0.4s backwards;
+}
+
+.connection-line-animated {
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #6366f1 25%, 
+        #8b5cf6 50%, 
+        #6366f1 75%, 
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 2px;
+}
+
+.connection-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.connection-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6366f1;
+    animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+.connection-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.connection-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Provider Side */
+.connection-provider-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: slideInFromRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+}
+
+.connection-provider-avatar {
     width: 80px;
     height: 80px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: logoSlideInRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s backwards;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    border: 4px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-.connection-provider-logo.gmail {
-    background: linear-gradient(135deg, #4285F4 0%, #34a853 100%);
+.connection-provider-avatar svg {
+    width: 40px;
+    height: 40px;
 }
 
-.connection-provider-logo.outlook {
-    background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
+.gmail-avatar {
+    background: linear-gradient(135deg, #ea4335 0%, #fbbc04 100%);
 }
 
-@keyframes logoSlideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100px) scale(0.5);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-    }
+.outlook-avatar {
+    background: linear-gradient(135deg, #0078d4 0%, #00bcf2 100%);
 }
 
-/* Connection Line Between Logos */
-.connection-line-animated {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 200px;
-    height: 4px;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    border-radius: 2px;
-    animation: lineGrow 1s ease-out 0.9s backwards;
+.connection-provider-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    transition: color 1s ease 0.5s;
 }
 
-@keyframes lineGrow {
-    from {
-        width: 0;
-        opacity: 0;
-    }
-    to {
-        width: 200px;
-        opacity: 1;
-    }
-}
-
-/* Pulse animation on logos */
-.connection-user-logo,
-.connection-provider-logo {
-    animation: logoSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
-               logoPulse 2s ease-in-out 1.5s infinite;
-}
-
-@keyframes logoPulse {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
-    }
-    50% {
-        transform: scale(1.05);
-        box-shadow: 0 12px 48px rgba(99, 102, 241, 0.6);
-    }
+.connection-animation-box.active .connection-provider-label {
+    color: #9ca3af;
 }
 
 /* Status Text */
-.connection-status-text {
+.connection-status-text-v2 {
     position: absolute;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
-    color: #374151;
-    animation: statusFade 0.5s ease-out 1.2s backwards;
-    transition: color 1s ease-out 1s;
+    color: #6b7280;
+    animation: fadeIn 0.6s ease 0.6s backwards;
+    transition: color 1s ease 0.5s;
 }
 
-.connection-animation-box.transitioning .connection-status-text {
-    color: #e5e5e5;
+.connection-animation-box.active .connection-status-text-v2 {
+    color: #9ca3af;
 }
 
-@keyframes statusFade {
+/* Animations */
+@keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateX(-50%) translateY(10px);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes dotPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
     }
 }
     </style>
