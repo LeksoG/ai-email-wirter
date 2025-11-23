@@ -8859,11 +8859,9 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
             }, [customPrompt, showSuggestionsEnabled]);
 
             // Initialize audio with local files
-            useEffect(() => {
-                // Notification sound - disabled for now (was using whoosh incorrectly)
-                // Add your notification sound file here if needed
-                // audioRef.current = new Audio('/your-notification-sound.mp3');
-                // audioRef.current.load();
+            useEffect(() => {     
+                 audioRef.current = new Audio('/effect-for-logo-intro-186595.mp3');
+                audioRef.current.load();
 
                 // Send email sound - whoosh (only plays when sending emails)
                 sendAudioRef.current = new Audio('/whoosh-motion-405445.mp3');
