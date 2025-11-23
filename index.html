@@ -7306,6 +7306,554 @@ body.dark-mode .centered-status-item.active {
     color: #a5b4fc;
 }
 
+/* ===== AI WRITER FOCUSED MODE - Smooth Layout Transitions ===== */
+/* This replaces the popup approach with in-place layout animation */
+
+/* Header slide up animation when in AI writing mode */
+.sticky-header.ai-mode-hidden {
+    animation: header-slide-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes header-slide-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100%);
+        pointer-events: none;
+    }
+}
+
+.sticky-header.ai-mode-visible {
+    animation: header-slide-down 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes header-slide-down {
+    0% {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+    }
+}
+
+/* Inbox sidebar slide out animation */
+.inbox-sidebar.ai-mode-hidden {
+    animation: inbox-slide-out 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes inbox-slide-out {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%) scale(0.9);
+        pointer-events: none;
+        width: 0;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+.inbox-sidebar.ai-mode-visible {
+    animation: inbox-slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes inbox-slide-in {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%) scale(0.9);
+        width: 0;
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        width: 480px;
+        pointer-events: all;
+    }
+}
+
+/* Email content area center animation */
+.email-content-area.ai-mode-centered {
+    animation: content-slide-center 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes content-slide-center {
+    0% {
+        margin-left: 0;
+    }
+    100% {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 900px;
+    }
+}
+
+.email-content-area.ai-mode-normal {
+    animation: content-slide-back 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes content-slide-back {
+    0% {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 900px;
+    }
+    100% {
+        margin-left: 0;
+        margin-right: 0;
+        max-width: none;
+    }
+}
+
+/* Desktop layout in AI writing mode */
+.desktop-inbox-layout.ai-writing-mode {
+    justify-content: center;
+}
+
+.desktop-inbox-layout.ai-writing-mode .inbox-sidebar {
+    display: none;
+}
+
+.desktop-inbox-layout.ai-writing-mode .email-content-area {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* ===== AI Writer Prompt Container (Oval at bottom) ===== */
+.ai-writer-prompt-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    animation: prompt-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.3s;
+    opacity: 0;
+}
+
+@keyframes prompt-slide-up {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.ai-writer-prompt-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    min-width: 400px;
+    max-width: 600px;
+}
+
+body.dark-mode .ai-writer-prompt-input {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.95) 0%, rgba(25, 25, 30, 0.9) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.ai-writer-prompt-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #374151;
+}
+
+body.dark-mode .ai-writer-prompt-input input {
+    color: #e5e5e5;
+}
+
+.ai-writer-prompt-input input::placeholder {
+    color: #9ca3af;
+}
+
+/* ===== GRAMMAR CHECK BUTTON & HIGHLIGHT EFFECTS ===== */
+.grammar-check-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6366f1;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 10;
+}
+
+body.dark-mode .grammar-check-btn {
+    background: linear-gradient(135deg, rgba(40, 40, 45, 0.95) 0%, rgba(35, 35, 40, 0.9) 100%);
+    border-color: rgba(99, 102, 241, 0.4);
+    color: #a5b4fc;
+}
+
+.grammar-check-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+.grammar-check-btn.checking {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    animation: grammar-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes grammar-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+    }
+}
+
+/* Grammar highlight overlay */
+.grammar-highlight-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+.grammar-checking-effect {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(99, 102, 241, 0.1) 30%,
+        rgba(139, 92, 246, 0.2) 50%,
+        rgba(99, 102, 241, 0.1) 70%,
+        transparent 100%
+    );
+    animation: grammar-scan 1.5s ease-in-out infinite;
+}
+
+@keyframes grammar-scan {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Grammar corrected word highlight */
+.grammar-corrected-word {
+    display: inline;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.15) 100%);
+    border-radius: 4px;
+    padding: 1px 4px;
+    animation: highlight-fade 3s ease-out forwards;
+}
+
+@keyframes highlight-fade {
+    0% {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(5, 150, 105, 0.3) 100%);
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+    70% {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.15) 100%);
+    }
+    100% {
+        background: transparent;
+        box-shadow: none;
+    }
+}
+
+/* Grammar result notification */
+.grammar-result-notification {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    animation: notification-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), notification-fade 0.5s ease-out 2.5s forwards;
+    z-index: 10;
+}
+
+.grammar-result-notification.success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+    border: 2px solid rgba(16, 185, 129, 0.4);
+    color: #059669;
+}
+
+.grammar-result-notification.corrected {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border: 2px solid rgba(99, 102, 241, 0.4);
+    color: #6366f1;
+}
+
+body.dark-mode .grammar-result-notification.success {
+    color: #34d399;
+}
+
+body.dark-mode .grammar-result-notification.corrected {
+    color: #a5b4fc;
+}
+
+@keyframes notification-appear {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes notification-fade {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* ===== SHOWCASE CAROUSEL FOR NO PROVIDER STATE ===== */
+.showcase-carousel-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.showcase-track {
+    display: flex;
+    gap: 20px;
+    animation: carousel-scroll 20s linear infinite;
+    width: fit-content;
+}
+
+@keyframes carousel-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.showcase-card {
+    flex-shrink: 0;
+    width: 300px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.85) 100%);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .showcase-card {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.9) 0%, rgba(25, 25, 30, 0.85) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.showcase-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
+}
+
+.showcase-card-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.showcase-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+body.dark-mode .showcase-card-title {
+    color: #e5e5e5;
+}
+
+.showcase-card-example {
+    font-size: 14px;
+    color: #6b7280;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+body.dark-mode .showcase-card-example {
+    color: #9ca3af;
+}
+
+.showcase-card-response {
+    margin-top: 12px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.08) 100%);
+    border-radius: 12px;
+    font-size: 13px;
+    color: #4f46e5;
+}
+
+body.dark-mode .showcase-card-response {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+    color: #a5b4fc;
+}
+
+/* Gradient fade on edges */
+.showcase-carousel-container::before,
+.showcase-carousel-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.showcase-carousel-container::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--bg-color, #e0e7ff) 0%, transparent 100%);
+}
+
+.showcase-carousel-container::after {
+    right: 0;
+    background: linear-gradient(-90deg, var(--bg-color, #e0e7ff) 0%, transparent 100%);
+}
+
+body.dark-mode .showcase-carousel-container::before {
+    background: linear-gradient(90deg, #0a0a0a 0%, transparent 100%);
+}
+
+body.dark-mode .showcase-carousel-container::after {
+    background: linear-gradient(-90deg, #0a0a0a 0%, transparent 100%);
+}
+
+/* Pause carousel on hover */
+.showcase-carousel-container:hover .showcase-track {
+    animation-play-state: paused;
+}
+
+/* ===== CLOSE BUTTON FOR AI WRITING MODE ===== */
+.ai-mode-close-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    font-size: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: close-btn-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.4s;
+    opacity: 0;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2);
+}
+
+body.dark-mode .ai-mode-close-btn {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.95) 0%, rgba(25, 25, 30, 0.9) 100%);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.ai-mode-close-btn:hover {
+    transform: rotate(90deg) scale(1.1);
+    background: rgba(239, 68, 68, 0.1);
+    box-shadow: 0 6px 24px rgba(239, 68, 68, 0.3);
+}
+
+@keyframes close-btn-appear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotate(-180deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+    }
+}
+
+/* ===== DRAG AND DROP ENHANCEMENT ===== */
+.inbox-email-draggable {
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.inbox-email-draggable:active {
+    cursor: grabbing;
+}
+
+.inbox-email-draggable.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+}
+
+.email-content-area.drag-active {
+    border: 2px dashed rgba(99, 102, 241, 0.5) !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.03) 100%) !important;
+}
+
+.email-content-area.drag-active::before {
+    content: '📧 Drop email here to reply';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: 600;
+    color: #6366f1;
+    text-align: center;
+    z-index: 10;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
 /* Logout Confirmation Dialog */
 .logout-confirm-overlay {
     position: fixed;
@@ -7956,6 +8504,16 @@ body.dark-mode .custom-language-select option:hover {
             const [selectedLanguage, setSelectedLanguage] = useState('english');
             const [showLanguageInHome, setShowLanguageInHome] = useState(false);
 
+            // AI Writing Mode states (smooth transition instead of popup)
+            const [aiWritingMode, setAiWritingMode] = useState(false);
+            const [aiWritingModeClosing, setAiWritingModeClosing] = useState(false);
+
+            // Manual Grammar Check states
+            const [isManualGrammarChecking, setIsManualGrammarChecking] = useState(false);
+            const [grammarCheckResult, setGrammarCheckResult] = useState(null); // 'success' | 'corrected' | null
+            const [grammarCorrectedText, setGrammarCorrectedText] = useState('');
+            const [showGrammarNotification, setShowGrammarNotification] = useState(false);
+
             // Audio references for notifications
             const audioRef = useRef(null);
             const sendAudioRef = useRef(null);
@@ -8023,10 +8581,9 @@ if (tokensParam) {
             setConnectionProvider('outlook');
             setShowConnectionAnimation(true);
 
-            // Connection sound disabled - file not available
-            // To enable: add sound file and uncomment below
-            // const connectionSound = new Audio('/connection-sound.mp3');
-            // connectionSound.play().catch(err => console.log('Sound failed:', err));
+            
+            const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
+            connectionSound.play().catch(err => console.log('Sound failed:', err));
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
@@ -8660,6 +9217,9 @@ useEffect(() => {
             console.log('✅ Gmail email sent successfully!');
         }
 
+        // Trigger AI writing mode animation
+        openAiWritingMode();
+
         // Success! Show animations
         setShowEnvelope(true);
         playSendSound();
@@ -8668,10 +9228,16 @@ useEffect(() => {
         setTimeout(() => {
             showNotification('✉️ Reply sent successfully!');
 
-            // Clear fields and close modal
+            // Clear fields and close AI writing mode
             setEmailReply('');
             setReplyPrompt('');
-            setViewingEmail(null);
+
+            // Close AI writing mode after a brief moment to show success
+            setTimeout(() => {
+                closeAiWritingMode();
+                setViewingEmail(null);
+            }, 1000);
+
             setIsSending(false);
 
             // Remove envelope after animation
@@ -10264,6 +10830,69 @@ const generateAiDraft = async (email) => {
                     console.error('Error rewriting reply:', error);
                     setIsRewritingReply(false);
                 }
+            };
+
+            // Manual Grammar Check function
+            const handleManualGrammarCheck = async (text, setText) => {
+                if (!text || text.trim().length < 3) return;
+
+                setIsManualGrammarChecking(true);
+                setGrammarCheckResult(null);
+                setShowGrammarNotification(false);
+
+                try {
+                    const response = await fetch('/api/transform', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: 'Check the grammar and spelling of this text. If there are errors, correct them and return ONLY the corrected text. If the text is already correct, return exactly "NO_ERRORS_FOUND". Do not add any explanations or extra text.',
+                            text: text,
+                            temperature: 0.3
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.result) {
+                        if (data.result.trim() === 'NO_ERRORS_FOUND' || data.result.trim().toLowerCase().includes('no errors') || data.result.trim() === text.trim()) {
+                            // No grammar issues found
+                            setGrammarCheckResult('success');
+                            setShowGrammarNotification(true);
+                        } else {
+                            // Grammar was corrected
+                            setGrammarCorrectedText(data.result);
+                            setText(data.result);
+                            setGrammarCheckResult('corrected');
+                            setShowGrammarNotification(true);
+                        }
+                    }
+
+                    // Hide notification after 3 seconds
+                    setTimeout(() => {
+                        setShowGrammarNotification(false);
+                        setGrammarCheckResult(null);
+                    }, 3000);
+
+                } catch (error) {
+                    console.error('Grammar check error:', error);
+                }
+
+                setIsManualGrammarChecking(false);
+            };
+
+            // Open AI Writing Mode (centered layout)
+            const openAiWritingMode = () => {
+                setAiWritingMode(true);
+                setAiWritingModeClosing(false);
+            };
+
+            // Close AI Writing Mode with animation
+            const closeAiWritingMode = () => {
+                setAiWritingModeClosing(true);
+                setTimeout(() => {
+                    setAiWritingMode(false);
+                    setAiWritingModeClosing(false);
+                }, 600); // Match animation duration
             };
 
             const renderSettings = () => {
@@ -11873,7 +12502,7 @@ const generateAiDraft = async (email) => {
                     <div className="ai-particle" style={{bottom: '20%', right: '10%', animationDelay: '12s'}}></div>
 
                     {/* Sticky Header */}
-                    <header className="sticky-header">
+                    <header className={`sticky-header ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''}`}>
                         <div className="container mx-auto px-4 py-4">
                             <div className="flex justify-center items-center" style={{position: 'relative'}}>
                                 {/* Navigation Bar */}
@@ -11936,7 +12565,7 @@ const generateAiDraft = async (email) => {
                                     <div className="desktop-inbox-layout">
                                         {/* Left Sidebar - Inbox */}
                                         {/* Left Sidebar - Inbox */}
-                                         <div className="inbox-sidebar">
+                                         <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''}`}>
                                             {/* Header with Title and Buttons */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
@@ -12048,79 +12677,94 @@ const generateAiDraft = async (email) => {
                                             {/* Email List Area */}
                                             <div className={`inbox-scroll-area ${showInboxSearchSuggestions && inboxSearchResults.length > 0 ? 'inbox-content-blur' : 'inbox-content-normal'}`}>
                                                 {inboxViewMode === 'tabs' ? (
-    /* Provider Selection View with Examples */
-    <div className="text-center py-12 splash-container" style={{maxWidth: '600px', margin: '0 auto'}}>
-        <div className="text-6xl mb-6" style={{animation: 'float 3s ease-in-out infinite'}}>📮</div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-3" style={{
+    /* Provider Selection View with Animated Showcase Carousel */
+    <div className="text-center py-8 splash-container" style={{maxWidth: '100%', margin: '0 auto', overflow: 'hidden'}}>
+        <div className="text-5xl mb-4" style={{animation: 'float 3s ease-in-out infinite'}}>📮</div>
+        <h3 className="text-xl font-bold text-gray-800 mb-2" style={{
             background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
         }}>
             Select Email Provider
         </h3>
-        <p className="text-sm text-gray-600 mb-8">Choose a provider to unlock AI-powered email management</p>
+        <p className="text-xs text-gray-600 mb-6">Connect to unlock AI-powered email management</p>
 
-        {/* Example Demos */}
-        <div className="space-y-4 text-left">
-            <div className="ladder-item" style={{
-                padding: '16px 20px',
-                background: darkMode
-                    ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)'
-                    : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%)',
-                borderRadius: '16px',
-                border: '2px solid rgba(99, 102, 241, 0.3)',
-                position: 'relative',
-                overflow: 'hidden',
-                animationDelay: '0s'
-            }}>
-                <div style={{fontSize: '12px', fontWeight: '700', color: '#6366f1', marginBottom: '8px'}}>
-                    ✨ AI Summarization
+        {/* Animated Showcase Carousel */}
+        <div className="showcase-carousel-container" style={{height: '280px'}}>
+            <div className="showcase-track">
+                {/* First set of cards */}
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">💬</div>
+                    <div className="showcase-card-title">Thanks for reaching out!</div>
+                    <div className="showcase-card-example">"Thank you for your interest in our product..."</div>
+                    <div className="showcase-card-response">→ AI generates professional responses instantly</div>
                 </div>
-                <div style={{fontSize: '13px', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px', fontWeight: '600'}}>
-                    "Meeting Tomorrow at 2 PM"
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">📅</div>
+                    <div className="showcase-card-title">Meeting Request</div>
+                    <div className="showcase-card-example">"Can we schedule a call this week?"</div>
+                    <div className="showcase-card-response">→ Smart scheduling suggestions included</div>
                 </div>
-                <div style={{fontSize: '12px', color: darkMode ? '#a0a0a0' : '#6b7280', fontStyle: 'italic'}}>
-                    → "Quick reminder about tomorrow's project sync meeting"
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">🙏</div>
+                    <div className="showcase-card-title">I appreciate your help</div>
+                    <div className="showcase-card-example">"Thank you so much for your assistance..."</div>
+                    <div className="showcase-card-response">→ Warm, personalized thank you notes</div>
                 </div>
-            </div>
-
-            <div className="ladder-item" style={{
-                padding: '16px 20px',
-                background: darkMode
-                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)'
-                    : 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.05) 100%)',
-                borderRadius: '16px',
-                border: '2px solid rgba(16, 185, 129, 0.3)',
-                animationDelay: '0.15s'
-            }}>
-                <div style={{fontSize: '12px', fontWeight: '700', color: '#10b981', marginBottom: '8px'}}>
-                    ⚡ Priority Detection
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">⚡</div>
+                    <div className="showcase-card-title">Quick Update</div>
+                    <div className="showcase-card-example">"Just a quick note to update you on..."</div>
+                    <div className="showcase-card-response">→ Concise status updates in seconds</div>
                 </div>
-                <div style={{fontSize: '13px', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px', fontWeight: '600'}}>
-                    "URGENT: Server Issue"
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">🤝</div>
+                    <div className="showcase-card-title">Looking forward to connecting</div>
+                    <div className="showcase-card-example">"I'd love to learn more about..."</div>
+                    <div className="showcase-card-response">→ Professional networking responses</div>
                 </div>
-                <div style={{fontSize: '12px', color: darkMode ? '#a0a0a0' : '#6b7280', fontStyle: 'italic'}}>
-                    → Automatically moved to top of your inbox
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">✅</div>
+                    <div className="showcase-card-title">Acknowledged</div>
+                    <div className="showcase-card-example">"I've received your message and..."</div>
+                    <div className="showcase-card-response">→ Quick confirmations with context</div>
                 </div>
-            </div>
-
-            <div className="ladder-item" style={{
-                padding: '16px 20px',
-                background: darkMode
-                    ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)'
-                    : 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.05) 100%)',
-                borderRadius: '16px',
-                border: '2px solid rgba(245, 158, 11, 0.3)',
-                animationDelay: '0.3s'
-            }}>
-                <div style={{fontSize: '12px', fontWeight: '700', color: '#f59e0b', marginBottom: '8px'}}>
-                    ✍️ AI Reply Generation
+                {/* Duplicate for infinite scroll */}
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">💬</div>
+                    <div className="showcase-card-title">Thanks for reaching out!</div>
+                    <div className="showcase-card-example">"Thank you for your interest in our product..."</div>
+                    <div className="showcase-card-response">→ AI generates professional responses instantly</div>
                 </div>
-                <div style={{fontSize: '13px', color: darkMode ? '#e5e5e5' : '#374151', marginBottom: '4px', fontWeight: '600'}}>
-                    Smart drafts in seconds
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">📅</div>
+                    <div className="showcase-card-title">Meeting Request</div>
+                    <div className="showcase-card-example">"Can we schedule a call this week?"</div>
+                    <div className="showcase-card-response">→ Smart scheduling suggestions included</div>
                 </div>
-                <div style={{fontSize: '12px', color: darkMode ? '#a0a0a0' : '#6b7280', fontStyle: 'italic'}}>
-                    → Professional responses with your tone
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">🙏</div>
+                    <div className="showcase-card-title">I appreciate your help</div>
+                    <div className="showcase-card-example">"Thank you so much for your assistance..."</div>
+                    <div className="showcase-card-response">→ Warm, personalized thank you notes</div>
+                </div>
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">⚡</div>
+                    <div className="showcase-card-title">Quick Update</div>
+                    <div className="showcase-card-example">"Just a quick note to update you on..."</div>
+                    <div className="showcase-card-response">→ Concise status updates in seconds</div>
+                </div>
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">🤝</div>
+                    <div className="showcase-card-title">Looking forward to connecting</div>
+                    <div className="showcase-card-example">"I'd love to learn more about..."</div>
+                    <div className="showcase-card-response">→ Professional networking responses</div>
+                </div>
+                <div className="showcase-card">
+                    <div className="showcase-card-icon">✅</div>
+                    <div className="showcase-card-title">Acknowledged</div>
+                    <div className="showcase-card-example">"I've received your message and..."</div>
+                    <div className="showcase-card-response">→ Quick confirmations with context</div>
                 </div>
             </div>
         </div>
@@ -12338,8 +12982,14 @@ const generateAiDraft = async (email) => {
                                                                                             });
                                                                                         }
                                                                                     }}
-                                                                                    className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
+                                                                                    className={`sidebar-email-item inbox-email-draggable ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''} ${draggedEmail?.id === email.id ? 'dragging' : ''}`}
                                                                                     style={{animationDelay: `${index * 0.05}s`}}
+                                                                                    draggable="true"
+                                                                                    onDragStart={(e) => {
+                                                                                        setDraggedEmail(email);
+                                                                                        e.dataTransfer.effectAllowed = 'move';
+                                                                                    }}
+                                                                                    onDragEnd={() => setDraggedEmail(null)}
                                                                                 >
                                                                                     <button
                                                                                         className="email-delete-btn"
@@ -12512,7 +13162,7 @@ const generateAiDraft = async (email) => {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''}`}
+                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''} ${aiWritingMode ? 'ai-mode-centered' : ''} ${aiWritingModeClosing ? 'ai-mode-normal' : ''}`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
@@ -12830,24 +13480,42 @@ const generateAiDraft = async (email) => {
                                                                 placeholder="Type your reply here..."
                                                             />
 
-                                                            {/* Grammar Check Indicator for Reply */}
-                                                            {checkGrammar && isCheckingGrammar && (
-                                                                <div
-                                                                    className="absolute top-4 right-4 text-xs font-medium"
-                                                                    style={{
-                                                                        background: darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
-                                                                        color: darkMode ? '#a5b4fc' : '#6366f1',
-                                                                        padding: '6px 12px',
-                                                                        borderRadius: '20px',
-                                                                        border: `1px solid ${darkMode ? 'rgba(99, 102, 241, 0.4)' : 'rgba(99, 102, 241, 0.3)'}`,
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '6px',
-                                                                        zIndex: 5
-                                                                    }}
+                                                            {/* Grammar Check Button - Manual trigger */}
+                                                            {emailReply && emailReply.trim().length > 2 && !showGrammarNotification && (
+                                                                <button
+                                                                    className={`grammar-check-btn ${isManualGrammarChecking ? 'checking' : ''}`}
+                                                                    onClick={() => handleManualGrammarCheck(emailReply, setEmailReply)}
+                                                                    disabled={isManualGrammarChecking}
                                                                 >
-                                                                    <span className="animate-pulse">✅</span>
-                                                                    Checking grammar...
+                                                                    {isManualGrammarChecking ? (
+                                                                        <>
+                                                                            <span className="animate-spin">⚡</span>
+                                                                            <span>Checking...</span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <span>✅</span>
+                                                                            <span>Check Grammar</span>
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                            )}
+
+                                                            {/* Grammar scanning overlay effect */}
+                                                            {isManualGrammarChecking && (
+                                                                <div className="grammar-highlight-overlay">
+                                                                    <div className="grammar-checking-effect"></div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Grammar result notification */}
+                                                            {showGrammarNotification && grammarCheckResult && (
+                                                                <div className={`grammar-result-notification ${grammarCheckResult}`}>
+                                                                    {grammarCheckResult === 'success' ? (
+                                                                        <>✅ No grammar issues found!</>
+                                                                    ) : (
+                                                                        <>✨ Grammar corrected!</>
+                                                                    )}
                                                                 </div>
                                                             )}
 
@@ -14064,6 +14732,59 @@ const generateAiDraft = async (email) => {
                                 )}
                             </div>
                         </div>
+                    )}
+
+                    {/* AI Writing Mode - Close Button and Prompt Container */}
+                    {aiWritingMode && !aiWritingModeClosing && (
+                        <>
+                            {/* Close button */}
+                            <button
+                                className="ai-mode-close-btn"
+                                onClick={closeAiWritingMode}
+                            >
+                                ✕
+                            </button>
+
+                            {/* Oval Prompt Container at bottom */}
+                            <div className="ai-writer-prompt-container">
+                                <div className="ai-writer-prompt-input">
+                                    <span style={{fontSize: '18px'}}>✨</span>
+                                    <input
+                                        type="text"
+                                        placeholder="Ask AI to modify your email..."
+                                        value={replyPrompt}
+                                        onChange={(e) => setReplyPrompt(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter' && replyPrompt.trim() && emailReply) {
+                                                handleRewriteReply();
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            if (replyPrompt.trim() && emailReply) {
+                                                handleRewriteReply();
+                                            }
+                                        }}
+                                        disabled={!replyPrompt.trim() || !emailReply || isRewritingReply}
+                                        style={{
+                                            padding: '10px 20px',
+                                            borderRadius: '50px',
+                                            background: (replyPrompt.trim() && emailReply)
+                                                ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                                                : 'rgba(156, 163, 175, 0.3)',
+                                            color: 'white',
+                                            border: 'none',
+                                            fontWeight: '600',
+                                            cursor: (replyPrompt.trim() && emailReply) ? 'pointer' : 'not-allowed',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                    >
+                                        {isRewritingReply ? '...' : '→'}
+                                    </button>
+                                </div>
+                            </div>
+                        </>
                     )}
 
                     {/* View Full Email Popup */}
