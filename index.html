@@ -8337,6 +8337,192 @@ body.dark-mode .custom-language-select option:hover {
     left: var(--before-left, 50%);
     top: var(--before-top, 50%);
 } 
+
+        /* Connection Animation Container */
+.connection-animation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.connection-animation-box {
+    width: 500px;
+    height: 200px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: boxAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Theme transition animation */
+.connection-animation-box.transitioning {
+    animation: themeDarken 1s ease-out 1s forwards;
+}
+
+@keyframes boxAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes themeDarken {
+    from {
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    }
+    to {
+        background: linear-gradient(135deg, #1e1e23 0%, #191919 100%);
+    }
+}
+
+/* User Logo Animation - Left Side */
+.connection-user-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    animation: logoSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes logoSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-100px) scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Provider Logo Animation - Right Side */
+.connection-provider-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: logoSlideInRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s backwards;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.connection-provider-logo.gmail {
+    background: linear-gradient(135deg, #4285F4 0%, #34a853 100%);
+}
+
+.connection-provider-logo.outlook {
+    background: linear-gradient(135deg, #0078D4 0%, #005a9e 100%);
+}
+
+@keyframes logoSlideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px) scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Connection Line Between Logos */
+.connection-line-animated {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 2px;
+    animation: lineGrow 1s ease-out 0.9s backwards;
+}
+
+@keyframes lineGrow {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+    to {
+        width: 200px;
+        opacity: 1;
+    }
+}
+
+/* Pulse animation on logos */
+.connection-user-logo,
+.connection-provider-logo {
+    animation: logoSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+               logoPulse 2s ease-in-out 1.5s infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 12px 48px rgba(99, 102, 241, 0.6);
+    }
+}
+
+/* Status Text */
+.connection-status-text {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    animation: statusFade 0.5s ease-out 1.2s backwards;
+    transition: color 1s ease-out 1s;
+}
+
+.connection-animation-box.transitioning .connection-status-text {
+    color: #e5e5e5;
+}
+
+@keyframes statusFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
     </style>
 </head>
 <body>
@@ -8552,6 +8738,7 @@ body.dark-mode .custom-language-select option:hover {
             const sendAudioRef = useRef(null);
             const carouselRef = useRef(null);
             const navRef = useRef(null);
+            const connectionAudioRef = useRef(null); // ADD THIS LINE
 
             // Extract name from email "from" field
 const extractSenderName = (fromField) => {
@@ -8614,11 +8801,11 @@ if (tokensParam) {
             setConnectionProvider('outlook');
             setShowConnectionAnimation(true);
 
-            // Play sound slightly after animation starts for better sync
-            setTimeout(() => {
-                const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
-                connectionSound.play().catch(err => console.log('Sound failed:', err));
-            }, 200);
+            // Play sound immediately
+if (connectionAudioRef.current) {
+    connectionAudioRef.current.currentTime = 0;
+    connectionAudioRef.current.play().catch(err => console.log('Connection sound failed:', err));
+}
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
@@ -8662,11 +8849,11 @@ if (tokensParam) {
             setConnectionProvider('gmail');
             setShowConnectionAnimation(true);
 
-            // CONNECTION SOUND - Play sound slightly after animation starts for better sync
-            setTimeout(() => {
-                const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
-                connectionSound.play().catch(err => console.log('Connection sound failed:', err));
-            }, 200);
+            // Play sound immediately
+if (connectionAudioRef.current) {
+    connectionAudioRef.current.currentTime = 0;
+    connectionAudioRef.current.play().catch(err => console.log('Connection sound failed:', err));
+}
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
@@ -8885,14 +9072,14 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
 
             // Initialize audio with local files
             useEffect(() => {
-                // Notification sound - disabled for now (was using whoosh incorrectly)
-                // Add your notification sound file here if needed
-                // audioRef.current = new Audio('/your-notification-sound.mp3');
-                // audioRef.current.load();
 
                 // Send email sound - whoosh (only plays when sending emails)
                 sendAudioRef.current = new Audio('/whoosh-motion-405445.mp3');
                 sendAudioRef.current.load();
+
+                // CONNECTION SOUND - Add this
+    connectionAudioRef.current = new Audio('/effect-for-logo-intro-186595.mp3');
+    connectionAudioRef.current.load();
 
                 // Load auto-prioritize setting
                 const savedAutoPrioritize = localStorage.getItem('autoPrioritize');
@@ -13431,228 +13618,7 @@ const generateAiDraft = async (email) => {
                                                 }
                                             }}
                                         >
-                                            {/* Inline AI Generation - shows when generating */}
-                                            {showCenteredWriter && (
-                                                <div className="ai-writer-centered-mode">
-                                                    {/* Header with action buttons */}
-                                                    <div className="centered-mode-header" style={{
-                                                        display: 'flex',
-                                                        justifyContent: 'space-between',
-                                                        alignItems: 'center',
-                                                        marginBottom: '20px'
-                                                    }}>
-                                                        <div style={{width: '40px'}}></div>
-                                                        {/* Action buttons - only show when result is ready */}
-                                                        {!isCenteredGenerating && centeredWriterResult && (
-                                                            <div style={{display: 'flex', gap: '12px'}}>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        // If viewing an email, update reply text
-                                                                        if (viewingEmail) {
-                                                                            setEmailReply(centeredWriterResult);
-                                                                        } else {
-                                                                            setEmailText(centeredWriterResult);
-                                                                        }
-                                                                        closeCenteredWriter();
-                                                                        showNotification(viewingEmail ? 'Reply updated!' : 'Email added to editor!');
-                                                                    }}
-                                                                    style={{
-                                                                        padding: '10px 20px',
-                                                                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                                                        color: 'white',
-                                                                        border: 'none',
-                                                                        borderRadius: '50px',
-                                                                        cursor: 'pointer',
-                                                                        fontSize: '14px',
-                                                                        fontWeight: '600',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '8px',
-                                                                        transition: 'all 0.3s ease'
-                                                                    }}
-                                                                >
-                                                                    <span>✓</span>
-                                                                    <span>{viewingEmail ? 'Use as Reply' : 'Use Email'}</span>
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        navigator.clipboard.writeText(centeredWriterResult);
-                                                                        showNotification('Copied to clipboard!');
-                                                                    }}
-                                                                    style={{
-                                                                        padding: '10px 20px',
-                                                                        background: darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
-                                                                        color: darkMode ? '#a5b4fc' : '#4f46e5',
-                                                                        border: '2px solid rgba(99, 102, 241, 0.3)',
-                                                                        borderRadius: '50px',
-                                                                        cursor: 'pointer',
-                                                                        fontSize: '14px',
-                                                                        fontWeight: '600',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '8px',
-                                                                        transition: 'all 0.3s ease'
-                                                                    }}
-                                                                >
-                                                                    <span>📋</span>
-                                                                    <span>Copy</span>
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                        {/* Close button - only when not generating */}
-                                                        {!isCenteredGenerating && (
-                                                            <button
-                                                                onClick={closeCenteredWriter}
-                                                                style={{
-                                                                    width: '36px',
-                                                                    height: '36px',
-                                                                    borderRadius: '50%',
-                                                                    background: 'rgba(156, 163, 175, 0.1)',
-                                                                    border: '2px solid rgba(156, 163, 175, 0.2)',
-                                                                    color: darkMode ? '#9ca3af' : '#6b7280',
-                                                                    cursor: 'pointer',
-                                                                    fontSize: '16px',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    transition: 'all 0.3s ease'
-                                                                }}
-                                                            >
-                                                                ✕
-                                                            </button>
-                                                        )}
-                                                        {isCenteredGenerating && <div style={{width: '40px'}}></div>}
-                                                    </div>
-
-                                                    {/* Prompt display */}
-                                                    <div style={{
-                                                        textAlign: 'center',
-                                                        fontSize: '16px',
-                                                        fontWeight: '500',
-                                                        color: darkMode ? '#9ca3af' : '#6b7280',
-                                                        marginBottom: '24px',
-                                                        fontStyle: 'italic'
-                                                    }}>
-                                                        "{centeredWriterPrompt}"
-                                                    </div>
-
-                                                    {/* Generation Animation or Result */}
-                                                    {isCenteredGenerating ? (
-                                                        <div style={{
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            alignItems: 'center',
-                                                            gap: '16px',
-                                                            padding: '40px 20px'
-                                                        }}>
-                                                            {['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'].map((status, idx) => {
-                                                                const allStatuses = ['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'];
-                                                                const currentIdx = allStatuses.findIndex(s => centeredGenerationStatus.includes(s.slice(2)));
-                                                                const isActive = idx === (currentIdx >= 0 ? currentIdx : 0);
-                                                                return (
-                                                                    <div
-                                                                        key={idx}
-                                                                        style={{
-                                                                            fontSize: '16px',
-                                                                            fontWeight: isActive ? '600' : '400',
-                                                                            color: isActive
-                                                                                ? (darkMode ? '#a5b4fc' : '#4f46e5')
-                                                                                : (darkMode ? '#6b7280' : '#9ca3af'),
-                                                                            opacity: isActive ? 1 : 0.5,
-                                                                            transition: 'all 0.3s ease',
-                                                                            transform: isActive ? 'scale(1.1)' : 'scale(1)'
-                                                                        }}
-                                                                    >
-                                                                        {status}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    ) : (
-                                                        <>
-                                                            {/* Result display with wave animation */}
-                                                            <div style={{
-                                                                padding: '20px',
-                                                                background: darkMode ? 'rgba(40, 40, 45, 0.5)' : 'rgba(249, 250, 251, 0.8)',
-                                                                borderRadius: '16px',
-                                                                fontSize: '15px',
-                                                                lineHeight: '1.7',
-                                                                color: darkMode ? '#e5e5e5' : '#374151'
-                                                            }}>
-                                                                {renderWaveText(centeredWriterResult)}
-                                                            </div>
-
-                                                            {/* Follow-up suggestions */}
-                                                            {aiSuggestions.length > 0 && (
-                                                                <div style={{marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center'}}>
-                                                                    {aiSuggestions.map((suggestion, idx) => (
-                                                                        <button
-                                                                            key={idx}
-                                                                            onClick={() => handleCenteredFollowup(suggestion)}
-                                                                            style={{
-                                                                                padding: '10px 18px',
-                                                                                borderRadius: '50px',
-                                                                                background: darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
-                                                                                border: '1px solid rgba(99, 102, 241, 0.3)',
-                                                                                color: darkMode ? '#a5b4fc' : '#4f46e5',
-                                                                                fontSize: '13px',
-                                                                                fontWeight: '500',
-                                                                                cursor: 'pointer',
-                                                                                transition: 'all 0.3s ease'
-                                                                            }}
-                                                                        >
-                                                                            {suggestion}
-                                                                        </button>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-
-                                                            {/* Follow-up input */}
-                                                            <div style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder="Ask for changes or improvements..."
-                                                                    value={aiFollowupPrompt}
-                                                                    onChange={(e) => setAiFollowupPrompt(e.target.value)}
-                                                                    onKeyPress={(e) => {
-                                                                        if (e.key === 'Enter' && aiFollowupPrompt.trim()) {
-                                                                            handleCenteredFollowup(aiFollowupPrompt);
-                                                                        }
-                                                                    }}
-                                                                    style={{
-                                                                        flex: 1,
-                                                                        padding: '14px 20px',
-                                                                        borderRadius: '50px',
-                                                                        background: darkMode ? 'rgba(40, 40, 45, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                                                                        border: '2px solid rgba(99, 102, 241, 0.2)',
-                                                                        fontSize: '14px',
-                                                                        color: darkMode ? '#e5e5e5' : '#374151',
-                                                                        outline: 'none'
-                                                                    }}
-                                                                />
-                                                                <button
-                                                                    onClick={() => handleCenteredFollowup(aiFollowupPrompt)}
-                                                                    disabled={!aiFollowupPrompt.trim()}
-                                                                    style={{
-                                                                        padding: '14px 24px',
-                                                                        borderRadius: '50px',
-                                                                        background: aiFollowupPrompt.trim()
-                                                                            ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
-                                                                            : 'rgba(156, 163, 175, 0.3)',
-                                                                        color: 'white',
-                                                                        border: 'none',
-                                                                        fontSize: '16px',
-                                                                        fontWeight: '600',
-                                                                        cursor: aiFollowupPrompt.trim() ? 'pointer' : 'not-allowed'
-                                                                    }}
-                                                                >
-                                                                    →
-                                                                </button>
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            )}
+                                            
 
                                             {viewingEmail && !showCenteredWriter ? (
                                                 <>
@@ -14734,55 +14700,64 @@ const generateAiDraft = async (email) => {
                         </div>
                     )}
 
-                    {/* Connection Animation Popup */}
-                    {showConnectionAnimation && (
-                        <div className="connection-animation-overlay">
-                            <div className="connection-animation-container">
-                                <div className="connection-animation-content">
-                                    {/* User Account Logo */}
-                                    <div className="connection-account-logo">
-                                        <div className="account-circle">
-                                            {userData && userData.name.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div className="account-label">Your Account</div>
-                                    </div>
+                    {/* Connection Animation Popup - NEW VERSION */}
+{showConnectionAnimation && (
+    <div className="connection-animation-overlay-v2">
+        <div className={`connection-animation-box ${showConnectionAnimation ? 'active' : ''}`}>
+            {/* User Logo - Left Side */}
+            <div className="connection-user-side">
+                <div 
+                    className={`connection-user-avatar ${selectedProfileIcon ? 'with-texture ' + selectedProfileIcon : ''}`}
+                    style={{
+                        background: selectedProfileIcon ? undefined : selectedProfileColor
+                    }}
+                >
+                    {userData && userData.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="connection-user-label">Your Account</div>
+            </div>
 
-                                    {/* Connection Line Animation */}
-                                    <div className="connection-line-container">
-                                        <div className="connection-line"></div>
-                                        <div className="connection-pulse"></div>
-                                    </div>
+            {/* Connection Line */}
+            <div className="connection-line-wrapper">
+                <div className="connection-line-animated"></div>
+                <div className="connection-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
 
-                                    {/* Email Provider Logo */}
-                                    <div className="connection-provider-logo">
-                                        {connectionProvider === 'gmail' ? (
-                                            <>
-                                                <div className="provider-circle gmail-circle">
-                                                    <svg viewBox="0 0 24 24" fill="#fff">
-                                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
-                                                    </svg>
-                                                </div>
-                                                <div className="provider-label">Gmail</div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="provider-circle outlook-circle">
-                                                    <svg viewBox="0 0 24 24" fill="#fff">
-                                                        <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
-                                                        <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="#fff"/>
-                                                    </svg>
-                                                </div>
-                                                <div className="provider-label">Outlook</div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="connection-status-text">
-                                    Connecting to {connectionProvider === 'gmail' ? 'Gmail' : 'Outlook'}...
-                                </div>
-                            </div>
+            {/* Provider Logo - Right Side */}
+            <div className="connection-provider-side">
+                {connectionProvider === 'gmail' ? (
+                    <>
+                        <div className="connection-provider-avatar gmail-avatar">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
+                            </svg>
                         </div>
-                    )}
+                        <div className="connection-provider-label">Gmail</div>
+                    </>
+                ) : (
+                    <>
+                        <div className="connection-provider-avatar outlook-avatar">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
+                                <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z"/>
+                            </svg>
+                        </div>
+                        <div className="connection-provider-label">Outlook</div>
+                    </>
+                )}
+            </div>
+
+            {/* Status Text */}
+            <div className="connection-status-text-v2">
+                Connecting...
+            </div>
+        </div>
+    </div>
+)}
 
                     {/* Authentication Popup */}
                     {showAuthPopup && (
