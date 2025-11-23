@@ -8872,6 +8872,10 @@ const playConnectionSound = () => {
     
     // Try to play sound, but don't alert on failure (browser autoplay policy)
     const attemptPlay = (audioElement) => {
+        // Reset to beginning in case it was already played
+        audioElement.currentTime = 0;
+        audioElement.volume = 0.7; // Set volume to 70%
+
         return audioElement.play()
             .then(() => {
                 console.log('✅ Sound played successfully');
@@ -8880,14 +8884,20 @@ const playConnectionSound = () => {
             .catch(err => {
                 // NotAllowedError is expected due to browser autoplay policy
                 if (err.name === 'NotAllowedError') {
-                    console.log('ℹ️ Sound blocked by browser autoplay policy (this is normal)');
+                    console.log('ℹ️ Sound blocked by browser autoplay policy (retrying...)');
+                    // Try again after a short delay
+                    setTimeout(() => {
+                        audioElement.play().catch(() => {
+                            console.log('ℹ️ Second attempt also blocked');
+                        });
+                    }, 500);
                 } else {
                     console.warn('⚠️ Sound failed:', err.message);
                 }
                 return false;
             });
     };
-    
+
     // Method 1: Try ref first
     if (connectionAudioRef.current) {
         console.log('✓ Using audio ref');
@@ -8897,6 +8907,7 @@ const playConnectionSound = () => {
         console.log('🔄 Using fallback method');
         try {
             const sound = new Audio('/effect-for-logo-intro-186595.mp3');
+            sound.load(); // Pre-load the audio
             attemptPlay(sound);
         } catch (err) {
             console.log('ℹ️ Could not create audio element:', err.message);
@@ -8923,8 +8934,12 @@ const playConnectionSound = () => {
             setConnectionProvider('outlook');
             setShowConnectionAnimation(true);
 
-            // Play sound after short delay
-            setTimeout(playConnectionSound, 400);
+            // Try to play sound immediately and again after 2 seconds
+            setTimeout(() => {
+                playConnectionSound();
+                // Try again after 2 seconds in case first attempt was blocked
+                setTimeout(playConnectionSound, 2000);
+            }, 100);
 
             // Close animation after 4 seconds
             setTimeout(() => {
@@ -8968,8 +8983,12 @@ const playConnectionSound = () => {
             setConnectionProvider('gmail');
             setShowConnectionAnimation(true);
 
-            // Play sound after short delay
-            setTimeout(playConnectionSound, 400);
+            // Try to play sound immediately and again after 2 seconds
+            setTimeout(() => {
+                playConnectionSound();
+                // Try again after 2 seconds in case first attempt was blocked
+                setTimeout(playConnectionSound, 2000);
+            }, 100);
 
             // Close animation after 4 seconds
             setTimeout(() => {
@@ -10359,7 +10378,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 }
 
                 // Use the AI Generation Modal for enhanced visual experience
-                if (useModal || (textToProcess.length > 50 && customPrompt)) {
+                // Always use centered animation when custom prompt is provided
+                if (useModal || customPrompt) {
                     handleAiGeneration(prompt, textToProcess);
                     return;
                 }
@@ -13742,7 +13762,8 @@ const generateAiDraft = async (email) => {
                                                         // Set the extracted text content to emailText
                                                         setEmailText(content);
                                                         setViewingEmail(null);
-                                                        showNotification('📧 Email content loaded!');
+                                                        setUploadedFile(null); // Clear any previous uploaded file
+                                                        showNotification('📧 File loaded! Add a prompt and click generate to analyze.');
                                                     };
 
                                                     reader.readAsText(file);
