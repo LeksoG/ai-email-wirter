@@ -8866,47 +8866,43 @@ if (tokensParam) {
         const tokens = JSON.parse(decodeURIComponent(tokensParam));
         console.log('🎉 OAuth tokens received for:', provider);
 
-        // ENHANCED SOUND FUNCTION
-        const playConnectionSound = () => {
-            console.log('🔊 Attempting to play connection sound...');
-            
-            // Method 1: Try ref first
-            if (connectionAudioRef.current) {
-                console.log('✓ Using audio ref');
-                connectionAudioRef.current.currentTime = 0;
-                connectionAudioRef.current.play()
-                    .then(() => console.log('✅ Sound played successfully via ref'))
-                    .catch(err => {
-                        console.error('❌ Ref sound failed:', err);
-                        // Method 2: Fallback to new Audio
-                        try {
-                            console.log('🔄 Trying fallback method...');
-                            const sound = new Audio('/effect-for-logo-intro-186595.mp3');
-                            sound.play()
-                                .then(() => console.log('✅ Fallback sound played'))
-                                .catch(err2 => {
-                                    console.error('❌ Fallback also failed:', err2);
-                                    alert('⚠️ Connection sound failed to play. Please check console for details.');
-                                });
-                        } catch (err3) {
-                            console.error('❌ Could not create fallback audio:', err3);
-                        }
-                    });
-            } else {
-                console.warn('⚠️ Audio ref not ready, using fallback');
-                try {
-                    const sound = new Audio('/effect-for-logo-intro-186595.mp3');
-                    sound.play()
-                        .then(() => console.log('✅ Fallback sound played'))
-                        .catch(err => {
-                            console.error('❌ Fallback sound failed:', err);
-                            alert('⚠️ Connection sound failed. File might be missing or browser blocked it.');
-                        });
-                } catch (err) {
-                    console.error('❌ Could not create fallback audio:', err);
+        // ENHANCED SOUND FUNCTION - No annoying alerts
+const playConnectionSound = () => {
+    console.log('🔊 Attempting to play connection sound...');
+    
+    // Try to play sound, but don't alert on failure (browser autoplay policy)
+    const attemptPlay = (audioElement) => {
+        return audioElement.play()
+            .then(() => {
+                console.log('✅ Sound played successfully');
+                return true;
+            })
+            .catch(err => {
+                // NotAllowedError is expected due to browser autoplay policy
+                if (err.name === 'NotAllowedError') {
+                    console.log('ℹ️ Sound blocked by browser autoplay policy (this is normal)');
+                } else {
+                    console.warn('⚠️ Sound failed:', err.message);
                 }
-            }
-        };
+                return false;
+            });
+    };
+    
+    // Method 1: Try ref first
+    if (connectionAudioRef.current) {
+        console.log('✓ Using audio ref');
+        attemptPlay(connectionAudioRef.current);
+    } else {
+        // Method 2: Fallback to new Audio
+        console.log('🔄 Using fallback method');
+        try {
+            const sound = new Audio('/effect-for-logo-intro-186595.mp3');
+            attemptPlay(sound);
+        } catch (err) {
+            console.log('ℹ️ Could not create audio element:', err.message);
+        }
+    }
+};
 
         if (provider === 'outlook') {
             console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
