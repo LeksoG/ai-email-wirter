@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         console.log('📡 Fetching emails from Microsoft Graph API...');
         
         const response = await fetch(
-            'https://graph.microsoft.com/v1.0/me/messages?$top=20&$select=id,subject,from,receivedDateTime,bodyPreview,conversationId',
+            'https://graph.microsoft.com/v1.0/me/messages?$top=20&$select=id,subject,from,receivedDateTime,body,bodyPreview,conversationId',
             {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -46,11 +46,23 @@ export default async function handler(req, res) {
         console.log('📧 Emails count:', data.value?.length || 0);
 
         const emails = data.value.map(email => {
+            // Extract body content (prefer text, fallback to HTML with tags stripped)
+            let bodyContent = '';
+            if (email.body) {
+                if (email.body.contentType === 'text') {
+                    bodyContent = email.body.content || '';
+                } else if (email.body.contentType === 'html') {
+                    // Strip HTML tags for plain text
+                    bodyContent = (email.body.content || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+                }
+            }
+
             const formatted = {
                 id: email.id,
                 from: email.from?.emailAddress?.name || email.from?.emailAddress?.address || 'Unknown',
                 subject: email.subject || 'No Subject',
                 snippet: email.bodyPreview || '',
+                body: bodyContent || email.bodyPreview || 'No content available', // Full email body
                 date: new Date(email.receivedDateTime).toLocaleString(),
                 threadId: email.conversationId
             };
