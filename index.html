@@ -8920,18 +8920,9 @@ if (tokensParam) {
 
             console.log('✅ Outlook connected!');
 
-            // Show connection animation popup
+            // Set connection provider and flag to play sound on next user interaction
             setConnectionProvider('outlook');
-            setShowConnectionAnimation(true);
-
-            // Set flag to play sound on next user interaction
             setPendingSoundPlay(true);
-
-            // Close animation after 4 seconds
-            setTimeout(() => {
-                setShowConnectionAnimation(false);
-                showNotification('📮 Outlook connected successfully!');
-            }, 4000);
 
         } else if (provider === 'gmail' || !provider) {
             console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
@@ -8965,18 +8956,9 @@ if (tokensParam) {
 
             console.log('✅ Gmail connected!');
 
-            // Show connection animation popup
+            // Set connection provider and flag to play sound on next user interaction
             setConnectionProvider('gmail');
-            setShowConnectionAnimation(true);
-
-            // Set flag to play sound on next user interaction
             setPendingSoundPlay(true);
-
-            // Close animation after 4 seconds
-            setTimeout(() => {
-                setShowConnectionAnimation(false);
-                showNotification('📧 Gmail connected successfully!');
-            }, 4000);
         }
 
         // Clean URL - DON'T CHANGE PAGE
@@ -9088,7 +9070,15 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                             connectionAudioRef.current.play()
                                 .then(() => {
                                     console.log('✅ Connection sound played successfully');
+                                    // Show animation when sound plays
+                                    setShowConnectionAnimation(true);
                                     setPendingSoundPlay(false);
+
+                                    // Hide animation and show notification after 4 seconds
+                                    setTimeout(() => {
+                                        setShowConnectionAnimation(false);
+                                        showNotification(connectionProvider === 'gmail' ? '📧 Gmail connected successfully!' : '📮 Outlook connected successfully!');
+                                    }, 4000);
                                 })
                                 .catch(err => {
                                     console.warn('⚠️ Sound failed:', err.message);
@@ -9101,7 +9091,15 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                                 sound.play()
                                     .then(() => {
                                         console.log('✅ Connection sound played successfully');
+                                        // Show animation when sound plays
+                                        setShowConnectionAnimation(true);
                                         setPendingSoundPlay(false);
+
+                                        // Hide animation and show notification after 4 seconds
+                                        setTimeout(() => {
+                                            setShowConnectionAnimation(false);
+                                            showNotification(connectionProvider === 'gmail' ? '📧 Gmail connected successfully!' : '📮 Outlook connected successfully!');
+                                        }, 4000);
                                     })
                                     .catch(err => {
                                         console.warn('⚠️ Sound failed:', err.message);
@@ -12269,30 +12267,7 @@ const generateAiDraft = async (email) => {
                                         </div>
                                     </div>
 
-                                    {droppedEmailFile ? (
-                                        <div
-                                            className="email-file-attachment"
-                                            onClick={() => {
-                                                setViewingEmail(droppedEmailFile);
-                                                setDroppedEmailFile(null);
-                                            }}
-                                        >
-                                            <div className="email-file-icon">📧</div>
-                                            <div className="email-file-info">
-                                                <div className="email-file-title">{droppedEmailFile.subject}</div>
-                                                <div className="email-file-subtitle">From: {droppedEmailFile.from} • Click to view full email</div>
-                                            </div>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setDroppedEmailFile(null);
-                                                }}
-                                                className="px-3 py-1 glass-effect rounded-full text-xs text-red-600 hover:bg-white/90 unified-button border-2 border-white"
-                                            >
-                                                ✕ Remove
-                                            </button>
-                                        </div>
-                                    ) : uploadedFile ? (
+                                    {uploadedFile ? (
                                         <div className="glass-dark rounded-2xl p-4 mb-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
@@ -12328,7 +12303,6 @@ const generateAiDraft = async (email) => {
                                                     className="w-full px-6 py-4 custom-textarea text-gray-800 placeholder-gray-500 resize-none border-2 border-white unified-button"
                                                     style={{borderRadius: '16px', height: '450px', maxWidth: '100%'}}
                                                     placeholder="Type or paste your email content here and watch the magic happen..."
-                                                    disabled={droppedEmailFile !== null}
                                                 />
                                                 {/* Grammar Check Indicator */}
                                                 {checkGrammar && isCheckingGrammar && (
@@ -13118,7 +13092,14 @@ const generateAiDraft = async (email) => {
                                 {/* Navigation Bar */}
                                 <div className={`nav-container ${showSearchBar ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} style={{transition: 'opacity 0.3s ease'}} ref={navRef}>
                                     <button
-                                        onClick={() => setCurrentPage('home')}
+                                        onClick={() => {
+                                            // Block navigation from settings to home if animation is showing
+                                            if (currentPage === 'settings' && showConnectionAnimation) {
+                                                showNotification('⏳ Just a sec, setting up final bits...');
+                                                return;
+                                            }
+                                            setCurrentPage('home');
+                                        }}
                                         className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
                                             currentPage === 'home'
                                                 ? 'active text-gray-800'
@@ -13787,8 +13768,20 @@ const generateAiDraft = async (email) => {
 
                                                 // Handle internal email drag from inbox
                                                 if (draggedEmail) {
-                                                    setDroppedEmailFile(draggedEmail);
+                                                    // Extract text from the email and paste it directly
+                                                    let emailContent = '';
+                                                    if (draggedEmail.subject) emailContent += 'Subject: ' + draggedEmail.subject + '\n';
+                                                    if (draggedEmail.from) emailContent += 'From: ' + draggedEmail.from + '\n\n';
+                                                    if (draggedEmail.body) {
+                                                        // Clean HTML tags from body
+                                                        const cleanBody = draggedEmail.body.replace(/<[^>]*>/g, '').trim();
+                                                        emailContent += cleanBody;
+                                                    }
+
+                                                    setEmailText(emailContent);
                                                     setViewingEmail(null);
+                                                    setDroppedEmailFile(null);
+                                                    showNotification('📧 Email text pasted! Add a prompt and click generate to analyze.');
                                                     return;
                                                 }
 
@@ -13838,8 +13831,9 @@ const generateAiDraft = async (email) => {
                                                         // Set the extracted text content to emailText
                                                         setEmailText(content);
                                                         setViewingEmail(null);
+                                                        setDroppedEmailFile(null);
                                                         setUploadedFile(null); // Clear any previous uploaded file
-                                                        showNotification('📧 File loaded! Add a prompt and click generate to analyze.');
+                                                        showNotification('📧 Email text pasted! Add a prompt and click generate to analyze.');
                                                     };
 
                                                     reader.readAsText(file);
