@@ -7061,6 +7061,391 @@ body.dark-mode .ai-send-button {
     }
 }
 
+/* ===== CENTERED AI WRITER MODE ===== */
+/* When generating, the inbox slides left and fades, container centers */
+
+/* Inbox slide-left and fade animation */
+.desktop-inbox-layout.generating-mode .inbox-sidebar {
+    animation: inbox-slide-left 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes inbox-slide-left {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%);
+        pointer-events: none;
+    }
+}
+
+/* Email content area slide and expand to center */
+.desktop-inbox-layout.generating-mode .email-content-area {
+    animation: content-center-expand 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes content-center-expand {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-240px);
+        width: calc(100% + 240px);
+        max-width: 1000px;
+    }
+}
+
+/* Centered AI Writer Container Styles */
+.ai-writer-centered-mode {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 900px;
+    max-height: 85vh;
+    z-index: 9999;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 32px;
+    padding: 32px;
+    overflow-y: auto;
+    box-shadow: 0 40px 120px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    animation: center-container-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.dark-mode .ai-writer-centered-mode {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(20, 20, 25, 0.95) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+@keyframes center-container-appear {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.85);
+        filter: blur(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* Centered mode background overlay (no blur) */
+.centered-mode-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 9998;
+    animation: overlay-fade 0.4s ease-out;
+}
+
+@keyframes overlay-fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Centered mode header with buttons */
+.centered-mode-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.centered-mode-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex: 1;
+}
+
+.centered-mode-close {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.centered-mode-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: rotate(90deg) scale(1.1);
+}
+
+.centered-mode-btn {
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.centered-mode-btn.primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.centered-mode-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.centered-mode-btn.secondary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #4f46e5;
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+body.dark-mode .centered-mode-btn.secondary {
+    background: rgba(40, 40, 45, 0.9);
+    color: #a5b4fc;
+}
+
+.centered-mode-btn.secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* Centered mode prompt display */
+.centered-mode-prompt {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+body.dark-mode .centered-mode-prompt {
+    color: #9ca3af;
+}
+
+/* Centered mode result area */
+.centered-mode-result {
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #374151;
+    white-space: pre-wrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.centered-mode-result::-webkit-scrollbar {
+    display: none;
+}
+
+body.dark-mode .centered-mode-result {
+    background: rgba(30, 30, 30, 0.5);
+    color: #e5e5e5;
+}
+
+/* Generating animation in centered mode */
+.centered-generating-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.centered-status-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.centered-status-item {
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.3;
+    transform: translateY(0) scale(0.95);
+    color: #9ca3af;
+}
+
+.centered-status-item.active {
+    opacity: 1;
+    transform: translateY(0) scale(1.1);
+    color: #6366f1;
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+}
+
+body.dark-mode .centered-status-item.active {
+    color: #a5b4fc;
+}
+
+/* Logout Confirmation Dialog */
+.logout-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.logout-confirm-dialog {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: popup-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center;
+}
+
+body.dark-mode .logout-confirm-dialog {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(20, 20, 25, 0.95) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.logout-confirm-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.logout-confirm-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+body.dark-mode .logout-confirm-title {
+    color: #e5e5e5;
+}
+
+.logout-confirm-message {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+body.dark-mode .logout-confirm-message {
+    color: #9ca3af;
+}
+
+.logout-confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.logout-confirm-btn {
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.logout-confirm-btn.cancel {
+    background: rgba(255, 255, 255, 0.8);
+    color: #374151;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .logout-confirm-btn.cancel {
+    background: rgba(60, 60, 60, 0.8);
+    color: #e5e5e5;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.logout-confirm-btn.cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logout-confirm-btn.confirm {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.logout-confirm-btn.confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* Fix for desktop blur animation visibility */
+@media (min-width: 1025px) {
+    .greeting-word {
+        -webkit-filter: blur(12px);
+        filter: blur(12px);
+        opacity: 0;
+        transform: translateY(8px) scale(0.95);
+        animation: greeting-word-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        -webkit-animation: greeting-word-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @-webkit-keyframes greeting-word-reveal {
+        0% {
+            opacity: 0;
+            -webkit-filter: blur(12px);
+            filter: blur(12px);
+            -webkit-transform: translateY(8px) scale(0.95);
+            transform: translateY(8px) scale(0.95);
+        }
+        60% {
+            opacity: 0.8;
+            -webkit-filter: blur(4px);
+            filter: blur(4px);
+            -webkit-transform: translateY(-2px) scale(1.02);
+            transform: translateY(-2px) scale(1.02);
+        }
+        100% {
+            opacity: 1;
+            -webkit-filter: blur(0);
+            filter: blur(0);
+            -webkit-transform: translateY(0) scale(1);
+            transform: translateY(0) scale(1);
+        }
+    }
+}
+
 /* Fullscreen Email Viewer */
 .fullscreen-email-viewer {
     position: fixed;
@@ -7517,6 +7902,16 @@ body.dark-mode .custom-language-select option:hover {
             const [removingSuggestionIndex, setRemovingSuggestionIndex] = useState(null);
             const [removedSuggestions, setRemovedSuggestions] = useState([]);
 
+            // Centered AI Writer Mode states (replaces popup modal)
+            const [showCenteredWriter, setShowCenteredWriter] = useState(false);
+            const [centeredWriterPrompt, setCenteredWriterPrompt] = useState('');
+            const [centeredWriterResult, setCenteredWriterResult] = useState('');
+            const [isCenteredGenerating, setIsCenteredGenerating] = useState(false);
+            const [centeredGenerationStatus, setCenteredGenerationStatus] = useState('');
+
+            // Logout Confirmation state
+            const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
             // View Full Email Popup states
             const [showViewEmailPopup, setShowViewEmailPopup] = useState(false);
             const [viewEmailPopupData, setViewEmailPopupData] = useState(null);
@@ -7628,12 +8023,10 @@ if (tokensParam) {
             setConnectionProvider('outlook');
             setShowConnectionAnimation(true);
 
-            // Load and play the connection sound
-            const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
-
-            connectionSound.play().catch(err => {
-                console.log('Connection sound failed:', err);
-            });
+            // Connection sound disabled - file not available
+            // To enable: add sound file and uncomment below
+            // const connectionSound = new Audio('/connection-sound.mp3');
+            // connectionSound.play().catch(err => console.log('Sound failed:', err));
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
@@ -7870,12 +8263,23 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                 }, 1000);
             };
 
-            // Function to handle logout
+            // Function to handle logout - now shows confirmation first
             const handleLogout = () => {
+                setShowLogoutConfirm(true);
+            };
+
+            // Confirm logout action
+            const confirmLogout = () => {
                 setUserData(null);
                 setIsLoggedIn(false);
                 localStorage.removeItem('userData');
                 localStorage.removeItem('isLoggedIn');
+                setShowLogoutConfirm(false);
+            };
+
+            // Cancel logout
+            const cancelLogout = () => {
+                setShowLogoutConfirm(false);
             };
 
             // Update suggestions based on custom prompt only
@@ -8776,28 +9180,17 @@ const fetchOutlookSentEmails = async (accessToken) => {
         console.log('📮 ========== FETCHING OUTLOOK SENT EMAILS ==========');
         console.log('🔑 Access token present:', !!accessToken);
 
-        const response = await fetch('/api/outlook-sent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ accessToken })
+        // Use Microsoft Graph API directly to fetch sent emails
+        const response = await fetch('https://graph.microsoft.com/v1.0/me/mailFolders/SentItems/messages?$top=20&$select=id,subject,bodyPreview,toRecipients,sentDateTime,conversationId', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
         });
 
         console.log('📡 Outlook sent API response status:', response.status);
 
-        // Handle 404 before trying to parse JSON
-        if (response.status === 404) {
-            console.warn('⚠️ Outlook sent endpoint not available yet');
-            setOutlookSentEmails([]);
-            return;
-        }
-
-        const data = await response.json();
-
         if (!response.ok) {
-            console.error('❌ Outlook sent API error');
-            console.error('Status:', response.status);
-            console.error('Error message:', data.message);
-
             // Handle 401 authentication errors
             if (response.status === 401) {
                 console.warn('⚠️ Authentication failed - clearing Outlook tokens');
@@ -8809,21 +9202,30 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 return;
             }
 
-            throw new Error(data.message || 'Failed to fetch Outlook sent emails');
+            console.warn('⚠️ Could not fetch Outlook sent emails');
+            setOutlookSentEmails([]);
+            return;
         }
 
-        console.log('📧 Outlook sent emails received:', data.emails?.length || 0);
+        const data = await response.json();
+        const emails = data.value || [];
+
+        console.log('📧 Outlook sent emails received:', emails.length);
 
         // Format emails for display
-        const formattedEmails = data.emails.map(function(email) {
+        const formattedEmails = emails.map(function(email) {
+            const toRecipients = email.toRecipients || [];
+            const toAddress = toRecipients.length > 0
+                ? (toRecipients[0].emailAddress?.address || toRecipients[0].emailAddress?.name || 'Unknown')
+                : 'Unknown';
             return {
                 id: email.id,
-                to: email.to,
-                subject: email.subject,
-                snippet: email.snippet,
-                date: email.date,
-                threadId: email.threadId,
-                internalDate: new Date(email.date).getTime()
+                to: toAddress,
+                subject: email.subject || '(No subject)',
+                snippet: email.bodyPreview || '',
+                date: new Date(email.sentDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                threadId: email.conversationId,
+                internalDate: new Date(email.sentDateTime).getTime()
             };
         });
 
@@ -9218,12 +9620,13 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 }
             };
 
-            // AI Generation Modal Handler
+            // AI Generation Handler - Now uses centered writer mode instead of popup modal
             const handleAiGeneration = async (prompt, emailContent) => {
-                setAiGenerationPrompt(prompt);
-                setShowAiGenerationModal(true);
-                setIsAiGenerating(true);
-                setAiGenerationResult('');
+                // Use the new centered writer mode
+                setCenteredWriterPrompt(prompt);
+                setShowCenteredWriter(true);
+                setIsCenteredGenerating(true);
+                setCenteredWriterResult('');
                 setAiSuggestions([]);
 
                 const statusMessages = [
@@ -9234,31 +9637,80 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 ];
 
                 let statusIndex = 0;
-                setAiGenerationStatus(statusMessages[0]);
+                setCenteredGenerationStatus(statusMessages[0]);
 
                 // Cycle through status messages
                 const statusInterval = setInterval(() => {
                     statusIndex = (statusIndex + 1) % statusMessages.length;
-                    setAiGenerationStatus(statusMessages[statusIndex]);
+                    setCenteredGenerationStatus(statusMessages[statusIndex]);
                 }, 1000);
 
                 try {
                     const result = await callAIAPI(prompt, emailContent);
 
-                    // Wait at least 5 seconds for nice animation
-                    await new Promise(resolve => setTimeout(resolve, Math.max(0, 5000 - (statusIndex * 1000))));
+                    // Wait at least 3 seconds for nice animation
+                    await new Promise(resolve => setTimeout(resolve, Math.max(0, 3000 - (statusIndex * 1000))));
 
                     clearInterval(statusInterval);
-                    setIsAiGenerating(false);
-                    setAiGenerationResult(result);
+                    setIsCenteredGenerating(false);
+                    setCenteredWriterResult(result);
 
                     // Generate suggestions based on the result
                     generateAiSuggestions(result, prompt);
                 } catch (error) {
                     clearInterval(statusInterval);
                     console.error('AI Generation error:', error);
-                    setIsAiGenerating(false);
-                    setAiGenerationResult('Failed to generate email. Please try again.');
+                    setIsCenteredGenerating(false);
+                    setCenteredWriterResult('Failed to generate email. Please try again.');
+                }
+            };
+
+            // Close centered writer and return to normal layout
+            const closeCenteredWriter = () => {
+                setShowCenteredWriter(false);
+                setCenteredWriterPrompt('');
+                setCenteredWriterResult('');
+                setIsCenteredGenerating(false);
+                setAiSuggestions([]);
+            };
+
+            // Handle follow-up in centered writer mode
+            const handleCenteredFollowup = async (followupPrompt) => {
+                if (!followupPrompt.trim()) return;
+
+                setIsCenteredGenerating(true);
+                setAiFollowupPrompt('');
+
+                const statusMessages = [
+                    '🤔 Analyzing your request',
+                    '✍️ Writing the email',
+                    '✨ Polishing content',
+                    '📝 Finalizing'
+                ];
+
+                let statusIndex = 0;
+                setCenteredGenerationStatus(statusMessages[0]);
+
+                const statusInterval = setInterval(() => {
+                    statusIndex = (statusIndex + 1) % statusMessages.length;
+                    setCenteredGenerationStatus(statusMessages[statusIndex]);
+                }, 800);
+
+                try {
+                    const result = await callAIAPI(
+                        `${followupPrompt}. Here is the current email: ${centeredWriterResult}`,
+                        ''
+                    );
+
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    clearInterval(statusInterval);
+                    setIsCenteredGenerating(false);
+                    setCenteredWriterResult(result);
+                    generateAiSuggestions(result, followupPrompt);
+                } catch (error) {
+                    clearInterval(statusInterval);
+                    setIsCenteredGenerating(false);
                 }
             };
 
@@ -13646,6 +14098,175 @@ const generateAiDraft = async (email) => {
                                     <div className="view-email-body">
                                         {viewEmailPopupData.snippet || viewEmailPopupData.body || 'No content available'}
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Centered AI Writer Mode - Replaces popup modal */}
+                    {showCenteredWriter && (
+                        <>
+                            <div className="centered-mode-overlay" onClick={() => !isCenteredGenerating && closeCenteredWriter()}></div>
+                            <div className="ai-writer-centered-mode">
+                                {/* Header with Close button on right, action buttons in center */}
+                                <div className="centered-mode-header">
+                                    <div style={{width: '40px'}}></div>
+                                    {/* Action buttons in center - only show when result is ready */}
+                                    {!isCenteredGenerating && centeredWriterResult && (
+                                        <div className="centered-mode-actions">
+                                            <button
+                                                className="centered-mode-btn primary"
+                                                onClick={() => {
+                                                    setEmailText(centeredWriterResult);
+                                                    closeCenteredWriter();
+                                                    showNotification('Email added to editor!');
+                                                }}
+                                            >
+                                                <span>✓</span>
+                                                <span>Use Email</span>
+                                            </button>
+                                            <button
+                                                className="centered-mode-btn secondary"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(centeredWriterResult);
+                                                    showNotification('Copied to clipboard!');
+                                                }}
+                                            >
+                                                <span>📋</span>
+                                                <span>Copy</span>
+                                            </button>
+                                        </div>
+                                    )}
+                                    {!isCenteredGenerating && !centeredWriterResult && (
+                                        <div className="centered-mode-actions"></div>
+                                    )}
+                                    {/* Close button - always visible when not generating */}
+                                    {!isCenteredGenerating && (
+                                        <button className="centered-mode-close" onClick={closeCenteredWriter}>
+                                            ✕
+                                        </button>
+                                    )}
+                                    {isCenteredGenerating && <div style={{width: '40px'}}></div>}
+                                </div>
+
+                                {/* Prompt display */}
+                                <div className="centered-mode-prompt">
+                                    "{centeredWriterPrompt}"
+                                </div>
+
+                                {/* Generation Animation or Result */}
+                                {isCenteredGenerating ? (
+                                    <div className="centered-generating-animation">
+                                        <div className="centered-status-list">
+                                            {['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'].map((status, idx) => {
+                                                const allStatuses = ['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'];
+                                                const currentIdx = allStatuses.findIndex(s => centeredGenerationStatus.includes(s.slice(2)));
+                                                let className = 'centered-status-item';
+                                                if (idx === (currentIdx >= 0 ? currentIdx : 0)) className += ' active';
+                                                return (
+                                                    <div key={idx} className={className}>
+                                                        {status}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Result display */}
+                                        <div className="centered-mode-result">
+                                            {centeredWriterResult}
+                                        </div>
+
+                                        {/* Follow-up suggestions */}
+                                        {aiSuggestions.length > 0 && (
+                                            <div style={{marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center'}}>
+                                                {aiSuggestions.map((suggestion, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        onClick={() => handleCenteredFollowup(suggestion)}
+                                                        style={{
+                                                            padding: '10px 18px',
+                                                            borderRadius: '50px',
+                                                            background: darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
+                                                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                                                            color: darkMode ? '#a5b4fc' : '#4f46e5',
+                                                            fontSize: '13px',
+                                                            fontWeight: '500',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.3s ease'
+                                                        }}
+                                                    >
+                                                        {suggestion}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Follow-up input */}
+                                        <div style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
+                                            <input
+                                                type="text"
+                                                placeholder="Ask for changes or improvements..."
+                                                value={aiFollowupPrompt}
+                                                onChange={(e) => setAiFollowupPrompt(e.target.value)}
+                                                onKeyPress={(e) => {
+                                                    if (e.key === 'Enter' && aiFollowupPrompt.trim()) {
+                                                        handleCenteredFollowup(aiFollowupPrompt);
+                                                    }
+                                                }}
+                                                style={{
+                                                    flex: 1,
+                                                    padding: '14px 20px',
+                                                    borderRadius: '50px',
+                                                    background: darkMode ? 'rgba(40, 40, 45, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                                                    border: '2px solid rgba(99, 102, 241, 0.2)',
+                                                    fontSize: '14px',
+                                                    color: darkMode ? '#e5e5e5' : '#374151',
+                                                    outline: 'none'
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => handleCenteredFollowup(aiFollowupPrompt)}
+                                                disabled={!aiFollowupPrompt.trim()}
+                                                style={{
+                                                    padding: '14px 24px',
+                                                    borderRadius: '50px',
+                                                    background: aiFollowupPrompt.trim()
+                                                        ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                                                        : 'rgba(156, 163, 175, 0.3)',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    fontSize: '16px',
+                                                    fontWeight: '600',
+                                                    cursor: aiFollowupPrompt.trim() ? 'pointer' : 'not-allowed'
+                                                }}
+                                            >
+                                                →
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+                    {/* Logout Confirmation Dialog */}
+                    {showLogoutConfirm && (
+                        <div className="logout-confirm-overlay" onClick={cancelLogout}>
+                            <div className="logout-confirm-dialog" onClick={(e) => e.stopPropagation()}>
+                                <div className="logout-confirm-icon">👋</div>
+                                <div className="logout-confirm-title">Confirm Logout</div>
+                                <div className="logout-confirm-message">
+                                    Are you sure you want to log out? You'll need to sign in again to access your account.
+                                </div>
+                                <div className="logout-confirm-buttons">
+                                    <button className="logout-confirm-btn cancel" onClick={cancelLogout}>
+                                        Cancel
+                                    </button>
+                                    <button className="logout-confirm-btn confirm" onClick={confirmLogout}>
+                                        Logout
+                                    </button>
                                 </div>
                             </div>
                         </div>
