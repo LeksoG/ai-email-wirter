@@ -7119,9 +7119,11 @@ body.dark-mode .ai-send-button {
     border-radius: 0;
     padding: 32px;
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: none;
     margin: 0 auto;
     animation: fade-in-content 0.4s ease-out;
+    box-sizing: border-box;
 }
 
 body.dark-mode .ai-writer-centered-mode {
@@ -13372,7 +13374,7 @@ const generateAiDraft = async (email) => {
                                             )}
 
                                             {/* Prioritizing Glow Notification - Smaller */}
-                                            {isPrioritizing && inboxViewMode !== 'tabs' && (
+                                            {isPrioritizing && inboxViewMode !== 'tabs' && !showCenteredWriter && !isCenteredGenerating && (
                                                 <div style={{marginBottom: '12px', animation: 'fadeInScale 0.3s ease-out'}}>
                                                     <div style={{
                                                         padding: '8px 16px',
@@ -14760,7 +14762,10 @@ const generateAiDraft = async (email) => {
                 alignItems: 'center',
                 gap: '16px',
                 padding: '40px 20px',
-                minHeight: '200px'
+                minHeight: '200px',
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box'
             }}>
                 {console.log('🎬 Rendering generation animation')}
                 {['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'].map((status, idx) => {
