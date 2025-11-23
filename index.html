@@ -4012,7 +4012,14 @@ body.dark-mode .modern-email-item:hover {
                         inset 0 1px 0 rgba(255, 255, 255, 0.8);
             border-radius: 24px;
             padding: 20px;
-            transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        min-width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body.dark-mode .inbox-sidebar {
@@ -7066,53 +7073,31 @@ body.dark-mode .ai-send-button {
 /* ===== CENTERED AI WRITER MODE ===== */
 /* When generating, the inbox slides left and fades, container centers */
 
-/* Inbox slide-left and fade animation */
-.desktop-inbox-layout.generating-mode .inbox-sidebar {
-    animation: inbox-slide-left 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+/* Smooth transition for generating mode layout */
+.desktop-inbox-layout.generating-mode {
+    justify-content: center;
 }
 
-/* Class to hide inbox during generation */
+/* Class to hide inbox during generation - uses transitions from base .inbox-sidebar */
 .inbox-sidebar.generating-hidden {
     opacity: 0;
     transform: translateX(-100%);
     pointer-events: none;
-    width: 0;
-    min-width: 0;
-    padding: 0;
-    margin: 0;
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    margin-right: -20px !important;
     overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes inbox-slide-left {
-    0% {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-100%);
-        pointer-events: none;
-    }
-}
-
-/* Email content area slide and expand to center */
-.desktop-inbox-layout.generating-mode .email-content-area {
-    animation: content-center-expand 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    margin: 0 auto;
-}
-
-@keyframes content-center-expand {
-    0% {
-        transform: translateX(0);
-        margin-left: 0;
-    }
-    100% {
-        transform: translateX(0);
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
-    }
+/* Email content area centers when inbox is hidden */
+.email-content-area.generating-centered {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 900px !important;
+    margin: 0 auto !important;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Hide back button during generation */
@@ -7128,20 +7113,30 @@ body.dark-mode .ai-send-button {
     position: relative;
     width: 100%;
     max-width: 100%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
-    backdrop-filter: blur(30px);
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    border-radius: 24px;
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 0;
     padding: 32px;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
-    animation: inline-container-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: none;
     margin: 0 auto;
+    animation: fade-in-content 0.4s ease-out;
 }
 
 body.dark-mode .ai-writer-centered-mode {
-    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(20, 20, 25, 0.95) 100%);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: transparent;
+}
+
+@keyframes fade-in-content {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes inline-container-appear {
@@ -7160,14 +7155,6 @@ body.dark-mode .ai-writer-centered-mode {
 /* Hide the overlay when in inline mode */
 .centered-mode-overlay {
     display: none;
-}
-
-/* Email content area centered during generation */
-.email-content-area.generating-centered {
-    width: 100% !important;
-    max-width: 900px !important;
-    margin: 0 auto !important;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes overlay-fade {
@@ -10305,7 +10292,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
             // Generate contextual suggestions based on email content
             const generateAiSuggestions = (emailResult, originalPrompt) => {
-                const lowerContent = emailResult.toLowerCase();
+                const lowerContent = (emailResult || '').toLowerCase();
                 const suggestions = [];
 
                 // Context-aware suggestions
@@ -10890,20 +10877,42 @@ const generateAiDraft = async (email) => {
             const handleRewriteReply = async () => {
                 if (!emailReply || !replyPrompt) return;
 
-                setIsRewritingReply(true);
+                // Check if user wants email structure
+                const needsStructure = replyPrompt.toLowerCase().includes('structure') ||
+                                     replyPrompt.toLowerCase().includes('format') ||
+                                     emailReply.match(/^(Hi|Hello|Hey|Dear)/i) === null;
+
+                let finalPrompt = replyPrompt;
+                if (needsStructure) {
+                    finalPrompt += ' Make sure to format it as a proper email with greeting, body, and closing.';
+                }
+
                 playNotificationSound();
 
+                // Use centered writer mode for smooth animation and suggestions
+                setCenteredWriterPrompt(finalPrompt);
+                setShowCenteredWriter(true);
+                setIsCenteredGenerating(true);
+                setCenteredWriterResult('');
+                setAiSuggestions([]);
+                setReplyPrompt('');
+
+                const statusMessages = [
+                    '🤔 Analyzing your request',
+                    '✍️ Writing the email',
+                    '✨ Polishing content',
+                    '📝 Finalizing'
+                ];
+
+                let statusIndex = 0;
+                setCenteredGenerationStatus(statusMessages[0]);
+
+                const statusInterval = setInterval(() => {
+                    statusIndex = (statusIndex + 1) % statusMessages.length;
+                    setCenteredGenerationStatus(statusMessages[statusIndex]);
+                }, 1000);
+
                 try {
-                    // Check if user wants email structure
-                    const needsStructure = replyPrompt.toLowerCase().includes('structure') ||
-                                         replyPrompt.toLowerCase().includes('format') ||
-                                         emailReply.match(/^(Hi|Hello|Hey|Dear)/i) === null;
-
-                    let finalPrompt = replyPrompt;
-                    if (needsStructure) {
-                        finalPrompt += ' Make sure to format it as a proper email with greeting, body, and closing.';
-                    }
-
                     const response = await fetch('/api/transform', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -10917,15 +10926,22 @@ const generateAiDraft = async (email) => {
 
                     const data = await response.json();
 
-                    if (data.result) {
-                        setEmailReply(data.result);
-                        setReplyPrompt('');
-                    }
+                    // Wait at least 2 seconds for nice animation
+                    await new Promise(resolve => setTimeout(resolve, Math.max(0, 2000 - (statusIndex * 1000))));
 
-                    setIsRewritingReply(false);
+                    clearInterval(statusInterval);
+                    setIsCenteredGenerating(false);
+
+                    if (data.result) {
+                        setCenteredWriterResult(data.result);
+                        // Generate suggestions based on the result
+                        generateAiSuggestions(data.result, finalPrompt);
+                    }
                 } catch (error) {
+                    clearInterval(statusInterval);
                     console.error('Error rewriting reply:', error);
-                    setIsRewritingReply(false);
+                    setIsCenteredGenerating(false);
+                    setCenteredWriterResult('Failed to generate email. Please try again.');
                 }
             };
 
@@ -13369,9 +13385,14 @@ const generateAiDraft = async (email) => {
                                                             <div style={{display: 'flex', gap: '12px'}}>
                                                                 <button
                                                                     onClick={() => {
-                                                                        setEmailText(centeredWriterResult);
+                                                                        // If viewing an email, update reply text
+                                                                        if (viewingEmail) {
+                                                                            setEmailReply(centeredWriterResult);
+                                                                        } else {
+                                                                            setEmailText(centeredWriterResult);
+                                                                        }
                                                                         closeCenteredWriter();
-                                                                        showNotification('Email added to editor!');
+                                                                        showNotification(viewingEmail ? 'Reply updated!' : 'Email added to editor!');
                                                                     }}
                                                                     style={{
                                                                         padding: '10px 20px',
@@ -13389,7 +13410,7 @@ const generateAiDraft = async (email) => {
                                                                     }}
                                                                 >
                                                                     <span>✓</span>
-                                                                    <span>Use Email</span>
+                                                                    <span>{viewingEmail ? 'Use as Reply' : 'Use Email'}</span>
                                                                 </button>
                                                                 <button
                                                                     onClick={() => {
