@@ -8920,9 +8920,37 @@ if (tokensParam) {
 
             console.log('✅ Outlook connected!');
 
-            // Set connection provider and flag to play sound on next user interaction
+            // Set connection provider and trigger animation automatically
             setConnectionProvider('outlook');
-            setPendingSoundPlay(true);
+
+            // Navigate to settings page
+            setCurrentPage('settings');
+
+            // Auto-trigger sound and animation after a brief delay
+            setTimeout(() => {
+                console.log('🎵 Auto-triggering connection animation...');
+                if (connectionAudioRef.current) {
+                    connectionAudioRef.current.currentTime = 0;
+                    connectionAudioRef.current.volume = 0.7;
+                    connectionAudioRef.current.play()
+                        .then(() => {
+                            console.log('✅ Connection sound played successfully');
+                            setShowConnectionAnimation(true);
+                            setPendingSoundPlay(false);
+
+                            setTimeout(() => {
+                                setShowConnectionAnimation(false);
+                                showNotification('📮 Outlook connected successfully!');
+                            }, 4000);
+                        })
+                        .catch(err => {
+                            console.log('⚠️ Sound blocked, trying click simulation:', err.message);
+                            // Simulate a click to satisfy browser autoplay policy
+                            document.body.click();
+                            setPendingSoundPlay(true); // Will trigger on click handler
+                        });
+                }
+            }, 500);
 
         } else if (provider === 'gmail' || !provider) {
             console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
@@ -8956,9 +8984,37 @@ if (tokensParam) {
 
             console.log('✅ Gmail connected!');
 
-            // Set connection provider and flag to play sound on next user interaction
+            // Set connection provider and trigger animation automatically
             setConnectionProvider('gmail');
-            setPendingSoundPlay(true);
+
+            // Navigate to settings page
+            setCurrentPage('settings');
+
+            // Auto-trigger sound and animation after a brief delay
+            setTimeout(() => {
+                console.log('🎵 Auto-triggering connection animation...');
+                if (connectionAudioRef.current) {
+                    connectionAudioRef.current.currentTime = 0;
+                    connectionAudioRef.current.volume = 0.7;
+                    connectionAudioRef.current.play()
+                        .then(() => {
+                            console.log('✅ Connection sound played successfully');
+                            setShowConnectionAnimation(true);
+                            setPendingSoundPlay(false);
+
+                            setTimeout(() => {
+                                setShowConnectionAnimation(false);
+                                showNotification('📧 Gmail connected successfully!');
+                            }, 4000);
+                        })
+                        .catch(err => {
+                            console.log('⚠️ Sound blocked, trying click simulation:', err.message);
+                            // Simulate a click to satisfy browser autoplay policy
+                            document.body.click();
+                            setPendingSoundPlay(true); // Will trigger on click handler
+                        });
+                }
+            }, 500);
         }
 
         // Clean URL - DON'T CHANGE PAGE
@@ -9935,6 +9991,61 @@ useEffect(() => {
                 }
             };
 
+            // Helper function to extract email body from Gmail payload
+            const extractEmailBody = (payload) => {
+                let body = '';
+
+                // Function to decode base64url encoded data
+                const decodeBase64 = (data) => {
+                    if (!data) return '';
+                    try {
+                        // Replace URL-safe characters
+                        const base64 = data.replace(/-/g, '+').replace(/_/g, '/');
+                        // Decode base64 to UTF-8
+                        return decodeURIComponent(escape(atob(base64)));
+                    } catch (e) {
+                        console.warn('Error decoding base64:', e);
+                        return '';
+                    }
+                };
+
+                // Function to extract text from parts recursively
+                const extractFromParts = (parts) => {
+                    if (!parts || !Array.isArray(parts)) return '';
+
+                    let text = '';
+                    for (const part of parts) {
+                        // If part has nested parts, recurse
+                        if (part.parts) {
+                            text += extractFromParts(part.parts);
+                        }
+                        // Extract text/plain or text/html
+                        else if (part.body && part.body.data) {
+                            if (part.mimeType === 'text/plain') {
+                                text += decodeBase64(part.body.data);
+                            } else if (part.mimeType === 'text/html' && !text) {
+                                // Use HTML as fallback if no plain text
+                                const html = decodeBase64(part.body.data);
+                                // Strip HTML tags for plain text
+                                text += html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+                            }
+                        }
+                    }
+                    return text;
+                };
+
+                // Check if email has parts (multipart)
+                if (payload.parts) {
+                    body = extractFromParts(payload.parts);
+                }
+                // Simple email with body directly in payload
+                else if (payload.body && payload.body.data) {
+                    body = decodeBase64(payload.body.data);
+                }
+
+                return body || 'No content available';
+            };
+
             const fetchGmailEmails = async (accessToken, isRetry = false) => {
                 try {
                     console.log('📬 Fetching Gmail inbox...');
@@ -9982,11 +10093,15 @@ useEffect(() => {
                         const date = headers.find(h => h.name === 'Date')?.value || '';
                         const messageId = headers.find(h => h.name === 'Message-ID')?.value || '';
 
+                        // Extract full email body
+                        const body = extractEmailBody(email.payload);
+
                         return {
                             id: email.id,
                             from: from,
                             subject: subject,
                             snippet: email.snippet,
+                            body: body, // Full email body content
                             date: new Date(parseInt(email.internalDate)).toLocaleString(),
                             internalDate: email.internalDate,
                             threadId: email.threadId,
@@ -10076,11 +10191,15 @@ useEffect(() => {
                         const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
                         const date = headers.find(h => h.name === 'Date')?.value || '';
 
+                        // Extract full email body
+                        const body = extractEmailBody(email.payload);
+
                         return {
                             id: email.id,
                             to: to,
                             subject: subject,
                             snippet: email.snippet,
+                            body: body, // Full email body content
                             date: new Date(parseInt(email.internalDate)).toLocaleString()
                         };
                     });
@@ -10175,7 +10294,7 @@ const fetchOutlookSentEmails = async (accessToken) => {
         console.log('🔑 Access token present:', !!accessToken);
 
         // Use Microsoft Graph API directly to fetch sent emails
-        const response = await fetch('https://graph.microsoft.com/v1.0/me/mailFolders/SentItems/messages?$top=20&$select=id,subject,bodyPreview,toRecipients,sentDateTime,conversationId', {
+        const response = await fetch('https://graph.microsoft.com/v1.0/me/mailFolders/SentItems/messages?$top=20&$select=id,subject,body,bodyPreview,toRecipients,sentDateTime,conversationId', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
@@ -10212,11 +10331,24 @@ const fetchOutlookSentEmails = async (accessToken) => {
             const toAddress = toRecipients.length > 0
                 ? (toRecipients[0].emailAddress?.address || toRecipients[0].emailAddress?.name || 'Unknown')
                 : 'Unknown';
+
+            // Extract body content (prefer text, fallback to HTML with tags stripped)
+            let bodyContent = '';
+            if (email.body) {
+                if (email.body.contentType === 'text') {
+                    bodyContent = email.body.content || '';
+                } else if (email.body.contentType === 'html') {
+                    // Strip HTML tags for plain text
+                    bodyContent = (email.body.content || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+                }
+            }
+
             return {
                 id: email.id,
                 to: toAddress,
                 subject: email.subject || '(No subject)',
                 snippet: email.bodyPreview || '',
+                body: bodyContent || email.bodyPreview || 'No content available', // Full email body
                 date: new Date(email.sentDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 threadId: email.conversationId,
                 internalDate: new Date(email.sentDateTime).getTime()
@@ -12909,8 +13041,8 @@ const generateAiDraft = async (email) => {
                                 <div className="mobile-email-body" style={{
                                     maxHeight: '250px',
                                     overflow: 'hidden'
-                                }}>{viewingEmail.snippet}</div>
-                                {viewingEmail.snippet && viewingEmail.snippet.length > 300 && (
+                                }}>{viewingEmail.body || viewingEmail.snippet}</div>
+                                {(viewingEmail.body || viewingEmail.snippet) && (viewingEmail.body || viewingEmail.snippet).length > 300 && (
                                     <button
                                         className="view-full-email-btn"
                                         onClick={() => handleViewFullEmail(viewingEmail)}
@@ -13896,9 +14028,9 @@ const generateAiDraft = async (email) => {
                                                             overflow: 'hidden',
                                                             position: 'relative'
                                                         }}>
-                                                            {viewingEmail.snippet}
+                                                            {viewingEmail.body || viewingEmail.snippet}
                                                         </p>
-                                                        {viewingEmail.snippet && viewingEmail.snippet.length > 300 && (
+                                                        {(viewingEmail.body || viewingEmail.snippet) && (viewingEmail.body || viewingEmail.snippet).length > 300 && (
                                                             <button
                                                                 className="view-full-email-btn"
                                                                 onClick={() => handleViewFullEmail(viewingEmail)}
@@ -15729,7 +15861,7 @@ const generateAiDraft = async (email) => {
                                         <span className="view-email-date">{viewEmailPopupData.date}</span>
                                     </div>
                                     <div className="view-email-body">
-                                        {viewEmailPopupData.snippet || viewEmailPopupData.body || 'No content available'}
+                                        {viewEmailPopupData.body || viewEmailPopupData.snippet || 'No content available'}
                                     </div>
                                 </div>
                             </div>
