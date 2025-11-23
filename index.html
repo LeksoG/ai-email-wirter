@@ -8721,6 +8721,7 @@ body.dark-mode .custom-language-select option:hover {
             // Connection animation states
             const [showConnectionAnimation, setShowConnectionAnimation] = useState(false);
             const [connectionProvider, setConnectionProvider] = useState(null); // 'gmail' or 'outlook'
+            const [pendingSoundPlay, setPendingSoundPlay] = useState(false);
 
             // Profile customization states
             const [showProfilePopup, setShowProfilePopup] = useState(false);
@@ -8923,12 +8924,8 @@ if (tokensParam) {
             setConnectionProvider('outlook');
             setShowConnectionAnimation(true);
 
-            // Try to play sound immediately and again after 2 seconds
-            setTimeout(() => {
-                playConnectionSound();
-                // Try again after 2 seconds in case first attempt was blocked
-                setTimeout(playConnectionSound, 2000);
-            }, 100);
+            // Set flag to play sound on next user interaction
+            setPendingSoundPlay(true);
 
             // Close animation after 4 seconds
             setTimeout(() => {
@@ -8972,12 +8969,8 @@ if (tokensParam) {
             setConnectionProvider('gmail');
             setShowConnectionAnimation(true);
 
-            // Try to play sound immediately and again after 2 seconds
-            setTimeout(() => {
-                playConnectionSound();
-                // Try again after 2 seconds in case first attempt was blocked
-                setTimeout(playConnectionSound, 2000);
-            }, 100);
+            // Set flag to play sound on next user interaction
+            setPendingSoundPlay(true);
 
             // Close animation after 4 seconds
             setTimeout(() => {
@@ -9080,6 +9073,63 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                     localStorage.setItem('darkMode', 'false');
                 }
             }, [darkMode]);
+
+            // Play connection sound on user interaction
+            useEffect(() => {
+                if (!pendingSoundPlay) return;
+
+                const handleUserInteraction = () => {
+                    console.log('🔊 Playing connection sound on user interaction...');
+
+                    const playSound = () => {
+                        if (connectionAudioRef.current) {
+                            connectionAudioRef.current.currentTime = 0;
+                            connectionAudioRef.current.volume = 0.7;
+                            connectionAudioRef.current.play()
+                                .then(() => {
+                                    console.log('✅ Connection sound played successfully');
+                                    setPendingSoundPlay(false);
+                                })
+                                .catch(err => {
+                                    console.warn('⚠️ Sound failed:', err.message);
+                                    setPendingSoundPlay(false);
+                                });
+                        } else {
+                            try {
+                                const sound = new Audio('/effect-for-logo-intro-186595.mp3');
+                                sound.volume = 0.7;
+                                sound.play()
+                                    .then(() => {
+                                        console.log('✅ Connection sound played successfully');
+                                        setPendingSoundPlay(false);
+                                    })
+                                    .catch(err => {
+                                        console.warn('⚠️ Sound failed:', err.message);
+                                        setPendingSoundPlay(false);
+                                    });
+                            } catch (err) {
+                                console.warn('⚠️ Could not create audio element:', err.message);
+                                setPendingSoundPlay(false);
+                            }
+                        }
+                    };
+
+                    playSound();
+                    // Remove listeners after playing
+                    document.removeEventListener('click', handleUserInteraction);
+                    document.removeEventListener('keydown', handleUserInteraction);
+                };
+
+                // Add listeners for user interactions
+                document.addEventListener('click', handleUserInteraction);
+                document.addEventListener('keydown', handleUserInteraction);
+
+                // Cleanup
+                return () => {
+                    document.removeEventListener('click', handleUserInteraction);
+                    document.removeEventListener('keydown', handleUserInteraction);
+                };
+            }, [pendingSoundPlay]);
 
             // Generate AI draft when viewing an email
             useEffect(() => {
@@ -10338,12 +10388,15 @@ const fetchOutlookSentEmails = async (accessToken) => {
             };
 
             const handleGenerate = async (useModal = false) => {
-                if (!selectedTone && !customPrompt) return;
-
                 // Ensure we have text to process
                 const textToProcess = uploadedFile?.content || emailText;
                 if (!textToProcess || textToProcess.trim().length === 0) {
                     alert('Please enter some text or upload a file before generating!');
+                    return;
+                }
+
+                if (!selectedTone && !customPrompt) {
+                    alert('Please enter a prompt or select a tone before generating!');
                     return;
                 }
 
