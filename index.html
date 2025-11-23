@@ -470,6 +470,8 @@
         .prompt-suggestions-container .suggestion-pill:nth-child(2) { animation-delay: 0.1s; }
         .prompt-suggestions-container .suggestion-pill:nth-child(3) { animation-delay: 0.15s; }
         .prompt-suggestions-container .suggestion-pill:nth-child(4) { animation-delay: 0.2s; }
+        .prompt-suggestions-container .suggestion-pill:nth-child(5) { animation-delay: 0.25s; }
+        .prompt-suggestions-container .suggestion-pill:nth-child(6) { animation-delay: 0.3s; }
 
         @keyframes pill-appear {
             0% {
@@ -7069,6 +7071,19 @@ body.dark-mode .ai-send-button {
     animation: inbox-slide-left 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+/* Class to hide inbox during generation */
+.inbox-sidebar.generating-hidden {
+    opacity: 0;
+    transform: translateX(-100%);
+    pointer-events: none;
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @keyframes inbox-slide-left {
     0% {
         opacity: 1;
@@ -7084,37 +7099,44 @@ body.dark-mode .ai-send-button {
 /* Email content area slide and expand to center */
 .desktop-inbox-layout.generating-mode .email-content-area {
     animation: content-center-expand 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    margin: 0 auto;
 }
 
 @keyframes content-center-expand {
     0% {
         transform: translateX(0);
+        margin-left: 0;
     }
     100% {
-        transform: translateX(-240px);
-        width: calc(100% + 240px);
-        max-width: 1000px;
+        transform: translateX(0);
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
     }
 }
 
-/* Centered AI Writer Container Styles */
+/* Hide back button during generation */
+.email-viewer-header .back-button-generating-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-20px);
+    transition: all 0.3s ease;
+}
+
+/* Centered AI Writer Container Styles - Inline mode (not popup) */
 .ai-writer-centered-mode {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 900px;
-    max-height: 85vh;
-    z-index: 9999;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
     backdrop-filter: blur(30px);
     border: 2px solid rgba(255, 255, 255, 0.8);
-    border-radius: 32px;
+    border-radius: 24px;
     padding: 32px;
     overflow-y: auto;
-    box-shadow: 0 40px 120px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
-    animation: center-container-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    animation: inline-container-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin: 0 auto;
 }
 
 body.dark-mode .ai-writer-centered-mode {
@@ -7122,29 +7144,30 @@ body.dark-mode .ai-writer-centered-mode {
     border-color: rgba(99, 102, 241, 0.3);
 }
 
-@keyframes center-container-appear {
+@keyframes inline-container-appear {
     0% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.85);
+        transform: scale(0.95);
         filter: blur(8px);
     }
     100% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
         filter: blur(0);
     }
 }
 
-/* Centered mode background overlay (no blur) */
+/* Hide the overlay when in inline mode */
 .centered-mode-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 9998;
-    animation: overlay-fade 0.4s ease-out;
+    display: none;
+}
+
+/* Email content area centered during generation */
+.email-content-area.generating-centered {
+    width: 100% !important;
+    max-width: 900px !important;
+    margin: 0 auto !important;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes overlay-fade {
@@ -8322,6 +8345,8 @@ body.dark-mode .custom-language-select option:hover {
             const [emailText, setEmailText] = useState('');
             const [customPrompt, setCustomPrompt] = useState('');
             const [showPromptSuggestions, setShowPromptSuggestions] = useState(false);
+            const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+            const [promptInputFocused, setPromptInputFocused] = useState(false);
             const [result, setResult] = useState('');
             const [isProcessing, setIsProcessing] = useState(false);
             const [showSuggestions, setShowSuggestions] = useState(false);
@@ -8627,11 +8652,9 @@ if (tokensParam) {
             setConnectionProvider('gmail');
             setShowConnectionAnimation(true);
 
-            // CONNECTION SOUND - Add your custom connection sound file here
-            // Example: Place your sound file (e.g., effect-for-logo-intro-186595.mp3) in the root directory
-            // Then uncomment and update the line below:
-            // const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
-            // connectionSound.play().catch(err => console.log('Connection sound failed:', err));
+            // CONNECTION SOUND - Play sound on Gmail connection
+            const connectionSound = new Audio('/effect-for-logo-intro-186595.mp3');
+            connectionSound.play().catch(err => console.log('Connection sound failed:', err));
 
             // Close animation after 2 seconds and show notification
             setTimeout(() => {
@@ -10322,6 +10345,80 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 setAiSuggestions(suggestions.slice(0, 4));
             };
 
+            // Generate dynamic prompt suggestions based on email content and user typing
+            const generatePromptSuggestions = (emailContent, userInput) => {
+                // Expanded predefined suggestions
+                const allPredefinedSuggestions = [
+                    'Write a professional email',
+                    'Send a thank you note',
+                    'Follow up on meeting',
+                    'Request information',
+                    'Make it more formal',
+                    'Make it friendlier',
+                    'Shorten this email',
+                    'Add more detail',
+                    'Write a response',
+                    'Schedule a meeting',
+                    'Ask for feedback',
+                    'Send a reminder',
+                    'Write an introduction',
+                    'Request a call',
+                    'Confirm appointment'
+                ];
+
+                let suggestions = [];
+
+                // If there's email content, generate AI-relevant suggestions (2 short ones)
+                if (emailContent && emailContent.trim().length > 20) {
+                    const lowerContent = emailContent.toLowerCase();
+
+                    // Generate 2 AI-based contextual suggestions based on email content
+                    if (lowerContent.includes('meeting') || lowerContent.includes('schedule') || lowerContent.includes('appointment')) {
+                        suggestions.push('Confirm the meeting');
+                        suggestions.push('Suggest new time');
+                    } else if (lowerContent.includes('question') || lowerContent.includes('help') || lowerContent.includes('?')) {
+                        suggestions.push('Answer politely');
+                        suggestions.push('Ask for clarification');
+                    } else if (lowerContent.includes('thank') || lowerContent.includes('appreciate')) {
+                        suggestions.push('Reply with thanks');
+                        suggestions.push('Send follow-up');
+                    } else if (lowerContent.includes('urgent') || lowerContent.includes('asap') || lowerContent.includes('important')) {
+                        suggestions.push('Respond urgently');
+                        suggestions.push('Acknowledge receipt');
+                    } else if (lowerContent.includes('proposal') || lowerContent.includes('offer') || lowerContent.includes('deal')) {
+                        suggestions.push('Accept offer');
+                        suggestions.push('Negotiate terms');
+                    } else if (lowerContent.includes('problem') || lowerContent.includes('issue') || lowerContent.includes('error')) {
+                        suggestions.push('Apologize politely');
+                        suggestions.push('Offer solution');
+                    } else {
+                        // Default AI suggestions for generic content
+                        suggestions.push('Reply professionally');
+                        suggestions.push('Summarize and respond');
+                    }
+                }
+
+                // Filter predefined suggestions based on user input
+                if (userInput && userInput.trim().length > 0) {
+                    const lowerInput = userInput.toLowerCase();
+                    const filtered = allPredefinedSuggestions.filter(s =>
+                        s.toLowerCase().includes(lowerInput)
+                    );
+                    suggestions = [...suggestions, ...filtered];
+                } else {
+                    // Add some predefined suggestions when no input
+                    suggestions = [...suggestions, ...allPredefinedSuggestions.slice(0, 4)];
+                }
+
+                // Remove duplicates and limit to 6 suggestions
+                const uniqueSuggestions = [...new Set(suggestions)].slice(0, 6);
+                setFilteredSuggestions(uniqueSuggestions);
+
+                // Show suggestions if we have any and user is typing or has email content
+                const shouldShow = uniqueSuggestions.length > 0 && (userInput.length > 0 || emailContent.trim().length > 20);
+                setShowPromptSuggestions(shouldShow && promptInputFocused);
+            };
+
             // Handle follow-up prompt in AI generation modal
             const handleAiFollowup = async (followupPrompt) => {
                 if (!followupPrompt.trim()) return;
@@ -11780,20 +11877,29 @@ const generateAiDraft = async (email) => {
                                      {/* Custom Prompt Input */}
 {/* Custom Prompt Input */}
 <div style={{position: 'relative'}}>
-    {/* Prompt Suggestions Container - Shows when focused and no email text */}
-    {showPromptSuggestions && !emailText.trim() && (
+    {/* Prompt Suggestions Container - Shows dynamically as user types */}
+    {showPromptSuggestions && filteredSuggestions.length > 0 && (
         <div className="prompt-suggestions-container">
-            <div className="suggestion-title">Quick suggestions</div>
+            <div className="suggestion-title">
+                {emailText.trim() ? 'Smart suggestions' : 'Quick suggestions'}
+            </div>
             <div className="suggestion-pills">
-                {['Write a professional email', 'Send a thank you note', 'Follow up on meeting', 'Request information'].map((suggestion, idx) => (
+                {filteredSuggestions.map((suggestion, idx) => (
                     <button
                         key={idx}
                         className="suggestion-pill"
+                        style={{
+                            animationDelay: `${idx * 0.05}s`
+                        }}
                         onClick={() => {
                             setCustomPrompt(suggestion);
                             setShowPromptSuggestions(false);
                         }}
                     >
+                        {/* Mark AI-generated suggestions with a subtle indicator */}
+                        {idx < 2 && emailText.trim().length > 20 && (
+                            <span style={{marginRight: '4px', opacity: 0.7}}>✨</span>
+                        )}
                         {suggestion}
                     </button>
                 ))}
@@ -11910,12 +12016,24 @@ const generateAiDraft = async (email) => {
         <input
             type="text"
             value={customPrompt}
-            onChange={(e) => setCustomPrompt(e.target.value)}
+            onChange={(e) => {
+                setCustomPrompt(e.target.value);
+                // Generate suggestions dynamically as user types
+                generatePromptSuggestions(emailText, e.target.value);
+            }}
             className="ai-prompt-input"
             placeholder="e.g., 'Write a professional email' or 'Make it more casual'"
             onKeyPress={(e) => e.key === 'Enter' && customPrompt && handleGenerate()}
-            onFocus={() => !emailText.trim() && setShowPromptSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowPromptSuggestions(false), 200)}
+            onFocus={() => {
+                setPromptInputFocused(true);
+                generatePromptSuggestions(emailText, customPrompt);
+            }}
+            onBlur={() => {
+                setTimeout(() => {
+                    setPromptInputFocused(false);
+                    setShowPromptSuggestions(false);
+                }, 200);
+            }}
         />
         {customPrompt && customPrompt.trim().length > 0 ? (
             <button
@@ -12562,10 +12680,10 @@ const generateAiDraft = async (email) => {
                               {/* Desktop Layout: Inbox Sidebar + Content Area */}
                                 {(emailConnected || outlookConnected) && currentPage === 'home' && (
                                     <>
-                                    <div className="desktop-inbox-layout">
+                                    <div className={`desktop-inbox-layout ${isCenteredGenerating ? 'generating-mode' : ''}`}>
                                         {/* Left Sidebar - Inbox */}
                                         {/* Left Sidebar - Inbox */}
-                                         <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''}`}>
+                                         <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''} ${isCenteredGenerating ? 'generating-hidden' : ''}`}>
                                             {/* Header with Title and Buttons */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
@@ -13162,7 +13280,7 @@ const generateAiDraft = async (email) => {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''} ${aiWritingMode ? 'ai-mode-centered' : ''} ${aiWritingModeClosing ? 'ai-mode-normal' : ''}`}
+                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''} ${aiWritingMode ? 'ai-mode-centered' : ''} ${aiWritingModeClosing ? 'ai-mode-normal' : ''} ${isCenteredGenerating ? 'generating-centered' : ''}`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
@@ -13174,24 +13292,303 @@ const generateAiDraft = async (email) => {
                                             onDrop={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(false);
+
+                                                // Handle internal email drag from inbox
                                                 if (draggedEmail) {
                                                     setDroppedEmailFile(draggedEmail);
                                                     setViewingEmail(null);
+                                                    return;
+                                                }
+
+                                                // Handle external file drops (email files)
+                                                const files = e.dataTransfer.files;
+                                                if (files && files.length > 0) {
+                                                    const file = files[0];
+                                                    const reader = new FileReader();
+
+                                                    reader.onload = (event) => {
+                                                        let content = event.target.result;
+
+                                                        // Parse .eml files to extract body text
+                                                        if (file.name.endsWith('.eml') || file.type === 'message/rfc822') {
+                                                            // Extract text content from email
+                                                            const lines = content.split('\n');
+                                                            let inBody = false;
+                                                            let bodyLines = [];
+                                                            let subject = '';
+                                                            let from = '';
+
+                                                            for (const line of lines) {
+                                                                if (line.toLowerCase().startsWith('subject:')) {
+                                                                    subject = line.substring(8).trim();
+                                                                }
+                                                                if (line.toLowerCase().startsWith('from:')) {
+                                                                    from = line.substring(5).trim();
+                                                                }
+                                                                if (inBody) {
+                                                                    // Skip HTML tags for cleaner text
+                                                                    const cleanLine = line.replace(/<[^>]*>/g, '').trim();
+                                                                    if (cleanLine) bodyLines.push(cleanLine);
+                                                                }
+                                                                if (line.trim() === '' && !inBody) {
+                                                                    inBody = true;
+                                                                }
+                                                            }
+
+                                                            // Build readable email content
+                                                            let extractedText = '';
+                                                            if (subject) extractedText += 'Subject: ' + subject + '\n';
+                                                            if (from) extractedText += 'From: ' + from + '\n\n';
+                                                            extractedText += bodyLines.join('\n');
+                                                            content = extractedText || content;
+                                                        }
+
+                                                        // Set the extracted text content to emailText
+                                                        setEmailText(content);
+                                                        setViewingEmail(null);
+                                                        showNotification('📧 Email content loaded!');
+                                                    };
+
+                                                    reader.readAsText(file);
                                                 }
                                             }}
                                         >
-                
-                                            {viewingEmail ? (
+                                            {/* Inline AI Generation - shows when generating */}
+                                            {showCenteredWriter && (
+                                                <div className="ai-writer-centered-mode">
+                                                    {/* Header with action buttons */}
+                                                    <div className="centered-mode-header" style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        marginBottom: '20px'
+                                                    }}>
+                                                        <div style={{width: '40px'}}></div>
+                                                        {/* Action buttons - only show when result is ready */}
+                                                        {!isCenteredGenerating && centeredWriterResult && (
+                                                            <div style={{display: 'flex', gap: '12px'}}>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEmailText(centeredWriterResult);
+                                                                        closeCenteredWriter();
+                                                                        showNotification('Email added to editor!');
+                                                                    }}
+                                                                    style={{
+                                                                        padding: '10px 20px',
+                                                                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                                        color: 'white',
+                                                                        border: 'none',
+                                                                        borderRadius: '50px',
+                                                                        cursor: 'pointer',
+                                                                        fontSize: '14px',
+                                                                        fontWeight: '600',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '8px',
+                                                                        transition: 'all 0.3s ease'
+                                                                    }}
+                                                                >
+                                                                    <span>✓</span>
+                                                                    <span>Use Email</span>
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        navigator.clipboard.writeText(centeredWriterResult);
+                                                                        showNotification('Copied to clipboard!');
+                                                                    }}
+                                                                    style={{
+                                                                        padding: '10px 20px',
+                                                                        background: darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
+                                                                        color: darkMode ? '#a5b4fc' : '#4f46e5',
+                                                                        border: '2px solid rgba(99, 102, 241, 0.3)',
+                                                                        borderRadius: '50px',
+                                                                        cursor: 'pointer',
+                                                                        fontSize: '14px',
+                                                                        fontWeight: '600',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '8px',
+                                                                        transition: 'all 0.3s ease'
+                                                                    }}
+                                                                >
+                                                                    <span>📋</span>
+                                                                    <span>Copy</span>
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                        {/* Close button - only when not generating */}
+                                                        {!isCenteredGenerating && (
+                                                            <button
+                                                                onClick={closeCenteredWriter}
+                                                                style={{
+                                                                    width: '36px',
+                                                                    height: '36px',
+                                                                    borderRadius: '50%',
+                                                                    background: 'rgba(156, 163, 175, 0.1)',
+                                                                    border: '2px solid rgba(156, 163, 175, 0.2)',
+                                                                    color: darkMode ? '#9ca3af' : '#6b7280',
+                                                                    cursor: 'pointer',
+                                                                    fontSize: '16px',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    transition: 'all 0.3s ease'
+                                                                }}
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        )}
+                                                        {isCenteredGenerating && <div style={{width: '40px'}}></div>}
+                                                    </div>
+
+                                                    {/* Prompt display */}
+                                                    <div style={{
+                                                        textAlign: 'center',
+                                                        fontSize: '16px',
+                                                        fontWeight: '500',
+                                                        color: darkMode ? '#9ca3af' : '#6b7280',
+                                                        marginBottom: '24px',
+                                                        fontStyle: 'italic'
+                                                    }}>
+                                                        "{centeredWriterPrompt}"
+                                                    </div>
+
+                                                    {/* Generation Animation or Result */}
+                                                    {isCenteredGenerating ? (
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center',
+                                                            gap: '16px',
+                                                            padding: '40px 20px'
+                                                        }}>
+                                                            {['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'].map((status, idx) => {
+                                                                const allStatuses = ['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'];
+                                                                const currentIdx = allStatuses.findIndex(s => centeredGenerationStatus.includes(s.slice(2)));
+                                                                const isActive = idx === (currentIdx >= 0 ? currentIdx : 0);
+                                                                return (
+                                                                    <div
+                                                                        key={idx}
+                                                                        style={{
+                                                                            fontSize: '16px',
+                                                                            fontWeight: isActive ? '600' : '400',
+                                                                            color: isActive
+                                                                                ? (darkMode ? '#a5b4fc' : '#4f46e5')
+                                                                                : (darkMode ? '#6b7280' : '#9ca3af'),
+                                                                            opacity: isActive ? 1 : 0.5,
+                                                                            transition: 'all 0.3s ease',
+                                                                            transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                                                                        }}
+                                                                    >
+                                                                        {status}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            {/* Result display */}
+                                                            <div style={{
+                                                                padding: '20px',
+                                                                background: darkMode ? 'rgba(40, 40, 45, 0.5)' : 'rgba(249, 250, 251, 0.8)',
+                                                                borderRadius: '16px',
+                                                                fontSize: '15px',
+                                                                lineHeight: '1.7',
+                                                                color: darkMode ? '#e5e5e5' : '#374151',
+                                                                whiteSpace: 'pre-wrap'
+                                                            }}>
+                                                                {centeredWriterResult}
+                                                            </div>
+
+                                                            {/* Follow-up suggestions */}
+                                                            {aiSuggestions.length > 0 && (
+                                                                <div style={{marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center'}}>
+                                                                    {aiSuggestions.map((suggestion, idx) => (
+                                                                        <button
+                                                                            key={idx}
+                                                                            onClick={() => handleCenteredFollowup(suggestion)}
+                                                                            style={{
+                                                                                padding: '10px 18px',
+                                                                                borderRadius: '50px',
+                                                                                background: darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
+                                                                                border: '1px solid rgba(99, 102, 241, 0.3)',
+                                                                                color: darkMode ? '#a5b4fc' : '#4f46e5',
+                                                                                fontSize: '13px',
+                                                                                fontWeight: '500',
+                                                                                cursor: 'pointer',
+                                                                                transition: 'all 0.3s ease'
+                                                                            }}
+                                                                        >
+                                                                            {suggestion}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+
+                                                            {/* Follow-up input */}
+                                                            <div style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Ask for changes or improvements..."
+                                                                    value={aiFollowupPrompt}
+                                                                    onChange={(e) => setAiFollowupPrompt(e.target.value)}
+                                                                    onKeyPress={(e) => {
+                                                                        if (e.key === 'Enter' && aiFollowupPrompt.trim()) {
+                                                                            handleCenteredFollowup(aiFollowupPrompt);
+                                                                        }
+                                                                    }}
+                                                                    style={{
+                                                                        flex: 1,
+                                                                        padding: '14px 20px',
+                                                                        borderRadius: '50px',
+                                                                        background: darkMode ? 'rgba(40, 40, 45, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                                                                        border: '2px solid rgba(99, 102, 241, 0.2)',
+                                                                        fontSize: '14px',
+                                                                        color: darkMode ? '#e5e5e5' : '#374151',
+                                                                        outline: 'none'
+                                                                    }}
+                                                                />
+                                                                <button
+                                                                    onClick={() => handleCenteredFollowup(aiFollowupPrompt)}
+                                                                    disabled={!aiFollowupPrompt.trim()}
+                                                                    style={{
+                                                                        padding: '14px 24px',
+                                                                        borderRadius: '50px',
+                                                                        background: aiFollowupPrompt.trim()
+                                                                            ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
+                                                                            : 'rgba(156, 163, 175, 0.3)',
+                                                                        color: 'white',
+                                                                        border: 'none',
+                                                                        fontSize: '16px',
+                                                                        fontWeight: '600',
+                                                                        cursor: aiFollowupPrompt.trim() ? 'pointer' : 'not-allowed'
+                                                                    }}
+                                                                >
+                                                                    →
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {viewingEmail && !showCenteredWriter ? (
                                                 <>
                                                     {/* Email Viewer Header */}
                                                     <div className="email-viewer-header">
-                                                        <button
-                                                            onClick={() => setViewingEmail(null)}
-                                                            className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all unified-button border-2 border-white flex items-center gap-2"
-                                                        >
-                                                            <span>←</span>
-                                                            <span>Back</span>
-                                                        </button>
+                                                        {/* Back button - hidden during generation */}
+                                                        {!isCenteredGenerating && (
+                                                            <button
+                                                                onClick={() => setViewingEmail(null)}
+                                                                className="px-4 py-2 glass-effect rounded-full text-gray-700 text-sm font-medium hover:bg-white/90 transition-all unified-button border-2 border-white flex items-center gap-2"
+                                                                style={{
+                                                                    transition: 'all 0.3s ease'
+                                                                }}
+                                                            >
+                                                                <span>←</span>
+                                                                <span>Back</span>
+                                                            </button>
+                                                        )}
                                                         <div className="email-action-buttons">
                                                             <button
                                                                 onClick={() => handleSummarizeEmail(viewingEmail)}
@@ -14822,154 +15219,6 @@ const generateAiDraft = async (email) => {
                                 </div>
                             </div>
                         </div>
-                    )}
-
-                    {/* Centered AI Writer Mode - Replaces popup modal */}
-                    {showCenteredWriter && (
-                        <>
-                            <div className="centered-mode-overlay" onClick={() => !isCenteredGenerating && closeCenteredWriter()}></div>
-                            <div className="ai-writer-centered-mode">
-                                {/* Header with Close button on right, action buttons in center */}
-                                <div className="centered-mode-header">
-                                    <div style={{width: '40px'}}></div>
-                                    {/* Action buttons in center - only show when result is ready */}
-                                    {!isCenteredGenerating && centeredWriterResult && (
-                                        <div className="centered-mode-actions">
-                                            <button
-                                                className="centered-mode-btn primary"
-                                                onClick={() => {
-                                                    setEmailText(centeredWriterResult);
-                                                    closeCenteredWriter();
-                                                    showNotification('Email added to editor!');
-                                                }}
-                                            >
-                                                <span>✓</span>
-                                                <span>Use Email</span>
-                                            </button>
-                                            <button
-                                                className="centered-mode-btn secondary"
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(centeredWriterResult);
-                                                    showNotification('Copied to clipboard!');
-                                                }}
-                                            >
-                                                <span>📋</span>
-                                                <span>Copy</span>
-                                            </button>
-                                        </div>
-                                    )}
-                                    {!isCenteredGenerating && !centeredWriterResult && (
-                                        <div className="centered-mode-actions"></div>
-                                    )}
-                                    {/* Close button - always visible when not generating */}
-                                    {!isCenteredGenerating && (
-                                        <button className="centered-mode-close" onClick={closeCenteredWriter}>
-                                            ✕
-                                        </button>
-                                    )}
-                                    {isCenteredGenerating && <div style={{width: '40px'}}></div>}
-                                </div>
-
-                                {/* Prompt display */}
-                                <div className="centered-mode-prompt">
-                                    "{centeredWriterPrompt}"
-                                </div>
-
-                                {/* Generation Animation or Result */}
-                                {isCenteredGenerating ? (
-                                    <div className="centered-generating-animation">
-                                        <div className="centered-status-list">
-                                            {['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'].map((status, idx) => {
-                                                const allStatuses = ['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'];
-                                                const currentIdx = allStatuses.findIndex(s => centeredGenerationStatus.includes(s.slice(2)));
-                                                let className = 'centered-status-item';
-                                                if (idx === (currentIdx >= 0 ? currentIdx : 0)) className += ' active';
-                                                return (
-                                                    <div key={idx} className={className}>
-                                                        {status}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <>
-                                        {/* Result display */}
-                                        <div className="centered-mode-result">
-                                            {centeredWriterResult}
-                                        </div>
-
-                                        {/* Follow-up suggestions */}
-                                        {aiSuggestions.length > 0 && (
-                                            <div style={{marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center'}}>
-                                                {aiSuggestions.map((suggestion, idx) => (
-                                                    <button
-                                                        key={idx}
-                                                        onClick={() => handleCenteredFollowup(suggestion)}
-                                                        style={{
-                                                            padding: '10px 18px',
-                                                            borderRadius: '50px',
-                                                            background: darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)',
-                                                            border: '1px solid rgba(99, 102, 241, 0.3)',
-                                                            color: darkMode ? '#a5b4fc' : '#4f46e5',
-                                                            fontSize: '13px',
-                                                            fontWeight: '500',
-                                                            cursor: 'pointer',
-                                                            transition: 'all 0.3s ease'
-                                                        }}
-                                                    >
-                                                        {suggestion}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        {/* Follow-up input */}
-                                        <div style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
-                                            <input
-                                                type="text"
-                                                placeholder="Ask for changes or improvements..."
-                                                value={aiFollowupPrompt}
-                                                onChange={(e) => setAiFollowupPrompt(e.target.value)}
-                                                onKeyPress={(e) => {
-                                                    if (e.key === 'Enter' && aiFollowupPrompt.trim()) {
-                                                        handleCenteredFollowup(aiFollowupPrompt);
-                                                    }
-                                                }}
-                                                style={{
-                                                    flex: 1,
-                                                    padding: '14px 20px',
-                                                    borderRadius: '50px',
-                                                    background: darkMode ? 'rgba(40, 40, 45, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                                                    border: '2px solid rgba(99, 102, 241, 0.2)',
-                                                    fontSize: '14px',
-                                                    color: darkMode ? '#e5e5e5' : '#374151',
-                                                    outline: 'none'
-                                                }}
-                                            />
-                                            <button
-                                                onClick={() => handleCenteredFollowup(aiFollowupPrompt)}
-                                                disabled={!aiFollowupPrompt.trim()}
-                                                style={{
-                                                    padding: '14px 24px',
-                                                    borderRadius: '50px',
-                                                    background: aiFollowupPrompt.trim()
-                                                        ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
-                                                        : 'rgba(156, 163, 175, 0.3)',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    fontSize: '16px',
-                                                    fontWeight: '600',
-                                                    cursor: aiFollowupPrompt.trim() ? 'pointer' : 'not-allowed'
-                                                }}
-                                            >
-                                                →
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </>
                     )}
 
                     {/* Logout Confirmation Dialog */}
