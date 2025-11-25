@@ -329,7 +329,7 @@
             margin: 0 auto 20px auto;
             text-align: center;
             z-index: 10;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, min-height 0.3s ease, margin 0.3s ease;
             width: 100%;
             min-height: 50px;
             display: flex;
@@ -340,6 +340,8 @@
         .greeting-container.hidden {
             opacity: 0;
             pointer-events: none;
+            min-height: 0;
+            margin: 0;
         }
 
         .greeting-oval {
@@ -5298,6 +5300,7 @@ body.dark-mode .mobile-reply-textarea {
     max-height: 90vh;
     min-height: 500px;
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: 0 40px 120px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
     animation: generation-container-lift 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
@@ -8650,6 +8653,7 @@ body.dark-mode .custom-language-select option:hover {
             const [authMode, setAuthMode] = useState('signup'); // 'signup' or 'login'
             const [authError, setAuthError] = useState('');
             const [isLoggingIn, setIsLoggingIn] = useState(false);
+            const [pendingConnection, setPendingConnection] = useState(null); // 'gmail' or 'outlook' - tracks which button should show "Finish Connecting"
             const [emailReply, setEmailReply] = useState('');
             const [replyPrompt, setReplyPrompt] = useState('');
             const [summarizingEmail, setSummarizingEmail] = useState(null);
@@ -8916,6 +8920,7 @@ if (tokensParam) {
 
             setOutlookConnected(true);
             setActiveProvider('outlook');
+            setPendingConnection(null);
 
             fetchOutlookEmails(tokens.access_token);
             fetchOutlookSentEmails(tokens.access_token);
@@ -8961,6 +8966,7 @@ if (tokensParam) {
             localStorage.setItem('emailConnected', 'true');
             localStorage.removeItem('oauth_in_progress');
             setEmailConnected(true);
+            setPendingConnection(null);
 
             fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
                 headers: {
@@ -9841,26 +9847,32 @@ useEffect(() => {
             const handleGmailConnect = async () => {
     // Check if user is logged in
     if (!isLoggedIn) {
+        setPendingConnection('gmail');
         setShowAuthPopup(true);
         return;
     }
 
-    // UNLOCK AUDIO on user click to enable sound after OAuth
+    // Show connection animation and play sound
+    setConnectionProvider('gmail');
+    setShowConnectionAnimation(true);
+
+    // UNLOCK AND PLAY AUDIO on user click
     if (connectionAudioRef.current) {
-        console.log('🔓 Unlocking audio on user interaction...');
+        console.log('🔊 Playing connection sound...');
         const audio = connectionAudioRef.current;
-        audio.volume = 0.01; // Very quiet
+        audio.volume = 0.5;
         audio.currentTime = 0;
         audio.play()
             .then(() => {
-                audio.pause();
-                audio.currentTime = 0;
-                console.log('✅ Audio unlocked for later playback');
+                console.log('✅ Connection sound played successfully');
             })
-            .catch(() => {
-                console.log('ℹ️ Audio unlock attempted (may retry)');
+            .catch((err) => {
+                console.log('ℹ️ Audio play failed:', err);
             });
     }
+
+    // Wait a moment for animation/sound to start
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
         console.log('🔐 Initiating Gmail OAuth...');
@@ -9878,6 +9890,7 @@ useEffect(() => {
         window.location.href = data.authUrl;
     } catch (error) {
         console.error('❌ Gmail OAuth error:', error);
+        setShowConnectionAnimation(false);
         showNotification('❌ Failed to connect Gmail');
     }
 };
@@ -9885,26 +9898,32 @@ useEffect(() => {
            const handleOutlookConnect = async () => {
     // Check if user is logged in
     if (!isLoggedIn) {
+        setPendingConnection('outlook');
         setShowAuthPopup(true);
         return;
     }
 
-    // UNLOCK AUDIO on user click to enable sound after OAuth
+    // Show connection animation and play sound
+    setConnectionProvider('outlook');
+    setShowConnectionAnimation(true);
+
+    // UNLOCK AND PLAY AUDIO on user click
     if (connectionAudioRef.current) {
-        console.log('🔓 Unlocking audio on user interaction...');
+        console.log('🔊 Playing connection sound...');
         const audio = connectionAudioRef.current;
-        audio.volume = 0.01; // Very quiet
+        audio.volume = 0.5;
         audio.currentTime = 0;
         audio.play()
             .then(() => {
-                audio.pause();
-                audio.currentTime = 0;
-                console.log('✅ Audio unlocked for later playback');
+                console.log('✅ Connection sound played successfully');
             })
-            .catch(() => {
-                console.log('ℹ️ Audio unlock attempted (may retry)');
+            .catch((err) => {
+                console.log('ℹ️ Audio play failed:', err);
             });
     }
+
+    // Wait a moment for animation/sound to start
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
         console.log('🔐 Initiating Outlook OAuth...');
@@ -9932,6 +9951,7 @@ useEffect(() => {
         window.location.href = data.authUrl;
     } catch (error) {
         console.error('❌ Outlook OAuth error:', error);
+        setShowConnectionAnimation(false);
         showNotification('❌ Failed to connect Outlook');
     }
 };
@@ -11673,7 +11693,7 @@ const generateAiDraft = async (email) => {
                                                     <svg className="connection-icon-unified" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                                     </svg>
-                                                    <span className="connection-text">Connect Gmail</span>
+                                                    <span className="connection-text">{pendingConnection === 'gmail' ? 'Finish Connecting Gmail' : 'Connect Gmail'}</span>
                                                 </button>
                                             ) : (
                                                 <div className="connection-btn-unified connected-unified gmail-connected-unified">
@@ -11711,7 +11731,7 @@ const generateAiDraft = async (email) => {
                                                         <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
                                                         <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="currentColor"/>
                                                     </svg>
-                                                    <span className="connection-text">Connect Outlook</span>
+                                                    <span className="connection-text">{pendingConnection === 'outlook' ? 'Finish Connecting Outlook' : 'Connect Outlook'}</span>
                                                 </button>
                                             ) : (
                                                 <div className="connection-btn-unified connected-unified outlook-connected-unified">
@@ -15356,7 +15376,10 @@ const generateAiDraft = async (email) => {
 
                     {/* Authentication Popup */}
                     {showAuthPopup && (
-                        <div className="auth-popup-overlay" onClick={() => setShowAuthPopup(false)}>
+                        <div className="auth-popup-overlay" onClick={() => {
+                            setShowAuthPopup(false);
+                            setPendingConnection(null);
+                        }}>
                             <div className="auth-popup-container" onClick={(e) => e.stopPropagation()}>
                                 <div className="auth-popup-icon">🔒</div>
                                 <h2 className="auth-popup-title">Account Required</h2>
@@ -15368,7 +15391,10 @@ const generateAiDraft = async (email) => {
                                 <div className="auth-popup-buttons">
                                     <button
                                         className="auth-popup-button auth-popup-button-secondary"
-                                        onClick={() => setShowAuthPopup(false)}
+                                        onClick={() => {
+                                            setShowAuthPopup(false);
+                                            // Keep pendingConnection so button shows "Finish Connecting"
+                                        }}
                                     >
                                         Later
                                     </button>
@@ -15378,6 +15404,7 @@ const generateAiDraft = async (email) => {
                                             setShowAuthPopup(false);
                                             setCurrentPage('settings');
                                             setShowAuthInSettings(true);
+                                            // Keep pendingConnection so button shows "Finish Connecting" after login
                                         }}
                                     >
                                         Go to Settings
