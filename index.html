@@ -9845,18 +9845,29 @@ useEffect(() => {
             }, [searchQuery, gmailEmails]);
 
             const handleGmailConnect = async () => {
-    // Check if user is logged in
-    if (!isLoggedIn) {
+    // First click: Show auth popup if not logged in, no animation/sound
+    if (pendingConnection !== 'gmail') {
         setPendingConnection('gmail');
+        if (!isLoggedIn) {
+            setShowAuthPopup(true);
+        }
+        return;
+    }
+
+    // Second click: User clicked "Finish Connecting" - show animation and play sound
+    if (!isLoggedIn) {
         setShowAuthPopup(true);
         return;
     }
 
-    // Show connection animation and play sound
+    // Show connection animation
     setConnectionProvider('gmail');
     setShowConnectionAnimation(true);
 
-    // UNLOCK AND PLAY AUDIO on user click
+    // Wait 1 second for animation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // PLAY AUDIO after animation
     if (connectionAudioRef.current) {
         console.log('🔊 Playing connection sound...');
         const audio = connectionAudioRef.current;
@@ -9870,9 +9881,6 @@ useEffect(() => {
                 console.log('ℹ️ Audio play failed:', err);
             });
     }
-
-    // Wait a moment for animation/sound to start
-    await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
         console.log('🔐 Initiating Gmail OAuth...');
@@ -9896,18 +9904,29 @@ useEffect(() => {
 };
 
            const handleOutlookConnect = async () => {
-    // Check if user is logged in
-    if (!isLoggedIn) {
+    // First click: Show auth popup if not logged in, no animation/sound
+    if (pendingConnection !== 'outlook') {
         setPendingConnection('outlook');
+        if (!isLoggedIn) {
+            setShowAuthPopup(true);
+        }
+        return;
+    }
+
+    // Second click: User clicked "Finish Connecting" - show animation and play sound
+    if (!isLoggedIn) {
         setShowAuthPopup(true);
         return;
     }
 
-    // Show connection animation and play sound
+    // Show connection animation
     setConnectionProvider('outlook');
     setShowConnectionAnimation(true);
 
-    // UNLOCK AND PLAY AUDIO on user click
+    // Wait 1 second for animation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // PLAY AUDIO after animation
     if (connectionAudioRef.current) {
         console.log('🔊 Playing connection sound...');
         const audio = connectionAudioRef.current;
@@ -9921,9 +9940,6 @@ useEffect(() => {
                 console.log('ℹ️ Audio play failed:', err);
             });
     }
-
-    // Wait a moment for animation/sound to start
-    await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
         console.log('🔐 Initiating Outlook OAuth...');
