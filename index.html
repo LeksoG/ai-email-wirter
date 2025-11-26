@@ -8912,62 +8912,30 @@ if (tokensParam) {
         };
 
         if (provider === 'outlook') {
-            console.log('📮 ========== PROCESSING OUTLOOK CONNECTION ==========');
+            console.log('📮 ========== PROCESSING OUTLOOK OAUTH COMPLETION ==========');
 
+            // Save tokens but DON'T finalize connection yet
             localStorage.setItem('outlookTokens', JSON.stringify(tokens));
-            localStorage.setItem('outlookConnected', 'true');
+            localStorage.setItem('outlook_oauth_complete', 'true');
             localStorage.removeItem('oauth_in_progress');
 
-            setOutlookConnected(true);
-            setActiveProvider('outlook');
-            setPendingConnection(null);
+            // Set state to show "Finish setting up Outlook account" button
+            setPendingConnection('outlook');
 
-            fetchOutlookEmails(tokens.access_token);
-            fetchOutlookSentEmails(tokens.access_token);
+            console.log('✅ Outlook OAuth completed! Waiting for user to finish setup...');
 
-            console.log('✅ Outlook connected!');
-
-            // Set connection provider and trigger animation automatically
-            setConnectionProvider('outlook');
-
-            // Navigate to settings page
+            // Navigate to settings page to show the "Finish setting up" button
             setCurrentPage('settings');
 
-            // Auto-trigger sound and animation after a brief delay
-            setTimeout(() => {
-                console.log('🎵 Auto-triggering connection animation...');
-                if (connectionAudioRef.current) {
-                    connectionAudioRef.current.currentTime = 0;
-                    connectionAudioRef.current.volume = 0.7;
-                    connectionAudioRef.current.play()
-                        .then(() => {
-                            console.log('✅ Connection sound played successfully');
-                            setShowConnectionAnimation(true);
-                            setPendingSoundPlay(false);
-
-                            setTimeout(() => {
-                                setShowConnectionAnimation(false);
-                                showNotification('📮 Outlook connected successfully!');
-                            }, 4000);
-                        })
-                        .catch(err => {
-                            console.log('⚠️ Sound blocked, trying click simulation:', err.message);
-                            // Simulate a click to satisfy browser autoplay policy
-                            document.body.click();
-                            setPendingSoundPlay(true); // Will trigger on click handler
-                        });
-                }
-            }, 500);
-
         } else if (provider === 'gmail' || !provider) {
-            console.log('📧 ========== PROCESSING GMAIL CONNECTION ==========');
+            console.log('📧 ========== PROCESSING GMAIL OAUTH COMPLETION ==========');
 
+            // Save tokens but DON'T finalize connection yet
             localStorage.setItem('gmailTokens', JSON.stringify(tokens));
-            localStorage.setItem('emailConnected', 'true');
+            localStorage.setItem('gmail_oauth_complete', 'true');
             localStorage.removeItem('oauth_in_progress');
-            setEmailConnected(true);
-            setPendingConnection(null);
 
+            // Fetch user info for display purposes
             fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
                 headers: {
                     Authorization: 'Bearer ' + tokens.access_token
@@ -8987,42 +8955,13 @@ if (tokensParam) {
                 console.error('Error fetching user info:', err);
             });
 
-            fetchGmailEmails(tokens.access_token);
-            fetchSentEmails(tokens.access_token);
+            // Set state to show "Finish setting up Gmail account" button
+            setPendingConnection('gmail');
 
-            console.log('✅ Gmail connected!');
+            console.log('✅ Gmail OAuth completed! Waiting for user to finish setup...');
 
-            // Set connection provider and trigger animation automatically
-            setConnectionProvider('gmail');
-
-            // Navigate to settings page
+            // Navigate to settings page to show the "Finish setting up" button
             setCurrentPage('settings');
-
-            // Auto-trigger sound and animation after a brief delay
-            setTimeout(() => {
-                console.log('🎵 Auto-triggering connection animation...');
-                if (connectionAudioRef.current) {
-                    connectionAudioRef.current.currentTime = 0;
-                    connectionAudioRef.current.volume = 0.7;
-                    connectionAudioRef.current.play()
-                        .then(() => {
-                            console.log('✅ Connection sound played successfully');
-                            setShowConnectionAnimation(true);
-                            setPendingSoundPlay(false);
-
-                            setTimeout(() => {
-                                setShowConnectionAnimation(false);
-                                showNotification('📧 Gmail connected successfully!');
-                            }, 4000);
-                        })
-                        .catch(err => {
-                            console.log('⚠️ Sound blocked, trying click simulation:', err.message);
-                            // Simulate a click to satisfy browser autoplay policy
-                            document.body.click();
-                            setPendingSoundPlay(true); // Will trigger on click handler
-                        });
-                }
-            }, 500);
         }
 
         // Clean URL - DON'T CHANGE PAGE
@@ -9100,6 +9039,20 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
         setOutlookConnected(false);
     }
 }
+
+    // Check for pending OAuth completions
+    const gmailOAuthComplete = localStorage.getItem('gmail_oauth_complete');
+    const outlookOAuthComplete = localStorage.getItem('outlook_oauth_complete');
+
+    if (gmailOAuthComplete === 'true') {
+        console.log('📧 Gmail OAuth pending finalization');
+        setPendingConnection('gmail');
+    }
+
+    if (outlookOAuthComplete === 'true') {
+        console.log('📮 Outlook OAuth pending finalization');
+        setPendingConnection('outlook');
+    }
 
     // Load dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -9845,43 +9798,70 @@ useEffect(() => {
             }, [searchQuery, gmailEmails]);
 
             const handleGmailConnect = async () => {
-    // First click: Show auth popup if not logged in, no animation/sound
-    if (pendingConnection !== 'gmail') {
-        setPendingConnection('gmail');
-        if (!isLoggedIn) {
-            setShowAuthPopup(true);
+    // Check if OAuth was completed and we're in "Finish setting up" state
+    const gmailOAuthComplete = localStorage.getItem('gmail_oauth_complete');
+
+    if (gmailOAuthComplete === 'true') {
+        // Second click: User clicked "Finish setting up Gmail account" - show animation and play sound
+        console.log('🎬 Finalizing Gmail connection with animation...');
+
+        // Show connection animation
+        setConnectionProvider('gmail');
+        setShowConnectionAnimation(true);
+
+        // Wait 1 second for animation
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // PLAY AUDIO after animation
+        if (connectionAudioRef.current) {
+            console.log('🔊 Playing connection sound...');
+            const audio = connectionAudioRef.current;
+            audio.volume = 0.5;
+            audio.currentTime = 0;
+            audio.play()
+                .then(() => {
+                    console.log('✅ Connection sound played successfully');
+                })
+                .catch((err) => {
+                    console.log('ℹ️ Audio play failed:', err);
+                });
         }
+
+        // Finalize the connection
+        localStorage.setItem('emailConnected', 'true');
+        localStorage.removeItem('gmail_oauth_complete');
+        setEmailConnected(true);
+        setPendingConnection(null);
+
+        // Fetch emails if not already fetched
+        const savedGmailTokens = localStorage.getItem('gmailTokens');
+        if (savedGmailTokens) {
+            try {
+                const tokens = JSON.parse(savedGmailTokens);
+                fetchGmailEmails(tokens.access_token);
+                fetchSentEmails(tokens.access_token);
+            } catch (error) {
+                console.error('❌ Error fetching Gmail emails:', error);
+            }
+        }
+
+        // Hide animation after 4 seconds
+        setTimeout(() => {
+            setShowConnectionAnimation(false);
+            showNotification('📧 Gmail connected successfully!');
+        }, 4000);
+
         return;
     }
 
-    // Second click: User clicked "Finish Connecting" - show animation and play sound
+    // First click: Immediately initiate OAuth if logged in, otherwise show auth popup
     if (!isLoggedIn) {
+        setPendingConnection('gmail');
         setShowAuthPopup(true);
         return;
     }
 
-    // Show connection animation
-    setConnectionProvider('gmail');
-    setShowConnectionAnimation(true);
-
-    // Wait 1 second for animation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // PLAY AUDIO after animation
-    if (connectionAudioRef.current) {
-        console.log('🔊 Playing connection sound...');
-        const audio = connectionAudioRef.current;
-        audio.volume = 0.5;
-        audio.currentTime = 0;
-        audio.play()
-            .then(() => {
-                console.log('✅ Connection sound played successfully');
-            })
-            .catch((err) => {
-                console.log('ℹ️ Audio play failed:', err);
-            });
-    }
-
+    // User is logged in, initiate OAuth immediately without animation/sound
     try {
         console.log('🔐 Initiating Gmail OAuth...');
 
@@ -9894,53 +9874,80 @@ useEffect(() => {
         const data = await response.json();
         console.log('📧 Redirecting to Google OAuth...');
 
-        localStorage.setItem('oauth_in_progress', 'true');
+        localStorage.setItem('oauth_in_progress', 'gmail');
         window.location.href = data.authUrl;
     } catch (error) {
         console.error('❌ Gmail OAuth error:', error);
-        setShowConnectionAnimation(false);
         showNotification('❌ Failed to connect Gmail');
     }
 };
 
            const handleOutlookConnect = async () => {
-    // First click: Show auth popup if not logged in, no animation/sound
-    if (pendingConnection !== 'outlook') {
-        setPendingConnection('outlook');
-        if (!isLoggedIn) {
-            setShowAuthPopup(true);
+    // Check if OAuth was completed and we're in "Finish setting up" state
+    const outlookOAuthComplete = localStorage.getItem('outlook_oauth_complete');
+
+    if (outlookOAuthComplete === 'true') {
+        // Second click: User clicked "Finish setting up Outlook account" - show animation and play sound
+        console.log('🎬 Finalizing Outlook connection with animation...');
+
+        // Show connection animation
+        setConnectionProvider('outlook');
+        setShowConnectionAnimation(true);
+
+        // Wait 1 second for animation
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // PLAY AUDIO after animation
+        if (connectionAudioRef.current) {
+            console.log('🔊 Playing connection sound...');
+            const audio = connectionAudioRef.current;
+            audio.volume = 0.5;
+            audio.currentTime = 0;
+            audio.play()
+                .then(() => {
+                    console.log('✅ Connection sound played successfully');
+                })
+                .catch((err) => {
+                    console.log('ℹ️ Audio play failed:', err);
+                });
         }
+
+        // Finalize the connection
+        localStorage.setItem('outlookConnected', 'true');
+        localStorage.removeItem('outlook_oauth_complete');
+        setOutlookConnected(true);
+        setActiveProvider('outlook');
+        setPendingConnection(null);
+
+        // Fetch emails if not already fetched
+        const savedOutlookTokens = localStorage.getItem('outlookTokens');
+        if (savedOutlookTokens) {
+            try {
+                const tokens = JSON.parse(savedOutlookTokens);
+                fetchOutlookEmails(tokens.access_token);
+                fetchOutlookSentEmails(tokens.access_token);
+            } catch (error) {
+                console.error('❌ Error fetching Outlook emails:', error);
+            }
+        }
+
+        // Hide animation after 4 seconds
+        setTimeout(() => {
+            setShowConnectionAnimation(false);
+            showNotification('📮 Outlook connected successfully!');
+        }, 4000);
+
         return;
     }
 
-    // Second click: User clicked "Finish Connecting" - show animation and play sound
+    // First click: Immediately initiate OAuth if logged in, otherwise show auth popup
     if (!isLoggedIn) {
+        setPendingConnection('outlook');
         setShowAuthPopup(true);
         return;
     }
 
-    // Show connection animation
-    setConnectionProvider('outlook');
-    setShowConnectionAnimation(true);
-
-    // Wait 1 second for animation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // PLAY AUDIO after animation
-    if (connectionAudioRef.current) {
-        console.log('🔊 Playing connection sound...');
-        const audio = connectionAudioRef.current;
-        audio.volume = 0.5;
-        audio.currentTime = 0;
-        audio.play()
-            .then(() => {
-                console.log('✅ Connection sound played successfully');
-            })
-            .catch((err) => {
-                console.log('ℹ️ Audio play failed:', err);
-            });
-    }
-
+    // User is logged in, initiate OAuth immediately without animation/sound
     try {
         console.log('🔐 Initiating Outlook OAuth...');
 
@@ -9967,7 +9974,6 @@ useEffect(() => {
         window.location.href = data.authUrl;
     } catch (error) {
         console.error('❌ Outlook OAuth error:', error);
-        setShowConnectionAnimation(false);
         showNotification('❌ Failed to connect Outlook');
     }
 };
@@ -11709,7 +11715,7 @@ const generateAiDraft = async (email) => {
                                                     <svg className="connection-icon-unified" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                                     </svg>
-                                                    <span className="connection-text">{pendingConnection === 'gmail' ? 'Finish Connecting Gmail' : 'Connect Gmail'}</span>
+                                                    <span className="connection-text">{pendingConnection === 'gmail' ? 'Finish setting up Gmail account' : 'Connect Gmail'}</span>
                                                 </button>
                                             ) : (
                                                 <div className="connection-btn-unified connected-unified gmail-connected-unified">
@@ -11747,7 +11753,7 @@ const generateAiDraft = async (email) => {
                                                         <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
                                                         <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="currentColor"/>
                                                     </svg>
-                                                    <span className="connection-text">{pendingConnection === 'outlook' ? 'Finish Connecting Outlook' : 'Connect Outlook'}</span>
+                                                    <span className="connection-text">{pendingConnection === 'outlook' ? 'Finish setting up Outlook account' : 'Connect Outlook'}</span>
                                                 </button>
                                             ) : (
                                                 <div className="connection-btn-unified connected-unified outlook-connected-unified">
