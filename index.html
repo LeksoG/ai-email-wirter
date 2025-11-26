@@ -4339,9 +4339,9 @@ body.dark-mode .modern-email-item:hover {
 
         .inbox-view-toggle-btn {
             flex: 1;
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: 50px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-align: center;
             cursor: pointer;
@@ -4349,6 +4349,10 @@ body.dark-mode .modern-email-item:hover {
             background: transparent;
             border: none;
             color: #6b7280;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
         }
 
         .inbox-view-toggle-btn.active {
@@ -7211,7 +7215,7 @@ body.dark-mode .ai-writer-centered-mode {
     }
 }
 
-/* Centered mode header with buttons */
+/* Action Buttons - Fixed positioning in centered mode */
 .centered-mode-header {
     display: flex;
     justify-content: space-between;
@@ -7219,16 +7223,21 @@ body.dark-mode .ai-writer-centered-mode {
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    position: relative;
 }
 
 .centered-mode-actions {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: 10px;
     justify-content: center;
-    flex: 1;
+    z-index: 10;
 }
 
 .centered-mode-close {
+    margin-left: auto;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -7245,11 +7254,6 @@ body.dark-mode .ai-writer-centered-mode {
     flex-shrink: 0;
 }
 
-.centered-mode-close:hover {
-    background: rgba(239, 68, 68, 0.2);
-    transform: rotate(90deg) scale(1.1);
-}
-
 .centered-mode-btn {
     padding: 12px 24px;
     border-radius: 50px;
@@ -7261,6 +7265,15 @@ body.dark-mode .ai-writer-centered-mode {
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
+}
+
+/* Ensure buttons stay centered even with close button */
+.centered-mode-header::before {
+    content: '';
+    width: 40px;
+    height: 40px;
+    visibility: hidden;
 }
 
 .centered-mode-btn.primary {
@@ -8636,6 +8649,20 @@ body.dark-mode .custom-language-select option:hover {
         opacity: 0;
     }
 }
+
+        /* Hide suggestion pills during AI generation mode */
+.email-content-area.generating-centered .prompt-suggestions-container,
+.email-content-area.generating-centered .suggestion-carousel-container {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Ensure no floating elements during generation */
+.desktop-inbox-layout.generating-mode .prompt-suggestions-container,
+.desktop-inbox-layout.generating-mode .suggestion-carousel-container {
+    display: none !important;
+}
     </style>
 </head>
 <body>
@@ -8790,6 +8817,11 @@ body.dark-mode .custom-language-select option:hover {
             const [isCenteredGenerating, setIsCenteredGenerating] = useState(false);
             const [centeredGenerationStatus, setCenteredGenerationStatus] = useState('');
             const [isReplyOnlyMode, setIsReplyOnlyMode] = useState(false); // For reply rewrite - no layout shift
+
+            // Draft management states
+            const [showSaveDraftModal, setShowSaveDraftModal] = useState(false);
+            const [drafts, setDrafts] = useState([]);
+            const [currentDraftToSave, setCurrentDraftToSave] = useState(null);
 
             // Logout Confirmation state
             const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -9296,6 +9328,17 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                         setDeletedEmails(deletedIds);
                     } catch (e) {
                         console.error('Error loading deleted sent emails:', e);
+                    }
+                }
+
+                // Load drafts
+                const savedDrafts = localStorage.getItem('emailDrafts');
+                if (savedDrafts) {
+                    try {
+                        const draftsData = JSON.parse(savedDrafts);
+                        setDrafts(draftsData);
+                    } catch (e) {
+                        console.error('Error loading drafts:', e);
                     }
                 }
             }, []);
@@ -10847,6 +10890,51 @@ const fetchOutlookSentEmails = async (accessToken) => {
                 setIsCenteredGenerating(false);
                 setAiSuggestions([]);
                 setIsReplyOnlyMode(false);
+            };
+
+            const handleCloseCenteredWriterWithPrompt = () => {
+                // If there's generated content, show save draft modal
+                if (centeredWriterResult && centeredWriterResult.trim()) {
+                    setCurrentDraftToSave({
+                        content: centeredWriterResult,
+                        prompt: centeredWriterPrompt,
+                        timestamp: Date.now(),
+                        provider: activeProvider
+                    });
+                    setShowSaveDraftModal(true);
+                } else {
+                    // No content, just close
+                    closeCenteredWriter();
+                }
+            };
+
+            const saveDraft = () => {
+                if (currentDraftToSave) {
+                    const newDraft = {
+                        ...currentDraftToSave,
+                        id: Date.now()
+                    };
+                    const updatedDrafts = [newDraft, ...drafts];
+                    setDrafts(updatedDrafts);
+                    localStorage.setItem('emailDrafts', JSON.stringify(updatedDrafts));
+                    showNotification('Draft saved!');
+                }
+                setShowSaveDraftModal(false);
+                setCurrentDraftToSave(null);
+                closeCenteredWriter();
+            };
+
+            const closeDraftWithoutSaving = () => {
+                setShowSaveDraftModal(false);
+                setCurrentDraftToSave(null);
+                closeCenteredWriter();
+            };
+
+            const deleteDraft = (draftId) => {
+                const updatedDrafts = drafts.filter(d => d.id !== draftId);
+                setDrafts(updatedDrafts);
+                localStorage.setItem('emailDrafts', JSON.stringify(updatedDrafts));
+                showNotification('Draft deleted');
             };
 
             // Handle follow-up in centered writer mode
@@ -12905,6 +12993,18 @@ const generateAiDraft = async (email) => {
                                     >
                                         📤 Sent
                                     </button>
+                                    {drafts.length > 0 && (
+                                        <button
+                                            className={`inbox-view-toggle-btn ${inboxViewMode === 'drafts' ? 'active' : ''}`}
+                                            onClick={() => {
+                                                setInboxViewMode('drafts');
+                                                setPriorityEmails([]);
+                                                setViewingEmail(null);
+                                            }}
+                                        >
+                                            📝 Drafts
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -12972,7 +13072,7 @@ const generateAiDraft = async (email) => {
                                             </div>
                                         )
                                     )
-                                ) : (
+                                ) : inboxViewMode === 'sent' ? (
                                     sentEmails.length > 0 ? (
                                         sentEmails.map((email, index) => (
                                             <div
@@ -12997,7 +13097,66 @@ const generateAiDraft = async (email) => {
                                             <p>No sent emails</p>
                                         </div>
                                     )
-                                )}
+                                ) : inboxViewMode === 'drafts' ? (
+                                    drafts.length > 0 ? (
+                                        drafts.map((draft, index) => (
+                                            <div
+                                                key={draft.id}
+                                                className="modern-email-item"
+                                                style={{animationDelay: `${index * 0.05}s`, position: 'relative'}}
+                                            >
+                                                <div className="text-xs font-bold text-gray-800 mb-1 truncate">📝 Draft</div>
+                                                <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{draft.prompt}</div>
+                                                <div className="text-xs text-gray-600 truncate">{draft.content.substring(0, 80)}...</div>
+                                                <div className="text-xs text-gray-400 mt-1">{new Date(draft.timestamp).toLocaleString()}</div>
+                                                <div style={{display: 'flex', gap: '8px', marginTop: '8px'}}>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setEmailText(draft.content);
+                                                            showNotification('Draft loaded to editor!');
+                                                        }}
+                                                        style={{
+                                                            padding: '6px 12px',
+                                                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '50px',
+                                                            fontSize: '11px',
+                                                            fontWeight: '600',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        Use
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            deleteDraft(draft.id);
+                                                        }}
+                                                        style={{
+                                                            padding: '6px 12px',
+                                                            background: 'rgba(239, 68, 68, 0.1)',
+                                                            color: '#ef4444',
+                                                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                                                            borderRadius: '50px',
+                                                            fontSize: '11px',
+                                                            fontWeight: '600',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-12 text-gray-500">
+                                            <div className="text-6xl mb-4">📝</div>
+                                            <p>No drafts saved</p>
+                                        </div>
+                                    )
+                                ) : null}
                             </div>
                         )}
                     </div>
@@ -13330,14 +13489,15 @@ const generateAiDraft = async (email) => {
                                     <div className={`desktop-inbox-layout ${(isCenteredGenerating && !isReplyOnlyMode) ? 'generating-mode' : ''}`}>
                                         {/* Left Sidebar - Inbox */}
                                         {/* Left Sidebar - Inbox */}
-                                         <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''} ${(isCenteredGenerating && !isReplyOnlyMode) ? 'generating-hidden' : ''}`}>
+                                         <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''} ${(showCenteredWriter && !isReplyOnlyMode) ? 'generating-hidden' : ''}`}>
                                             {/* Header with Title and Buttons */}
                                             <div className="inbox-header">
                                                 <div className="inbox-header-left">
                                                     <h2 className="text-2xl font-bold text-gray-800">
-                                                        {inboxViewMode === 'tabs' ? '📧 Inbox' : 
+                                                        {inboxViewMode === 'tabs' ? '📧 Inbox' :
                                                          inboxViewMode === 'received' ? (activeProvider === 'gmail' ? '📧 Gmail - Received' : '📮 Outlook - Received') :
-                                                         (activeProvider === 'gmail' ? '📧 Gmail - Sent' : '📮 Outlook - Sent')}
+                                                         inboxViewMode === 'sent' ? (activeProvider === 'gmail' ? '📧 Gmail - Sent' : '📮 Outlook - Sent') :
+                                                         inboxViewMode === 'drafts' ? '📝 Drafts' : '📧 Inbox'}
                                                     </h2>
                                                 </div>
                                                 <div className="inbox-header-right">
@@ -13777,7 +13937,7 @@ const generateAiDraft = async (email) => {
                                                                                 </div>
                                                                             ))
                                                                         )
-                                                                    ) : (
+                                                                    ) : inboxViewMode === 'sent' ? (
                                                                         /* Sent Emails */
                                                                         activeProvider === 'outlook' ? (
                                                                             outlookSentEmails.filter(email => !deletedEmails.includes(email.id)).length > 0 ? (
@@ -13840,7 +14000,49 @@ const generateAiDraft = async (email) => {
                                                                                 </div>
                                                                             )
                                                                         )
-                                                                    )}
+                                                                    ) : inboxViewMode === 'drafts' ? (
+                                                                        /* Drafts */
+                                                                        drafts.length > 0 ? (
+                                                                            drafts.map((draft, index) => (
+                                                                                <div
+                                                                                    key={draft.id}
+                                                                                    className="sidebar-email-item"
+                                                                                    style={{animationDelay: `${index * 0.05}s`, position: 'relative'}}
+                                                                                >
+                                                                                    <button
+                                                                                        className="email-delete-btn"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            deleteDraft(draft.id);
+                                                                                        }}
+                                                                                    >
+                                                                                        Delete
+                                                                                    </button>
+                                                                                    <div className="text-xs font-bold text-gray-800 mb-1 truncate">📝 Draft</div>
+                                                                                    <div className="text-sm font-semibold text-gray-700 mb-1 truncate">{draft.prompt}</div>
+                                                                                    <div className="text-xs text-gray-600 truncate">{draft.content.substring(0, 80)}...</div>
+                                                                                    <div className="text-xs text-gray-400 mt-1">{new Date(draft.timestamp).toLocaleString()}</div>
+                                                                                    <div style={{display: 'flex', gap: '8px', marginTop: '8px'}}>
+                                                                                        <button
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                setEmailText(draft.content);
+                                                                                                showNotification('Draft loaded to editor!');
+                                                                                            }}
+                                                                                            className="oval-button px-3 py-1.5 text-xs font-semibold glass-effect border-2 border-white unified-button text-gray-800"
+                                                                                        >
+                                                                                            Load to Editor
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))
+                                                                        ) : (
+                                                                            <div className="text-center py-12 text-gray-500">
+                                                                                <div className="text-6xl mb-4">📝</div>
+                                                                                <p>No drafts saved</p>
+                                                                            </div>
+                                                                        )
+                                                                    ) : null}
                                                                 </div>
                                                             </>
                                                         )}
@@ -13919,6 +14121,18 @@ const generateAiDraft = async (email) => {
                                                             >
                                                                 📤 Sent
                                                             </button>
+                                                            {drafts.length > 0 && (
+                                                                <button
+                                                                    className={`inbox-view-toggle-btn ${inboxViewMode === 'drafts' ? 'active' : ''}`}
+                                                                    onClick={() => {
+                                                                        setInboxViewMode('drafts');
+                                                                        setPriorityEmails([]);
+                                                                        setViewingEmail(null);
+                                                                    }}
+                                                                >
+                                                                    📝 Drafts
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 )}
@@ -14835,7 +15049,7 @@ onDrop={(e) => {
                 <button
                     onClick={() => {
                         console.log('❌ Closing centered writer');
-                        closeCenteredWriter();
+                        handleCloseCenteredWriterWithPrompt();
                     }}
                     style={{
                         width: '36px',
@@ -16011,6 +16225,30 @@ onDrop={(e) => {
                                     </button>
                                     <button className="logout-confirm-btn confirm" onClick={confirmLogout}>
                                         Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Save Draft Modal */}
+                    {showSaveDraftModal && (
+                        <div className="logout-confirm-overlay" onClick={closeDraftWithoutSaving}>
+                            <div className="logout-confirm-dialog" onClick={(e) => e.stopPropagation()}>
+                                <div className="logout-confirm-icon">💾</div>
+                                <div className="logout-confirm-title">Save Email Draft?</div>
+                                <div className="logout-confirm-message">
+                                    Would you like to save this generated email as a draft? You can access it later from the Drafts tab.
+                                </div>
+                                <div className="logout-confirm-buttons">
+                                    <button className="logout-confirm-btn cancel" onClick={closeDraftWithoutSaving}>
+                                        Close Without Saving
+                                    </button>
+                                    <button className="logout-confirm-btn confirm" onClick={saveDraft} style={{
+                                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                        boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+                                    }}>
+                                        Save as Draft
                                     </button>
                                 </div>
                             </div>
