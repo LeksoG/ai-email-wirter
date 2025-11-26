@@ -225,44 +225,52 @@
             overflow: visible;
         }
 
-        .unified-button::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: inherit;
-            padding: 2px;
-            background: linear-gradient(90deg,
-                white,
-                rgba(255, 255, 255, 0.3),
-                rgba(255, 255, 255, 0.1),
-                rgba(255, 255, 255, 0.3),
-                white
-            );
-            background-size: 200% 100%;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .unified-button:hover::before {
-            opacity: 1;
-            animation: outline-sweep 0.6s ease-in-out;
-        }
-
-        @keyframes outline-sweep {
+        /* Navigation Button Glow Animation */
+        @keyframes nav-button-glow {
             0% {
-                background-position: 200% 0;
-                opacity: 0;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
             }
             50% {
-                opacity: 1;
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.6),
+                           0 0 60px rgba(139, 92, 246, 0.4);
             }
             100% {
-                background-position: -200% 0;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            }
+        }
+
+        .nav-button-glow-once {
+            animation: nav-button-glow 1s ease-in-out;
+        }
+
+        /* Navigation Blur Transition */
+        .nav-blur-out {
+            animation: blur-out 0.4s ease-out forwards;
+        }
+
+        .nav-blur-in {
+            animation: blur-in 0.4s ease-out forwards;
+        }
+
+        @keyframes blur-out {
+            0% {
+                opacity: 1;
+                filter: blur(0);
+            }
+            100% {
                 opacity: 0;
+                filter: blur(10px);
+            }
+        }
+
+        @keyframes blur-in {
+            0% {
+                opacity: 0;
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0);
             }
         }
 
@@ -8706,6 +8714,9 @@ body.dark-mode .custom-language-select option:hover {
             const [showSuggestionsEnabled, setShowSuggestionsEnabled] = useState(true);
             const [userEmail, setUserEmail] = useState('');
             const [viewingEmail, setViewingEmail] = useState(null);
+            const [navEmailMode, setNavEmailMode] = useState(false); // Track if nav is in email view mode
+            const [navTransitioning, setNavTransitioning] = useState(false); // Track navigation transition
+            const [showNavGlow, setShowNavGlow] = useState(false); // Track glow animation
 
             // Authentication states
             const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13104,6 +13115,15 @@ const generateAiDraft = async (email) => {
                                                         setViewingEmail(email);
                                                         setMobileInboxOpen(false);
                                                         setMobileEmailViewerOpen(true);
+                                                        // Transition navigation to email mode
+                                                        setNavTransitioning(true);
+                                                        setTimeout(() => {
+                                                            setNavEmailMode(true);
+                                                            setShowNavGlow(true);
+                                                            setNavTransitioning(false);
+                                                            // Remove glow after animation
+                                                            setTimeout(() => setShowNavGlow(false), 1000);
+                                                        }, 400);
                                                     }}
                                                     className="modern-email-item"
                                                     style={{animationDelay: `${index * 0.05}s`}}
@@ -13129,6 +13149,15 @@ const generateAiDraft = async (email) => {
                                                         setViewingEmail(email);
                                                         setMobileInboxOpen(false);
                                                         setMobileEmailViewerOpen(true);
+                                                        // Transition navigation to email mode
+                                                        setNavTransitioning(true);
+                                                        setTimeout(() => {
+                                                            setNavEmailMode(true);
+                                                            setShowNavGlow(true);
+                                                            setNavTransitioning(false);
+                                                            // Remove glow after animation
+                                                            setTimeout(() => setShowNavGlow(false), 1000);
+                                                        }, 400);
                                                     }}
                                                     className="modern-email-item"
                                                     style={{animationDelay: `${index * 0.05}s`}}
@@ -13155,6 +13184,15 @@ const generateAiDraft = async (email) => {
                                                     setViewingEmail(email);
                                                     setMobileInboxOpen(false);
                                                     setMobileEmailViewerOpen(true);
+                                                    // Transition navigation to email mode
+                                                    setNavTransitioning(true);
+                                                    setTimeout(() => {
+                                                        setNavEmailMode(true);
+                                                        setShowNavGlow(true);
+                                                        setNavTransitioning(false);
+                                                        // Remove glow after animation
+                                                        setTimeout(() => setShowNavGlow(false), 1000);
+                                                    }, 400);
                                                 }}
                                                 className="modern-email-item"
                                                 style={{animationDelay: `${index * 0.05}s`}}
@@ -13273,35 +13311,21 @@ const generateAiDraft = async (email) => {
                                 setMobileViewerCurrentY(0);
                             }}
                         >
-                            {/* Header with Close Indicator and Actions */}
+                            {/* Header with Close Indicator */}
                             <div className="mobile-email-header">
                                 <div
                                     className="mobile-email-close-bar"
                                     onClick={() => {
-                                        setMobileEmailViewerOpen(false);
-                                        setTimeout(() => setViewingEmail(null), 400);
+                                        setNavTransitioning(true);
+                                        setTimeout(() => {
+                                            setNavEmailMode(false);
+                                            setMobileEmailViewerOpen(false);
+                                            setTimeout(() => setViewingEmail(null), 400);
+                                            setNavTransitioning(false);
+                                        }, 400);
                                     }}
                                 >
                                     <div className="mobile-email-close-indicator"></div>
-                                </div>
-                                <div className="mobile-email-actions">
-                                    <button
-                                        onClick={() => {
-                                            setMobileEmailViewerOpen(false);
-                                            setTimeout(() => setViewingEmail(null), 400);
-                                        }}
-                                        className="px-4 py-2 glass-effect rounded-full text-sm font-medium unified-button border-2 border-white"
-                                        style={{color: darkMode ? '#e5e5e5' : '#374151'}}
-                                    >
-                                        ← Close
-                                    </button>
-                                    <button
-                                        onClick={() => handleSummarizeEmail(viewingEmail)}
-                                        className="px-4 py-2 glass-effect rounded-full text-sm font-medium unified-button border-2 border-white"
-                                        style={{color: darkMode ? '#e5e5e5' : '#374151'}}
-                                    >
-                                        ✨ Summarize
-                                    </button>
                                 </div>
                             </div>
 
@@ -13496,36 +13520,86 @@ const generateAiDraft = async (email) => {
                     <header className={`sticky-header ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''}`}>
                         <div className="container mx-auto px-4 py-4">
                             <div className="flex justify-center items-center" style={{position: 'relative'}}>
-                                {/* Navigation Bar */}
-                                <div className={`nav-container ${showSearchBar ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} style={{transition: 'opacity 0.3s ease'}} ref={navRef}>
-                                    <button
-                                        onClick={() => {
-                                            // Block navigation from settings to home if animation is showing
-                                            if (currentPage === 'settings' && showConnectionAnimation) {
-                                                showNotification('⏳ Just a sec, setting up final bits...');
-                                                return;
-                                            }
-                                            setCurrentPage('home');
-                                        }}
-                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
-                                            currentPage === 'home'
-                                                ? 'active text-gray-800'
-                                                : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
-                                        }`}
+                                {/* Navigation Bar - Dynamic based on email viewing mode */}
+                                {!navEmailMode ? (
+                                    <div
+                                        className={`nav-container ${showSearchBar ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${navTransitioning ? 'nav-blur-out' : 'nav-blur-in'}`}
+                                        style={{transition: 'opacity 0.3s ease'}}
+                                        ref={navRef}
                                     >
-                                        Home
-                                    </button>
-                                    <button
-                                        onClick={() => setCurrentPage('settings')}
-                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
-                                            currentPage === 'settings'
-                                                ? 'active text-gray-800'
-                                                : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
-                                        }`}
+                                        <button
+                                            onClick={() => {
+                                                // Block navigation from settings to home if animation is showing
+                                                if (currentPage === 'settings' && showConnectionAnimation) {
+                                                    showNotification('⏳ Just a sec, setting up final bits...');
+                                                    return;
+                                                }
+                                                setCurrentPage('home');
+                                            }}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
+                                                currentPage === 'home'
+                                                    ? 'active text-gray-800'
+                                                    : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Home
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentPage('settings')}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
+                                                currentPage === 'settings'
+                                                    ? 'active text-gray-800'
+                                                    : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Settings
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={`nav-container ${navTransitioning ? 'nav-blur-out' : 'nav-blur-in'}`}
+                                        style={{display: 'flex', gap: '12px', alignItems: 'center'}}
                                     >
-                                        Settings
-                                    </button>
-                                </div>
+                                        {/* Back Button */}
+                                        <button
+                                            onClick={() => {
+                                                setNavTransitioning(true);
+                                                setTimeout(() => {
+                                                    setNavEmailMode(false);
+                                                    setMobileEmailViewerOpen(false);
+                                                    setTimeout(() => setViewingEmail(null), 400);
+                                                    setNavTransitioning(false);
+                                                }, 400);
+                                            }}
+                                            className="px-5 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800"
+                                            style={{marginRight: 'auto'}}
+                                        >
+                                            ← Back
+                                        </button>
+
+                                        {/* Summarize Button */}
+                                        <button
+                                            onClick={() => handleSummarizeEmail(viewingEmail)}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800 ${showNavGlow ? 'nav-button-glow-once' : ''}`}
+                                        >
+                                            ✨ Summarize
+                                        </button>
+
+                                        {/* Reply Button */}
+                                        <button
+                                            onClick={() => {
+                                                // Scroll to reply section
+                                                const replySection = document.querySelector('.mobile-email-section');
+                                                if (replySection) {
+                                                    replySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }
+                                            }}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800 ${showNavGlow ? 'nav-button-glow-once' : ''}`}
+                                        >
+                                            ✍️ Reply
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </header>
