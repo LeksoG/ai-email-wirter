@@ -7211,7 +7211,7 @@ body.dark-mode .ai-writer-centered-mode {
     }
 }
 
-/* Action Buttons - Fixed positioning in centered mode */
+/* Centered mode header with buttons */
 .centered-mode-header {
     display: flex;
     justify-content: space-between;
@@ -7219,21 +7219,16 @@ body.dark-mode .ai-writer-centered-mode {
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid rgba(99, 102, 241, 0.1);
-    position: relative;
 }
 
 .centered-mode-actions {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     gap: 10px;
     justify-content: center;
-    z-index: 10;
+    flex: 1;
 }
 
 .centered-mode-close {
-    margin-left: auto;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -7250,6 +7245,11 @@ body.dark-mode .ai-writer-centered-mode {
     flex-shrink: 0;
 }
 
+.centered-mode-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: rotate(90deg) scale(1.1);
+}
+
 .centered-mode-btn {
     padding: 12px 24px;
     border-radius: 50px;
@@ -7261,15 +7261,6 @@ body.dark-mode .ai-writer-centered-mode {
     display: flex;
     align-items: center;
     gap: 8px;
-    white-space: nowrap;
-}
-
-/* Ensure buttons stay centered even with close button */
-.centered-mode-header::before {
-    content: '';
-    width: 40px;
-    height: 40px;
-    visibility: hidden;
 }
 
 .centered-mode-btn.primary {
@@ -8644,20 +8635,6 @@ body.dark-mode .custom-language-select option:hover {
     to {
         opacity: 0;
     }
-}
-
-        /* Hide suggestion pills during AI generation mode */
-.email-content-area.generating-centered .prompt-suggestions-container,
-.email-content-area.generating-centered .suggestion-carousel-container {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-/* Ensure no floating elements during generation */
-.desktop-inbox-layout.generating-mode .prompt-suggestions-container,
-.desktop-inbox-layout.generating-mode .suggestion-carousel-container {
-    display: none !important;
 }
     </style>
 </head>
