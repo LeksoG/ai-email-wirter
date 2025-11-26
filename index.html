@@ -8859,10 +8859,8 @@ const extractSenderName = (fromField) => {
     return 'there';
 };
 
-           // Initialize app with console logging
+           // Initialize app
 useEffect(() => {
-    console.log('🚀 InkMind initialized');
-    
    // Check for OAuth callback with tokens
 const urlParams = new URLSearchParams(window.location.search);
 const tokensParam = urlParams.get('tokens');
@@ -8871,49 +8869,36 @@ const provider = urlParams.get('provider');
 if (tokensParam) {
     try {
         const tokens = JSON.parse(decodeURIComponent(tokensParam));
-        console.log('🎉 OAuth tokens received for:', provider);
 
         // ENHANCED SOUND FUNCTION - Works after audio is unlocked on button click
         const playConnectionSound = () => {
-            console.log('🔊 Attempting to play connection sound...');
-
             const attemptPlay = (audioElement) => {
                 audioElement.currentTime = 0;
                 audioElement.volume = 0.7;
 
                 return audioElement.play()
-                    .then(() => {
-                        console.log('✅ Sound played successfully');
-                        return true;
-                    })
                     .catch(err => {
-                        if (err.name === 'NotAllowedError') {
-                            console.log('ℹ️ Sound blocked - audio was not unlocked on user interaction');
-                        } else {
-                            console.warn('⚠️ Sound failed:', err.message);
+                        if (err.name !== 'NotAllowedError') {
+                            console.warn('Sound playback failed:', err.message);
                         }
                         return false;
                     });
             };
 
             if (connectionAudioRef.current) {
-                console.log('✓ Using audio ref');
                 attemptPlay(connectionAudioRef.current);
             } else {
-                console.log('🔄 Using fallback method');
                 try {
                     const sound = new Audio('/effect-for-logo-intro-186595.mp3');
                     sound.load();
                     attemptPlay(sound);
                 } catch (err) {
-                    console.log('ℹ️ Could not create audio element:', err.message);
+                    console.warn('Could not create audio element:', err.message);
                 }
             }
         };
 
         if (provider === 'outlook') {
-            console.log('📮 ========== PROCESSING OUTLOOK OAUTH COMPLETION ==========');
-
             // Save tokens but DON'T finalize connection yet
             localStorage.setItem('outlookTokens', JSON.stringify(tokens));
             localStorage.setItem('outlook_oauth_complete', 'true');
@@ -8922,14 +8907,10 @@ if (tokensParam) {
             // Set state to show "Finish setting up Outlook account" button
             setPendingConnection('outlook');
 
-            console.log('✅ Outlook OAuth completed! Waiting for user to finish setup...');
-
             // Navigate to settings page to show the "Finish setting up" button
             setCurrentPage('settings');
 
         } else if (provider === 'gmail' || !provider) {
-            console.log('📧 ========== PROCESSING GMAIL OAUTH COMPLETION ==========');
-
             // Save tokens but DON'T finalize connection yet
             localStorage.setItem('gmailTokens', JSON.stringify(tokens));
             localStorage.setItem('gmail_oauth_complete', 'true');
@@ -8943,7 +8924,6 @@ if (tokensParam) {
             })
             .then(function(res) { return res.json(); })
             .then(function(userInfo) {
-                console.log('👤 User:', userInfo.email);
                 setUserEmail(userInfo.email);
                 localStorage.setItem('userEmail', userInfo.email);
 
@@ -9045,12 +9025,10 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
     const outlookOAuthComplete = localStorage.getItem('outlook_oauth_complete');
 
     if (gmailOAuthComplete === 'true') {
-        console.log('📧 Gmail OAuth pending finalization');
         setPendingConnection('gmail');
     }
 
     if (outlookOAuthComplete === 'true') {
-        console.log('📮 Outlook OAuth pending finalization');
         setPendingConnection('outlook');
     }
 
@@ -9078,15 +9056,12 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                 if (!pendingSoundPlay) return;
 
                 const handleUserInteraction = () => {
-                    console.log('🔊 Playing connection sound on user interaction...');
-
                     const playSound = () => {
                         if (connectionAudioRef.current) {
                             connectionAudioRef.current.currentTime = 0;
                             connectionAudioRef.current.volume = 0.7;
                             connectionAudioRef.current.play()
                                 .then(() => {
-                                    console.log('✅ Connection sound played successfully');
                                     // Show animation when sound plays
                                     setShowConnectionAnimation(true);
                                     setPendingSoundPlay(false);
@@ -9098,7 +9073,7 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                                     }, 4000);
                                 })
                                 .catch(err => {
-                                    console.warn('⚠️ Sound failed:', err.message);
+                                    console.warn('Sound playback failed:', err.message);
                                     setPendingSoundPlay(false);
                                 });
                         } else {
@@ -9107,7 +9082,6 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                                 sound.volume = 0.7;
                                 sound.play()
                                     .then(() => {
-                                        console.log('✅ Connection sound played successfully');
                                         // Show animation when sound plays
                                         setShowConnectionAnimation(true);
                                         setPendingSoundPlay(false);
@@ -9119,11 +9093,11 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                                         }, 4000);
                                     })
                                     .catch(err => {
-                                        console.warn('⚠️ Sound failed:', err.message);
+                                        console.warn('Sound playback failed:', err.message);
                                         setPendingSoundPlay(false);
                                     });
                             } catch (err) {
-                                console.warn('⚠️ Could not create audio element:', err.message);
+                                console.warn('Could not create audio element:', err.message);
                                 setPendingSoundPlay(false);
                             }
                         }
@@ -13938,26 +13912,86 @@ const generateAiDraft = async (email) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(false);
                                             }}
-                                            onDrop={(e) => {
+onDrop={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(false);
 
+                                                // Helper function to clean and format email content
+                                                const cleanEmailContent = (text) => {
+                                                    if (!text) return '';
+
+                                                    // Decode HTML entities
+                                                    const decodeHTML = (html) => {
+                                                        const textarea = document.createElement('textarea');
+                                                        textarea.innerHTML = html;
+                                                        return textarea.value;
+                                                    };
+
+                                                    let cleaned = text;
+
+                                                    // Remove script and style tags with their content
+                                                    cleaned = cleaned.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                                                    cleaned = cleaned.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
+                                                    // Convert common HTML tags to text equivalents
+                                                    cleaned = cleaned.replace(/<br\s*\/?>/gi, '\n');
+                                                    cleaned = cleaned.replace(/<\/p>/gi, '\n\n');
+                                                    cleaned = cleaned.replace(/<\/div>/gi, '\n');
+                                                    cleaned = cleaned.replace(/<\/h[1-6]>/gi, '\n\n');
+                                                    cleaned = cleaned.replace(/<li>/gi, '• ');
+                                                    cleaned = cleaned.replace(/<\/li>/gi, '\n');
+
+                                                    // Remove all remaining HTML tags
+                                                    cleaned = cleaned.replace(/<[^>]+>/g, '');
+
+                                                    // Decode HTML entities
+                                                    cleaned = decodeHTML(cleaned);
+
+                                                    // Remove email headers and technical content
+                                                    cleaned = cleaned.replace(/^Content-Type:.*$/gm, '');
+                                                    cleaned = cleaned.replace(/^Content-Transfer-Encoding:.*$/gm, '');
+                                                    cleaned = cleaned.replace(/^MIME-Version:.*$/gm, '');
+                                                    cleaned = cleaned.replace(/^--[=_].*$/gm, '');
+                                                    cleaned = cleaned.replace(/^boundary=.*$/gm, '');
+
+                                                    // Remove base64 and encoded content markers
+                                                    cleaned = cleaned.replace(/^[A-Za-z0-9+/=]{60,}$/gm, '');
+
+                                                    // Clean up excessive whitespace while preserving paragraph breaks
+                                                    cleaned = cleaned.replace(/[ \t]+/g, ' '); // Multiple spaces to single space
+                                                    cleaned = cleaned.replace(/\n[ \t]+/g, '\n'); // Remove leading spaces on lines
+                                                    cleaned = cleaned.replace(/[ \t]+\n/g, '\n'); // Remove trailing spaces on lines
+                                                    cleaned = cleaned.replace(/\n{3,}/g, '\n\n'); // Max 2 consecutive newlines
+
+                                                    // Trim and return
+                                                    return cleaned.trim();
+                                                };
+
                                                 // Handle internal email drag from inbox
                                                 if (draggedEmail) {
-                                                    // Extract text from the email and paste it directly
                                                     let emailContent = '';
-                                                    if (draggedEmail.subject) emailContent += 'Subject: ' + draggedEmail.subject + '\n';
-                                                    if (draggedEmail.from) emailContent += 'From: ' + draggedEmail.from + '\n\n';
+
+                                                    if (draggedEmail.subject) {
+                                                        emailContent += 'Subject: ' + draggedEmail.subject + '\n';
+                                                    }
+                                                    if (draggedEmail.from) {
+                                                        emailContent += 'From: ' + draggedEmail.from + '\n';
+                                                    }
+                                                    if (draggedEmail.date) {
+                                                        emailContent += 'Date: ' + draggedEmail.date + '\n';
+                                                    }
+
+                                                    emailContent += '\n';
+
                                                     if (draggedEmail.body) {
-                                                        // Clean HTML tags from body
-                                                        const cleanBody = draggedEmail.body.replace(/<[^>]*>/g, '').trim();
+                                                        const cleanBody = cleanEmailContent(draggedEmail.body);
                                                         emailContent += cleanBody;
                                                     }
 
                                                     setEmailText(emailContent);
                                                     setViewingEmail(null);
                                                     setDroppedEmailFile(null);
-                                                    showNotification('📧 Email text pasted! Add a prompt and click generate to analyze.');
+                                                    showNotification('📧 Email content pasted successfully!');
                                                     return;
                                                 }
 
@@ -13972,44 +14006,60 @@ const generateAiDraft = async (email) => {
 
                                                         // Parse .eml files to extract body text
                                                         if (file.name.endsWith('.eml') || file.type === 'message/rfc822') {
-                                                            // Extract text content from email
                                                             const lines = content.split('\n');
                                                             let inBody = false;
-                                                            let bodyLines = [];
+                                                            let bodyText = '';
                                                             let subject = '';
                                                             let from = '';
+                                                            let date = '';
+                                                            let isHtml = false;
+                                                            let inPlainText = false;
 
-                                                            for (const line of lines) {
-                                                                if (line.toLowerCase().startsWith('subject:')) {
-                                                                    subject = line.substring(8).trim();
-                                                                }
-                                                                if (line.toLowerCase().startsWith('from:')) {
-                                                                    from = line.substring(5).trim();
-                                                                }
-                                                                if (inBody) {
-                                                                    // Skip HTML tags for cleaner text
-                                                                    const cleanLine = line.replace(/<[^>]*>/g, '').trim();
-                                                                    if (cleanLine) bodyLines.push(cleanLine);
-                                                                }
-                                                                if (line.trim() === '' && !inBody) {
-                                                                    inBody = true;
+                                                            for (let i = 0; i < lines.length; i++) {
+                                                                const line = lines[i];
+
+                                                                // Extract headers
+                                                                if (!inBody) {
+                                                                    if (line.toLowerCase().startsWith('subject:')) {
+                                                                        subject = line.substring(8).trim();
+                                                                    } else if (line.toLowerCase().startsWith('from:')) {
+                                                                        from = line.substring(5).trim();
+                                                                    } else if (line.toLowerCase().startsWith('date:')) {
+                                                                        date = line.substring(5).trim();
+                                                                    } else if (line.toLowerCase().includes('content-type: text/html')) {
+                                                                        isHtml = true;
+                                                                    } else if (line.toLowerCase().includes('content-type: text/plain')) {
+                                                                        inPlainText = true;
+                                                                    } else if (line.trim() === '') {
+                                                                        inBody = true;
+                                                                    }
+                                                                } else {
+                                                                    // Collect body content, skip boundaries
+                                                                    if (!line.startsWith('--') || !line.match(/^--[=_]/)) {
+                                                                        bodyText += line + '\n';
+                                                                    }
                                                                 }
                                                             }
 
                                                             // Build readable email content
                                                             let extractedText = '';
                                                             if (subject) extractedText += 'Subject: ' + subject + '\n';
-                                                            if (from) extractedText += 'From: ' + from + '\n\n';
-                                                            extractedText += bodyLines.join('\n');
+                                                            if (from) extractedText += 'From: ' + from + '\n';
+                                                            if (date) extractedText += 'Date: ' + date + '\n';
+                                                            extractedText += '\n';
+
+                                                            // Clean the body text
+                                                            const cleanBody = cleanEmailContent(bodyText);
+                                                            extractedText += cleanBody;
+
                                                             content = extractedText || content;
                                                         }
 
-                                                        // Set the extracted text content to emailText
                                                         setEmailText(content);
                                                         setViewingEmail(null);
                                                         setDroppedEmailFile(null);
-                                                        setUploadedFile(null); // Clear any previous uploaded file
-                                                        showNotification('📧 Email text pasted! Add a prompt and click generate to analyze.');
+                                                        setUploadedFile(null);
+                                                        showNotification('📧 Email file loaded successfully!');
                                                     };
 
                                                     reader.readAsText(file);
