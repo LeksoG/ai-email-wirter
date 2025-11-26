@@ -171,6 +171,17 @@
             }
         }
 
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+                transform: scale(1.02);
+            }
+        }
+
         .fade-in {
             animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -214,44 +225,52 @@
             overflow: visible;
         }
 
-        .unified-button::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: inherit;
-            padding: 2px;
-            background: linear-gradient(90deg,
-                white,
-                rgba(255, 255, 255, 0.3),
-                rgba(255, 255, 255, 0.1),
-                rgba(255, 255, 255, 0.3),
-                white
-            );
-            background-size: 200% 100%;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .unified-button:hover::before {
-            opacity: 1;
-            animation: outline-sweep 0.6s ease-in-out;
-        }
-
-        @keyframes outline-sweep {
+        /* Navigation Button Glow Animation */
+        @keyframes nav-button-glow {
             0% {
-                background-position: 200% 0;
-                opacity: 0;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
             }
             50% {
-                opacity: 1;
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.6),
+                           0 0 60px rgba(139, 92, 246, 0.4);
             }
             100% {
-                background-position: -200% 0;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            }
+        }
+
+        .nav-button-glow-once {
+            animation: nav-button-glow 1s ease-in-out;
+        }
+
+        /* Navigation Blur Transition */
+        .nav-blur-out {
+            animation: blur-out 0.4s ease-out forwards;
+        }
+
+        .nav-blur-in {
+            animation: blur-in 0.4s ease-out forwards;
+        }
+
+        @keyframes blur-out {
+            0% {
+                opacity: 1;
+                filter: blur(0);
+            }
+            100% {
                 opacity: 0;
+                filter: blur(10px);
+            }
+        }
+
+        @keyframes blur-in {
+            0% {
+                opacity: 0;
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0);
             }
         }
 
@@ -8695,6 +8714,9 @@ body.dark-mode .custom-language-select option:hover {
             const [showSuggestionsEnabled, setShowSuggestionsEnabled] = useState(true);
             const [userEmail, setUserEmail] = useState('');
             const [viewingEmail, setViewingEmail] = useState(null);
+            const [navEmailMode, setNavEmailMode] = useState(false); // Track if nav is in email view mode
+            const [navTransitioning, setNavTransitioning] = useState(false); // Track navigation transition
+            const [showNavGlow, setShowNavGlow] = useState(false); // Track glow animation
 
             // Authentication states
             const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -12602,6 +12624,69 @@ const generateAiDraft = async (email) => {
 
                                 {/* Custom Transformation + Suggestions */}
                                 <div className="pt-4 border-t border-gray-300 space-y-4 custom-transformation-section">
+                                    {/* Rewrite with AI button - shows when user has written content */}
+                                    {emailText.trim().length > 50 && !customPrompt.trim() && (
+                                        <div style={{marginBottom: '16px', textAlign: 'center'}}>
+                                            <button
+                                                onClick={() => {
+                                                    const rewritePrompt = 'Rewrite and improve this email';
+                                                    setIsReplyOnlyMode(false);
+                                                    setCenteredWriterPrompt(rewritePrompt);
+                                                    setShowCenteredWriter(true);
+                                                    setIsCenteredGenerating(true);
+                                                    setCenteredWriterResult('');
+                                                    setAiSuggestions([]);
+
+                                                    const statusMessages = [
+                                                        '🤔 Analyzing your request',
+                                                        '✍️ Writing the email',
+                                                        '✨ Polishing content',
+                                                        '📝 Finalizing'
+                                                    ];
+
+                                                    let statusIndex = 0;
+                                                    setCenteredGenerationStatus(statusMessages[0]);
+
+                                                    const statusInterval = setInterval(() => {
+                                                        statusIndex = (statusIndex + 1) % statusMessages.length;
+                                                        setCenteredGenerationStatus(statusMessages[statusIndex]);
+                                                    }, 2000);
+
+                                                    generateEmail(rewritePrompt).then(result => {
+                                                        clearInterval(statusInterval);
+                                                        setIsCenteredGenerating(false);
+                                                        setCenteredWriterResult(result);
+                                                        generateAiSuggestions(result, rewritePrompt);
+                                                    }).catch(error => {
+                                                        clearInterval(statusInterval);
+                                                        console.error('AI Generation error:', error);
+                                                        setIsCenteredGenerating(false);
+                                                        setCenteredWriterResult('Failed to generate email. Please try again.');
+                                                    });
+                                                }}
+                                                style={{
+                                                    padding: '14px 32px',
+                                                    background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    borderRadius: '50px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '15px',
+                                                    fontWeight: '600',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '10px',
+                                                    transition: 'all 0.3s ease',
+                                                    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                                                    animation: 'pulse-glow 2s ease-in-out infinite'
+                                                }}
+                                                className="unified-button"
+                                            >
+                                                <span>✨</span>
+                                                <span>Rewrite with AI</span>
+                                            </button>
+                                        </div>
+                                    )}
                                      {/* Custom Prompt Input */}
 {/* Custom Prompt Input */}
 <div style={{position: 'relative'}}>
@@ -13030,6 +13115,15 @@ const generateAiDraft = async (email) => {
                                                         setViewingEmail(email);
                                                         setMobileInboxOpen(false);
                                                         setMobileEmailViewerOpen(true);
+                                                        // Transition navigation to email mode
+                                                        setNavTransitioning(true);
+                                                        setTimeout(() => {
+                                                            setNavEmailMode(true);
+                                                            setShowNavGlow(true);
+                                                            setNavTransitioning(false);
+                                                            // Remove glow after animation
+                                                            setTimeout(() => setShowNavGlow(false), 1000);
+                                                        }, 400);
                                                     }}
                                                     className="modern-email-item"
                                                     style={{animationDelay: `${index * 0.05}s`}}
@@ -13055,6 +13149,15 @@ const generateAiDraft = async (email) => {
                                                         setViewingEmail(email);
                                                         setMobileInboxOpen(false);
                                                         setMobileEmailViewerOpen(true);
+                                                        // Transition navigation to email mode
+                                                        setNavTransitioning(true);
+                                                        setTimeout(() => {
+                                                            setNavEmailMode(true);
+                                                            setShowNavGlow(true);
+                                                            setNavTransitioning(false);
+                                                            // Remove glow after animation
+                                                            setTimeout(() => setShowNavGlow(false), 1000);
+                                                        }, 400);
                                                     }}
                                                     className="modern-email-item"
                                                     style={{animationDelay: `${index * 0.05}s`}}
@@ -13081,6 +13184,15 @@ const generateAiDraft = async (email) => {
                                                     setViewingEmail(email);
                                                     setMobileInboxOpen(false);
                                                     setMobileEmailViewerOpen(true);
+                                                    // Transition navigation to email mode
+                                                    setNavTransitioning(true);
+                                                    setTimeout(() => {
+                                                        setNavEmailMode(true);
+                                                        setShowNavGlow(true);
+                                                        setNavTransitioning(false);
+                                                        // Remove glow after animation
+                                                        setTimeout(() => setShowNavGlow(false), 1000);
+                                                    }, 400);
                                                 }}
                                                 className="modern-email-item"
                                                 style={{animationDelay: `${index * 0.05}s`}}
@@ -13199,35 +13311,21 @@ const generateAiDraft = async (email) => {
                                 setMobileViewerCurrentY(0);
                             }}
                         >
-                            {/* Header with Close Indicator and Actions */}
+                            {/* Header with Close Indicator */}
                             <div className="mobile-email-header">
                                 <div
                                     className="mobile-email-close-bar"
                                     onClick={() => {
-                                        setMobileEmailViewerOpen(false);
-                                        setTimeout(() => setViewingEmail(null), 400);
+                                        setNavTransitioning(true);
+                                        setTimeout(() => {
+                                            setNavEmailMode(false);
+                                            setMobileEmailViewerOpen(false);
+                                            setTimeout(() => setViewingEmail(null), 400);
+                                            setNavTransitioning(false);
+                                        }, 400);
                                     }}
                                 >
                                     <div className="mobile-email-close-indicator"></div>
-                                </div>
-                                <div className="mobile-email-actions">
-                                    <button
-                                        onClick={() => {
-                                            setMobileEmailViewerOpen(false);
-                                            setTimeout(() => setViewingEmail(null), 400);
-                                        }}
-                                        className="px-4 py-2 glass-effect rounded-full text-sm font-medium unified-button border-2 border-white"
-                                        style={{color: darkMode ? '#e5e5e5' : '#374151'}}
-                                    >
-                                        ← Close
-                                    </button>
-                                    <button
-                                        onClick={() => handleSummarizeEmail(viewingEmail)}
-                                        className="px-4 py-2 glass-effect rounded-full text-sm font-medium unified-button border-2 border-white"
-                                        style={{color: darkMode ? '#e5e5e5' : '#374151'}}
-                                    >
-                                        ✨ Summarize
-                                    </button>
                                 </div>
                             </div>
 
@@ -13422,36 +13520,86 @@ const generateAiDraft = async (email) => {
                     <header className={`sticky-header ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''}`}>
                         <div className="container mx-auto px-4 py-4">
                             <div className="flex justify-center items-center" style={{position: 'relative'}}>
-                                {/* Navigation Bar */}
-                                <div className={`nav-container ${showSearchBar ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} style={{transition: 'opacity 0.3s ease'}} ref={navRef}>
-                                    <button
-                                        onClick={() => {
-                                            // Block navigation from settings to home if animation is showing
-                                            if (currentPage === 'settings' && showConnectionAnimation) {
-                                                showNotification('⏳ Just a sec, setting up final bits...');
-                                                return;
-                                            }
-                                            setCurrentPage('home');
-                                        }}
-                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
-                                            currentPage === 'home'
-                                                ? 'active text-gray-800'
-                                                : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
-                                        }`}
+                                {/* Navigation Bar - Dynamic based on email viewing mode */}
+                                {!navEmailMode ? (
+                                    <div
+                                        className={`nav-container ${showSearchBar ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${navTransitioning ? 'nav-blur-out' : 'nav-blur-in'}`}
+                                        style={{transition: 'opacity 0.3s ease'}}
+                                        ref={navRef}
                                     >
-                                        Home
-                                    </button>
-                                    <button
-                                        onClick={() => setCurrentPage('settings')}
-                                        className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
-                                            currentPage === 'settings'
-                                                ? 'active text-gray-800'
-                                                : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
-                                        }`}
+                                        <button
+                                            onClick={() => {
+                                                // Block navigation from settings to home if animation is showing
+                                                if (currentPage === 'settings' && showConnectionAnimation) {
+                                                    showNotification('⏳ Just a sec, setting up final bits...');
+                                                    return;
+                                                }
+                                                setCurrentPage('home');
+                                            }}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
+                                                currentPage === 'home'
+                                                    ? 'active text-gray-800'
+                                                    : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Home
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentPage('settings')}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white ${
+                                                currentPage === 'settings'
+                                                    ? 'active text-gray-800'
+                                                    : 'nav-tab-inactive text-gray-700 hover:bg-white/70'
+                                            }`}
+                                        >
+                                            Settings
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={`nav-container ${navTransitioning ? 'nav-blur-out' : 'nav-blur-in'}`}
+                                        style={{display: 'flex', gap: '12px', alignItems: 'center'}}
                                     >
-                                        Settings
-                                    </button>
-                                </div>
+                                        {/* Back Button */}
+                                        <button
+                                            onClick={() => {
+                                                setNavTransitioning(true);
+                                                setTimeout(() => {
+                                                    setNavEmailMode(false);
+                                                    setMobileEmailViewerOpen(false);
+                                                    setTimeout(() => setViewingEmail(null), 400);
+                                                    setNavTransitioning(false);
+                                                }, 400);
+                                            }}
+                                            className="px-5 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800"
+                                            style={{marginRight: 'auto'}}
+                                        >
+                                            ← Back
+                                        </button>
+
+                                        {/* Summarize Button */}
+                                        <button
+                                            onClick={() => handleSummarizeEmail(viewingEmail)}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800 ${showNavGlow ? 'nav-button-glow-once' : ''}`}
+                                        >
+                                            ✨ Summarize
+                                        </button>
+
+                                        {/* Reply Button */}
+                                        <button
+                                            onClick={() => {
+                                                // Scroll to reply section
+                                                const replySection = document.querySelector('.mobile-email-section');
+                                                if (replySection) {
+                                                    replySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }
+                                            }}
+                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800 ${showNavGlow ? 'nav-button-glow-once' : ''}`}
+                                        >
+                                            ✍️ Reply
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </header>
@@ -13486,7 +13634,7 @@ const generateAiDraft = async (email) => {
                               {/* Desktop Layout: Inbox Sidebar + Content Area */}
                                 {(emailConnected || outlookConnected) && currentPage === 'home' && (
                                     <>
-                                    <div className={`desktop-inbox-layout ${(isCenteredGenerating && !isReplyOnlyMode) ? 'generating-mode' : ''}`}>
+                                    <div className={`desktop-inbox-layout ${(showCenteredWriter && !isReplyOnlyMode) ? 'generating-mode' : ''}`}>
                                         {/* Left Sidebar - Inbox */}
                                         {/* Left Sidebar - Inbox */}
                                          <div className={`inbox-sidebar ${aiWritingMode ? 'ai-mode-hidden' : ''} ${aiWritingModeClosing ? 'ai-mode-visible' : ''} ${(showCenteredWriter && !isReplyOnlyMode) ? 'generating-hidden' : ''}`}>
@@ -14141,7 +14289,7 @@ const generateAiDraft = async (email) => {
 
                                         {/* Right Content Area - Email Viewer or AI Tools */}
                                         <div
-                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''} ${aiWritingMode ? 'ai-mode-centered' : ''} ${aiWritingModeClosing ? 'ai-mode-normal' : ''} ${(isCenteredGenerating && !isReplyOnlyMode) ? 'generating-centered' : ''}`}
+                                        className={`email-content-area ${viewingEmail ? 'viewing-email' : 'drop-zone'} ${isDraggingOver ? 'drag-over' : ''} ${aiWritingMode ? 'ai-mode-centered' : ''} ${aiWritingModeClosing ? 'ai-mode-normal' : ''} ${(showCenteredWriter && !isReplyOnlyMode) ? 'generating-centered' : ''}`}
                                             onDragOver={(e) => {
                                                 e.preventDefault();
                                                 setIsDraggingOver(true);
@@ -14988,7 +15136,7 @@ onDrop={(e) => {
             <div style={{width: '40px'}}></div>
             {/* Action buttons - only show when result is ready */}
             {!isCenteredGenerating && centeredWriterResult && (
-                <div style={{display: 'flex', gap: '12px'}}>
+                <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center'}}>
                     <button
                         onClick={() => {
                             console.log('📝 Using result...');
@@ -15018,6 +15166,35 @@ onDrop={(e) => {
                     >
                         <span>✓</span>
                         <span>{viewingEmail ? 'Use as Reply' : 'Use Email'}</span>
+                    </button>
+                    <button
+                        onClick={() => {
+                            // Save to drafts
+                            setCurrentDraftToSave({
+                                content: centeredWriterResult,
+                                prompt: centeredWriterPrompt,
+                                timestamp: Date.now(),
+                                provider: activeProvider
+                            });
+                            setShowSaveDraftModal(true);
+                        }}
+                        style={{
+                            padding: '10px 20px',
+                            background: darkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)',
+                            color: darkMode ? '#c4b5fd' : '#7c3aed',
+                            border: '2px solid rgba(139, 92, 246, 0.3)',
+                            borderRadius: '50px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            transition: 'all 0.3s ease'
+                        }}
+                    >
+                        <span>💾</span>
+                        <span>Save to Drafts</span>
                     </button>
                     <button
                         onClick={() => {
@@ -15090,14 +15267,27 @@ onDrop={(e) => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '16px',
-                padding: '40px 20px',
-                minHeight: '200px',
+                justifyContent: 'center',
+                gap: '24px',
+                padding: '60px 40px',
+                minHeight: '300px',
                 width: '100%',
                 maxWidth: '100%',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                background: darkMode ? 'rgba(40, 40, 45, 0.5)' : 'rgba(249, 250, 251, 0.8)',
+                borderRadius: '16px',
+                border: '2px solid rgba(99, 102, 241, 0.2)'
             }}>
                 {console.log('🎬 Rendering generation animation')}
+                <div style={{
+                    fontSize: '20px',
+                    fontWeight: '700',
+                    color: darkMode ? '#a5b4fc' : '#4f46e5',
+                    marginBottom: '12px',
+                    textAlign: 'center'
+                }}>
+                    ✨ Generating with AI
+                </div>
                 {['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'].map((status, idx) => {
                     const allStatuses = ['🤔 Analyzing your request', '✍️ Writing the email', '✨ Polishing content', '📝 Finalizing'];
                     const currentIdx = allStatuses.findIndex(s => centeredGenerationStatus.includes(s.slice(2)));
@@ -15106,14 +15296,20 @@ onDrop={(e) => {
                         <div
                             key={idx}
                             style={{
-                                fontSize: '16px',
-                                fontWeight: isActive ? '600' : '400',
+                                fontSize: '18px',
+                                fontWeight: isActive ? '700' : '500',
                                 color: isActive
                                     ? (darkMode ? '#a5b4fc' : '#4f46e5')
                                     : (darkMode ? '#6b7280' : '#9ca3af'),
-                                opacity: isActive ? 1 : 0.5,
-                                transition: 'all 0.3s ease',
-                                transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                                opacity: isActive ? 1 : 0.4,
+                                transition: 'all 0.4s ease',
+                                transform: isActive ? 'scale(1.15)' : 'scale(1)',
+                                padding: '12px 24px',
+                                borderRadius: '50px',
+                                background: isActive
+                                    ? (darkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)')
+                                    : 'transparent',
+                                border: isActive ? '2px solid rgba(99, 102, 241, 0.3)' : '2px solid transparent'
                             }}
                         >
                             {status}
