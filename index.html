@@ -274,6 +274,48 @@
             }
         }
 
+        /* Back Button Separated Layout */
+        .nav-with-back-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-button-separated {
+            animation: slide-in-from-left 0.4s ease-out;
+        }
+
+        @keyframes slide-in-from-left {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .email-action-buttons {
+            display: flex;
+            gap: 12px;
+            animation: slide-in-from-right 0.4s ease-out;
+        }
+
+        @keyframes slide-in-from-right {
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         /* Splash Animation for Inbox Container */
         .splash-container {
             animation: container-fade-in 0.8s ease-out;
@@ -10092,29 +10134,68 @@ useEffect(() => {
                     }
                 };
 
+                // Function to strip HTML tags and decode HTML entities
+                const stripHtmlAndDecode = (html) => {
+                    if (!html) return '';
+
+                    // Create a temporary div to decode HTML entities
+                    const txt = document.createElement('textarea');
+                    txt.innerHTML = html;
+                    let decoded = txt.value;
+
+                    // Remove script and style elements completely
+                    decoded = decoded.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                    decoded = decoded.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
+                    // Convert common HTML tags to readable text
+                    decoded = decoded.replace(/<br\s*\/?>/gi, '\n');
+                    decoded = decoded.replace(/<\/p>/gi, '\n\n');
+                    decoded = decoded.replace(/<\/div>/gi, '\n');
+                    decoded = decoded.replace(/<\/li>/gi, '\n');
+                    decoded = decoded.replace(/<\/tr>/gi, '\n');
+
+                    // Remove all remaining HTML tags
+                    decoded = decoded.replace(/<[^>]+>/g, '');
+
+                    // Decode HTML entities again (in case there were nested encodings)
+                    txt.innerHTML = decoded;
+                    decoded = txt.value;
+
+                    // Clean up excessive whitespace
+                    decoded = decoded.replace(/&nbsp;/g, ' ');
+                    decoded = decoded.replace(/\n\s*\n\s*\n/g, '\n\n'); // Max 2 newlines
+                    decoded = decoded.trim();
+
+                    return decoded;
+                };
+
                 // Function to extract text from parts recursively
                 const extractFromParts = (parts) => {
                     if (!parts || !Array.isArray(parts)) return '';
 
-                    let text = '';
+                    let plainText = '';
+                    let htmlText = '';
+
                     for (const part of parts) {
                         // If part has nested parts, recurse
                         if (part.parts) {
-                            text += extractFromParts(part.parts);
+                            const extracted = extractFromParts(part.parts);
+                            if (!plainText) plainText = extracted;
                         }
                         // Extract text/plain or text/html
                         else if (part.body && part.body.data) {
                             if (part.mimeType === 'text/plain') {
-                                text += decodeBase64(part.body.data);
-                            } else if (part.mimeType === 'text/html' && !text) {
-                                // Use HTML as fallback if no plain text
-                                const html = decodeBase64(part.body.data);
-                                // Strip HTML tags for plain text
-                                text += html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+                                plainText = decodeBase64(part.body.data);
+                            } else if (part.mimeType === 'text/html') {
+                                htmlText = decodeBase64(part.body.data);
                             }
                         }
                     }
-                    return text;
+
+                    // Prefer plain text, fallback to stripped HTML
+                    if (plainText) return plainText;
+                    if (htmlText) return stripHtmlAndDecode(htmlText);
+                    return '';
                 };
 
                 // Check if email has parts (multipart)
@@ -10123,7 +10204,13 @@ useEffect(() => {
                 }
                 // Simple email with body directly in payload
                 else if (payload.body && payload.body.data) {
-                    body = decodeBase64(payload.body.data);
+                    const rawBody = decodeBase64(payload.body.data);
+                    // Check if it looks like HTML (contains tags)
+                    if (rawBody.includes('<') && rawBody.includes('>')) {
+                        body = stripHtmlAndDecode(rawBody);
+                    } else {
+                        body = rawBody;
+                    }
                 }
 
                 return body || 'No content available';
@@ -13439,11 +13526,8 @@ const generateAiDraft = async (email) => {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div
-                                        className={`nav-container ${navTransitioning ? 'nav-blur-out' : 'nav-blur-in'}`}
-                                        style={{display: 'flex', gap: '12px', alignItems: 'center'}}
-                                    >
-                                        {/* Back Button */}
+                                    <div className={`nav-with-back-button ${navTransitioning ? 'nav-blur-out' : ''}`}>
+                                        {/* Back Button - Separated on the left */}
                                         <button
                                             onClick={() => {
                                                 setNavTransitioning(true);
@@ -13454,33 +13538,35 @@ const generateAiDraft = async (email) => {
                                                     setNavTransitioning(false);
                                                 }, 400);
                                             }}
-                                            className="px-5 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800"
-                                            style={{marginRight: 'auto'}}
+                                            className="px-5 py-2 rounded-full font-medium transition-all oval-button unified-button border-2 border-white active text-gray-800 back-button-separated"
                                         >
                                             ← Back
                                         </button>
 
-                                        {/* Summarize Button */}
-                                        <button
-                                            onClick={() => handleSummarizeEmail(viewingEmail)}
-                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800 ${showNavGlow ? 'nav-button-glow-once' : ''}`}
-                                        >
-                                            ✨ Summarize
-                                        </button>
+                                        {/* Email Action Buttons - In oval nav container on the right */}
+                                        <div className="nav-container email-action-buttons">
+                                            {/* Summarize Button */}
+                                            <button
+                                                onClick={() => handleSummarizeEmail(viewingEmail)}
+                                                className={`px-6 py-2 rounded-full font-medium transition-all nav-tab ${showNavGlow ? 'nav-button-glow-once' : ''} text-gray-800`}
+                                            >
+                                                ✨ Summarize
+                                            </button>
 
-                                        {/* Reply Button */}
-                                        <button
-                                            onClick={() => {
-                                                // Scroll to reply section
-                                                const replySection = document.querySelector('.mobile-email-section');
-                                                if (replySection) {
-                                                    replySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                                }
-                                            }}
-                                            className={`px-6 py-2 rounded-full font-medium transition-all oval-button nav-tab unified-button border-2 border-white active text-gray-800 ${showNavGlow ? 'nav-button-glow-once' : ''}`}
-                                        >
-                                            ✍️ Reply
-                                        </button>
+                                            {/* Reply Button */}
+                                            <button
+                                                onClick={() => {
+                                                    // Scroll to reply section
+                                                    const replySection = document.querySelector('.mobile-email-section');
+                                                    if (replySection) {
+                                                        replySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                    }
+                                                }}
+                                                className={`px-6 py-2 rounded-full font-medium transition-all nav-tab ${showNavGlow ? 'nav-button-glow-once' : ''} text-gray-800`}
+                                            >
+                                                ✍️ Reply
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
