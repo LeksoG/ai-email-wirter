@@ -13592,6 +13592,15 @@ const generateAiDraft = async (email) => {
                                                                             setViewingEmail(email);
                                                                             setInboxSearchQuery('');
                                                                             setShowInboxSearchSuggestions(false);
+                                                                            // Transition navigation to email mode
+                                                                            setNavTransitioning(true);
+                                                                            setTimeout(() => {
+                                                                                setNavEmailMode(true);
+                                                                                setShowNavGlow(true);
+                                                                                setNavTransitioning(false);
+                                                                                // Remove glow after animation
+                                                                                setTimeout(() => setShowNavGlow(false), 1000);
+                                                                            }, 400);
                                                                         }}
                                                                     >
                                                                         <div className="text-xs font-bold text-gray-800">{email.from || email.to}</div>
@@ -13793,6 +13802,15 @@ const generateAiDraft = async (email) => {
                                                                                                             return updated;
                                                                                                         });
                                                                                                     }
+                                                                                                    // Transition navigation to email mode
+                                                                                                    setNavTransitioning(true);
+                                                                                                    setTimeout(() => {
+                                                                                                        setNavEmailMode(true);
+                                                                                                        setShowNavGlow(true);
+                                                                                                        setNavTransitioning(false);
+                                                                                                        // Remove glow after animation
+                                                                                                        setTimeout(() => setShowNavGlow(false), 1000);
+                                                                                                    }, 400);
                                                                                                 }}
                                                                                                 className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''}`}
                                                                                                 style={{
@@ -13894,6 +13912,15 @@ const generateAiDraft = async (email) => {
                                                                                                     return updated;
                                                                                                 });
                                                                                             }
+                                                                                            // Transition navigation to email mode
+                                                                                            setNavTransitioning(true);
+                                                                                            setTimeout(() => {
+                                                                                                setNavEmailMode(true);
+                                                                                                setShowNavGlow(true);
+                                                                                                setNavTransitioning(false);
+                                                                                                // Remove glow after animation
+                                                                                                setTimeout(() => setShowNavGlow(false), 1000);
+                                                                                            }, 400);
                                                                                         }}
                                                                                         className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
                                                                                         style={{animationDelay: `${index * 0.05}s`}}
@@ -13937,6 +13964,15 @@ const generateAiDraft = async (email) => {
                                                                                                 return updated;
                                                                                             });
                                                                                         }
+                                                                                        // Transition navigation to email mode
+                                                                                        setNavTransitioning(true);
+                                                                                        setTimeout(() => {
+                                                                                            setNavEmailMode(true);
+                                                                                            setShowNavGlow(true);
+                                                                                            setNavTransitioning(false);
+                                                                                            // Remove glow after animation
+                                                                                            setTimeout(() => setShowNavGlow(false), 1000);
+                                                                                        }, 400);
                                                                                     }}
                                                                                     className={`sidebar-email-item inbox-email-draggable ${viewingEmail?.id === email.id ? 'active' : ''} ${unreadEmails.has(email.id) ? 'unread-email' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''} ${draggedEmail?.id === email.id ? 'dragging' : ''}`}
                                                                                     style={{animationDelay: `${index * 0.05}s`}}
@@ -13975,7 +14011,18 @@ const generateAiDraft = async (email) => {
                                                                                 outlookSentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
                                                                                     <div
                                                                                         key={email.id}
-                                                                                        onClick={() => setViewingEmail(email)}
+                                                                                        onClick={() => {
+                                                                                            setViewingEmail(email);
+                                                                                            // Transition navigation to email mode
+                                                                                            setNavTransitioning(true);
+                                                                                            setTimeout(() => {
+                                                                                                setNavEmailMode(true);
+                                                                                                setShowNavGlow(true);
+                                                                                                setNavTransitioning(false);
+                                                                                                // Remove glow after animation
+                                                                                                setTimeout(() => setShowNavGlow(false), 1000);
+                                                                                            }, 400);
+                                                                                        }}
                                                                                         className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
                                                                                         style={{animationDelay: `${index * 0.05}s`}}
                                                                                     >
@@ -14005,7 +14052,18 @@ const generateAiDraft = async (email) => {
                                                                                 sentEmails.filter(email => !deletedEmails.includes(email.id)).map((email, index) => (
                                                                                     <div
                                                                                         key={email.id}
-                                                                                        onClick={() => setViewingEmail(email)}
+                                                                                        onClick={() => {
+                                                                                            setViewingEmail(email);
+                                                                                            // Transition navigation to email mode
+                                                                                            setNavTransitioning(true);
+                                                                                            setTimeout(() => {
+                                                                                                setNavEmailMode(true);
+                                                                                                setShowNavGlow(true);
+                                                                                                setNavTransitioning(false);
+                                                                                                // Remove glow after animation
+                                                                                                setTimeout(() => setShowNavGlow(false), 1000);
+                                                                                            }, 400);
+                                                                                        }}
                                                                                         className={`sidebar-email-item ${viewingEmail?.id === email.id ? 'active' : ''} ${deletingEmailId === email.id ? 'deleting-email' : ''}`}
                                                                                         style={{animationDelay: `${index * 0.05}s`}}
                                                                                     >
