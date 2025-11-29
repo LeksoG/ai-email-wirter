@@ -9022,6 +9022,8 @@ body.dark-mode .custom-language-select option:hover {
             const [newEmailCount, setNewEmailCount] = useState(0);
             const [unreadEmails, setUnreadEmails] = useState(new Set());
             const [lastEmailCheck, setLastEmailCheck] = useState(Date.now());
+            const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false);
+            const [isTabVisible, setIsTabVisible] = useState(true);
             const [showInboxExpand, setShowInboxExpand] = useState(false);
             const [userName, setUserName] = useState('');
             const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
@@ -9412,6 +9414,12 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
         setDarkMode(true);
         document.body.classList.add('dark-mode');
     }
+
+    // Load push notifications preference
+    const savedPushNotifications = localStorage.getItem('pushNotificationsEnabled');
+    if (savedPushNotifications === 'true') {
+        setPushNotificationsEnabled(true);
+    }
 }, []);
 
             // Update dark mode
@@ -9437,6 +9445,33 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                     return () => clearTimeout(timer);
                 }
             }, [pendingConnection, currentPage]);
+
+            // Track page visibility for push notifications
+            useEffect(() => {
+                const handleVisibilityChange = () => {
+                    setIsTabVisible(!document.hidden);
+                };
+
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+                return () => {
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
+                };
+            }, []);
+
+            // Helper function to send desktop notification
+            const sendDesktopNotification = (title, body) => {
+                if (!pushNotificationsEnabled || isTabVisible) return;
+
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(title, {
+                        body: body,
+                        icon: '/icon-192x192.png',
+                        badge: '/icon-72x72.png',
+                        tag: 'email-generation',
+                        requireInteraction: false
+                    });
+                }
+            };
 
             // Play connection sound on user interaction
             useEffect(() => {
@@ -10067,7 +10102,7 @@ useEffect(() => {
             ];
 
             const tools = [
-                { id: 'email', icon: '✉️', name: 'Email Rewriter', desc: 'Transform your emails instantly' },
+                { id: 'email', icon: '💧', name: 'Email Rewriter', desc: 'Transform your emails instantly' },
                 { id: 'summary', icon: '📝', name: 'Text Summarizer', desc: 'Condense long content' },
                 { id: 'grammar', icon: '✅', name: 'Grammar Check', desc: 'Polish your writing' },
                 { id: 'translate', icon: '🌐', name: 'Translator', desc: 'Translate to any language' },
@@ -11065,6 +11100,9 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
                     setIsProcessing(false);
                     setTimeout(() => animateText(transformedText), 100);
+
+                    // Send push notification if enabled and tab is not visible
+                    sendDesktopNotification('💧 Email Generated!', 'Your AI-generated email is ready to view.');
                 } catch (error) {
                     console.error('API Error:', error);
                     setResult(`Error: ${error.message}\n\nPlease check that:\n1. Your MISTRAL_API_KEY is set in Vercel\n2. Your API key is valid\n3. You have sufficient credits`);
@@ -11120,6 +11158,9 @@ const fetchOutlookSentEmails = async (accessToken) => {
                     setSavedResults(prev => [newResult, ...prev]);
 
                     setIsProcessing(false);
+
+                    // Send push notification if enabled and tab is not visible
+                    sendDesktopNotification('💧 Email Generated!', 'Your AI-generated email is ready to view.');
                     setTimeout(() => animateText(transformedText), 100);
                 } catch (error) {
                     console.error('Retry Error:', error);
@@ -12027,7 +12068,7 @@ const generateAiDraft = async (email) => {
         await new Promise(resolve => setTimeout(resolve, Math.max(0, 2000 - (statusIndex * 1000))));
 
         clearInterval(statusInterval);
-        
+
         console.log('✅ Setting results...');
         setIsCenteredGenerating(false);
 
@@ -12037,6 +12078,9 @@ const generateAiDraft = async (email) => {
             // Generate suggestions based on the result
             generateAiSuggestions(data.result, finalPrompt);
             console.log('✓ Results and suggestions set');
+
+            // Send push notification if enabled and tab is not visible
+            sendDesktopNotification('💧 Email Generated!', 'Your AI-generated email is ready to view.');
         } else {
             console.error('❌ No result in API response');
             setCenteredWriterResult('Failed to generate email. Please try again.');
@@ -12414,6 +12458,43 @@ const generateAiDraft = async (email) => {
                                             <span
                                                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                                     showSuggestionsEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                }`}
+                                            />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Push Notifications Toggle */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                        🔔 Push Notifications
+                                    </label>
+                                    <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                        <span className="text-sm text-gray-700">Notify when email generation is complete</span>
+                                        <button
+                                            onClick={() => {
+                                                const newValue = !pushNotificationsEnabled;
+                                                setPushNotificationsEnabled(newValue);
+                                                localStorage.setItem('pushNotificationsEnabled', newValue.toString());
+                                                if (newValue && 'Notification' in window) {
+                                                    Notification.requestPermission().then(permission => {
+                                                        if (permission === 'granted') {
+                                                            showNotification('🔔 Push notifications enabled!');
+                                                        } else {
+                                                            setPushNotificationsEnabled(false);
+                                                            localStorage.setItem('pushNotificationsEnabled', 'false');
+                                                            showNotification('⚠️ Please allow notifications in your browser settings');
+                                                        }
+                                                    });
+                                                }
+                                            }}
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                pushNotificationsEnabled ? 'bg-indigo-600' : 'bg-gray-300'
+                                            }`}
+                                        >
+                                            <span
+                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                    pushNotificationsEnabled ? 'translate-x-6' : 'translate-x-1'
                                                 }`}
                                             />
                                         </button>
@@ -15647,7 +15728,7 @@ onDrop={(e) => {
                         <>
                             <div className="envelope-blur-overlay"></div>
                             <div className="envelope-animation">
-                                📧
+                                💧
                             </div>
                         </>
                     )}
