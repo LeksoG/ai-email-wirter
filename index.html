@@ -4169,6 +4169,12 @@ body.dark-mode .modern-email-item:hover {
             align-items: center;
         }
 
+        /* Container for inbox button positioning */
+        .desktop-inbox-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
         .inbox-sidebar {
             width: 480px;
             height: calc(100vh - 120px);
@@ -7386,9 +7392,9 @@ body.dark-mode .ai-writer-centered-mode {
 
 /* View Inbox Button Styles */
 .view-inbox-button {
-    position: fixed;
-    top: 120px;
-    left: 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
     z-index: 1000;
     padding: 12px 24px;
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
@@ -7400,7 +7406,7 @@ body.dark-mode .ai-writer-centered-mode {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    animation: slide-in-from-left 0.5s ease-out;
+    animation: slide-in-from-right 0.5s ease-out;
 }
 
 .view-inbox-button:hover {
@@ -11271,8 +11277,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
                 try {
                     const result = await callAIAPI(
-                        `${followupPrompt}. Here is the current email: ${centeredWriterResult}`,
-                        ''
+                        `Please edit and improve the following email based on this request: ${followupPrompt}\n\nCurrent email:\n${centeredWriterResult}`,
+                        centeredWriterResult || 'Edit the email'
                     );
 
                     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -11459,8 +11465,8 @@ const fetchOutlookSentEmails = async (accessToken) => {
 
                 try {
                     const result = await callAIAPI(
-                        `${followupPrompt}. Here is the current email: ${aiGenerationResult}`,
-                        ''
+                        `Please edit and improve the following email based on this request: ${followupPrompt}\n\nCurrent email:\n${aiGenerationResult}`,
+                        aiGenerationResult || 'Edit the email'
                     );
 
                     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -13834,6 +13840,7 @@ const generateAiDraft = async (email) => {
                               {/* Desktop Layout: Inbox Sidebar + Content Area */}
                                 {(emailConnected || outlookConnected) && currentPage === 'home' && (
                                     <>
+                                    <div className="desktop-inbox-wrapper">
                                     {/* View Inbox Toggle Button */}
                                     <button
                                         className="view-inbox-button"
@@ -15396,7 +15403,7 @@ onDrop={(e) => {
                 </div>
 
                 {/* Follow-up input */}
-                <div style={{marginTop: '20px', display: 'flex', gap: '10px'}}>
+                <div style={{marginTop: '50px', display: 'flex', gap: '10px'}}>
                     <input
                         type="text"
                         placeholder="Ask for changes or improvements..."
@@ -15441,6 +15448,7 @@ onDrop={(e) => {
         )}
     </div>
 )}
+                                    </div>
                                     </div>
                                     </>
                                 )}
