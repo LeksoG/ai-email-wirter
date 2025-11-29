@@ -278,14 +278,24 @@
         .nav-with-back-button {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
+            gap: 16px;
         }
 
         .back-button-separated {
             animation: slide-in-from-left 0.4s ease-out;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
         }
 
         @keyframes slide-in-from-left {
@@ -1347,6 +1357,108 @@
             color: #fff;
             transform: scale(1.05);
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Connection Confirmation Popup */
+        .connection-confirm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .connection-confirm-dialog {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+            animation: popup-scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        body.dark-mode .connection-confirm-dialog {
+            background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(20, 20, 25, 0.95) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .connection-confirm-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        .connection-confirm-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        body.dark-mode .connection-confirm-title {
+            color: #e5e5e5;
+        }
+
+        .connection-confirm-message {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        body.dark-mode .connection-confirm-message {
+            color: #9ca3af;
+        }
+
+        .connection-confirm-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .connection-confirm-btn {
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid;
+        }
+
+        .connection-confirm-btn.cancel {
+            background: rgba(107, 114, 128, 0.1);
+            border-color: rgba(107, 114, 128, 0.3);
+            color: #6b7280;
+        }
+
+        .connection-confirm-btn.cancel:hover {
+            background: rgba(107, 114, 128, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .connection-confirm-btn.confirm {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .connection-confirm-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
         }
 
         /* Connection Animation Popup */
@@ -6143,10 +6255,19 @@ body.dark-mode .view-email-from {
 
 .view-email-body {
     font-size: 15px;
-    line-height: 1.7;
+    line-height: 1.6;
     color: #4b5563;
-    white-space: pre-wrap;
+    white-space: normal;
     word-break: break-word;
+    text-align: left;
+}
+
+.view-email-body p {
+    margin-bottom: 12px;
+}
+
+.view-email-body p:last-child {
+    margin-bottom: 0;
 }
 
 body.dark-mode .view-email-body {
@@ -8819,6 +8940,8 @@ body.dark-mode .custom-language-select option:hover {
             const [showConnectionAnimation, setShowConnectionAnimation] = useState(false);
             const [connectionProvider, setConnectionProvider] = useState(null); // 'gmail' or 'outlook'
             const [pendingSoundPlay, setPendingSoundPlay] = useState(false);
+            const [showConnectionConfirmPopup, setShowConnectionConfirmPopup] = useState(false);
+            const [confirmConnectionProvider, setConfirmConnectionProvider] = useState(null);
 
             // Profile customization states
             const [showProfilePopup, setShowProfilePopup] = useState(false);
@@ -9883,55 +10006,10 @@ useEffect(() => {
     const gmailOAuthComplete = localStorage.getItem('gmail_oauth_complete');
 
     if (gmailOAuthComplete === 'true') {
-        // Second click: User clicked "Finish setting up Gmail account" - show animation and play sound
-        console.log('🎬 Finalizing Gmail connection with animation...');
-
-        // Show connection animation
-        setConnectionProvider('gmail');
-        setShowConnectionAnimation(true);
-
-        // Wait 1 second for animation
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // PLAY AUDIO after animation
-        if (connectionAudioRef.current) {
-            console.log('🔊 Playing connection sound...');
-            const audio = connectionAudioRef.current;
-            audio.volume = 0.5;
-            audio.currentTime = 0;
-            audio.play()
-                .then(() => {
-                    console.log('✅ Connection sound played successfully');
-                })
-                .catch((err) => {
-                    console.log('ℹ️ Audio play failed:', err);
-                });
-        }
-
-        // Finalize the connection
-        localStorage.setItem('emailConnected', 'true');
-        localStorage.removeItem('gmail_oauth_complete');
-        setEmailConnected(true);
-        setPendingConnection(null);
-
-        // Fetch emails if not already fetched
-        const savedGmailTokens = localStorage.getItem('gmailTokens');
-        if (savedGmailTokens) {
-            try {
-                const tokens = JSON.parse(savedGmailTokens);
-                fetchGmailEmails(tokens.access_token);
-                fetchSentEmails(tokens.access_token);
-            } catch (error) {
-                console.error('❌ Error fetching Gmail emails:', error);
-            }
-        }
-
-        // Hide animation after 4 seconds
-        setTimeout(() => {
-            setShowConnectionAnimation(false);
-            showNotification('📧 Gmail connected successfully!');
-        }, 4000);
-
+        // Show confirmation popup instead of going straight to animation
+        console.log('📧 Showing Gmail connection confirmation popup...');
+        setConfirmConnectionProvider('gmail');
+        setShowConnectionConfirmPopup(true);
         return;
     }
 
@@ -9968,56 +10046,10 @@ useEffect(() => {
     const outlookOAuthComplete = localStorage.getItem('outlook_oauth_complete');
 
     if (outlookOAuthComplete === 'true') {
-        // Second click: User clicked "Finish setting up Outlook account" - show animation and play sound
-        console.log('🎬 Finalizing Outlook connection with animation...');
-
-        // Show connection animation
-        setConnectionProvider('outlook');
-        setShowConnectionAnimation(true);
-
-        // Wait 1 second for animation
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // PLAY AUDIO after animation
-        if (connectionAudioRef.current) {
-            console.log('🔊 Playing connection sound...');
-            const audio = connectionAudioRef.current;
-            audio.volume = 0.5;
-            audio.currentTime = 0;
-            audio.play()
-                .then(() => {
-                    console.log('✅ Connection sound played successfully');
-                })
-                .catch((err) => {
-                    console.log('ℹ️ Audio play failed:', err);
-                });
-        }
-
-        // Finalize the connection
-        localStorage.setItem('outlookConnected', 'true');
-        localStorage.removeItem('outlook_oauth_complete');
-        setOutlookConnected(true);
-        setActiveProvider('outlook');
-        setPendingConnection(null);
-
-        // Fetch emails if not already fetched
-        const savedOutlookTokens = localStorage.getItem('outlookTokens');
-        if (savedOutlookTokens) {
-            try {
-                const tokens = JSON.parse(savedOutlookTokens);
-                fetchOutlookEmails(tokens.access_token);
-                fetchOutlookSentEmails(tokens.access_token);
-            } catch (error) {
-                console.error('❌ Error fetching Outlook emails:', error);
-            }
-        }
-
-        // Hide animation after 4 seconds
-        setTimeout(() => {
-            setShowConnectionAnimation(false);
-            showNotification('📮 Outlook connected successfully!');
-        }, 4000);
-
+        // Show confirmation popup instead of going straight to animation
+        console.log('📮 Showing Outlook connection confirmation popup...');
+        setConfirmConnectionProvider('outlook');
+        setShowConnectionConfirmPopup(true);
         return;
     }
 
@@ -10058,6 +10090,89 @@ useEffect(() => {
         showNotification('❌ Failed to connect Outlook');
     }
 };
+
+            const handleConfirmConnection = async () => {
+                // Close the confirmation popup
+                setShowConnectionConfirmPopup(false);
+
+                const provider = confirmConnectionProvider;
+
+                // Show connection animation
+                setConnectionProvider(provider);
+                setShowConnectionAnimation(true);
+
+                // Wait 1 second for animation
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // PLAY AUDIO after animation
+                if (connectionAudioRef.current) {
+                    console.log('🔊 Playing connection sound...');
+                    const audio = connectionAudioRef.current;
+                    audio.volume = 0.5;
+                    audio.currentTime = 0;
+                    audio.play()
+                        .then(() => {
+                            console.log('✅ Connection sound played successfully');
+                        })
+                        .catch((err) => {
+                            console.log('ℹ️ Audio play failed:', err);
+                        });
+                }
+
+                // Finalize the connection based on provider
+                if (provider === 'gmail') {
+                    localStorage.setItem('emailConnected', 'true');
+                    localStorage.removeItem('gmail_oauth_complete');
+                    setEmailConnected(true);
+                    setPendingConnection(null);
+
+                    // Fetch emails if not already fetched
+                    const savedGmailTokens = localStorage.getItem('gmailTokens');
+                    if (savedGmailTokens) {
+                        try {
+                            const tokens = JSON.parse(savedGmailTokens);
+                            fetchGmailEmails(tokens.access_token);
+                            fetchSentEmails(tokens.access_token);
+                        } catch (error) {
+                            console.error('❌ Error fetching Gmail emails:', error);
+                        }
+                    }
+
+                    // Hide animation after 4 seconds
+                    setTimeout(() => {
+                        setShowConnectionAnimation(false);
+                        showNotification('📧 Gmail connected successfully!');
+                    }, 4000);
+                } else if (provider === 'outlook') {
+                    localStorage.setItem('outlookConnected', 'true');
+                    localStorage.removeItem('outlook_oauth_complete');
+                    setOutlookConnected(true);
+                    setActiveProvider('outlook');
+                    setPendingConnection(null);
+
+                    // Fetch emails if not already fetched
+                    const savedOutlookTokens = localStorage.getItem('outlookTokens');
+                    if (savedOutlookTokens) {
+                        try {
+                            const tokens = JSON.parse(savedOutlookTokens);
+                            fetchOutlookEmails(tokens.access_token);
+                            fetchOutlookSentEmails(tokens.access_token);
+                        } catch (error) {
+                            console.error('❌ Error fetching Outlook emails:', error);
+                        }
+                    }
+
+                    // Hide animation after 4 seconds
+                    setTimeout(() => {
+                        setShowConnectionAnimation(false);
+                        showNotification('📮 Outlook connected successfully!');
+                    }, 4000);
+                }
+
+                // Reset confirmation provider
+                setConfirmConnectionProvider(null);
+            };
+
             const isTokenExpired = (expiryDate) => {
                 if (!expiryDate) return true;
                 // Add 5 minute buffer before actual expiry
@@ -11886,7 +12001,7 @@ const generateAiDraft = async (email) => {
                                                     <svg className="connection-icon-unified" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.545l8.073-6.052C21.69 2.28 24 3.434 24 5.457z"/>
                                                     </svg>
-                                                    <span className="connection-text">{pendingConnection === 'gmail' ? 'Finish setting up Gmail account' : 'Connect Gmail'}</span>
+                                                    <span className="connection-text">Connect Gmail</span>
                                                 </button>
                                             ) : (
                                                 <div className="connection-btn-unified connected-unified gmail-connected-unified">
@@ -11924,7 +12039,7 @@ const generateAiDraft = async (email) => {
                                                         <path d="M23 7.5v9c0 .8-.7 1.5-1.5 1.5h-9L6 12l6.5-6h9c.8 0 1.5.7 1.5 1.5zM11 6L5 11h6l6-5z"/>
                                                         <path d="M1 8.5v7c0 .8.7 1.5 1.5 1.5h8L5 11 10.5 6h-8c-.8 0-1.5.7-1.5 1.5z" fill="currentColor"/>
                                                     </svg>
-                                                    <span className="connection-text">{pendingConnection === 'outlook' ? 'Finish setting up Outlook account' : 'Connect Outlook'}</span>
+                                                    <span className="connection-text">Connect Outlook</span>
                                                 </button>
                                             ) : (
                                                 <div className="connection-btn-unified connected-unified outlook-connected-unified">
@@ -13527,7 +13642,7 @@ const generateAiDraft = async (email) => {
                                     </div>
                                 ) : (
                                     <div className={`nav-with-back-button ${navTransitioning ? 'nav-blur-out' : ''}`}>
-                                        {/* Back Button - Separated on the left */}
+                                        {/* Back Button - Circular icon on the left */}
                                         <button
                                             onClick={() => {
                                                 setNavTransitioning(true);
@@ -13538,12 +13653,12 @@ const generateAiDraft = async (email) => {
                                                     setNavTransitioning(false);
                                                 }, 400);
                                             }}
-                                            className="px-5 py-2 rounded-full font-medium transition-all oval-button unified-button border-2 border-white active text-gray-800 back-button-separated"
+                                            className="font-medium transition-all oval-button unified-button border-2 border-white active text-gray-800 back-button-separated"
                                         >
-                                            ← Back
+                                            ←
                                         </button>
 
-                                        {/* Email Action Buttons - In oval nav container on the right */}
+                                        {/* Email Action Buttons - In oval nav container */}
                                         <div className="nav-container email-action-buttons">
                                             {/* Summarize Button */}
                                             <button
@@ -16210,7 +16325,12 @@ onDrop={(e) => {
                                         <span className="view-email-date">{viewEmailPopupData.date}</span>
                                     </div>
                                     <div className="view-email-body">
-                                        {viewEmailPopupData.body || viewEmailPopupData.snippet || 'No content available'}
+                                        {(viewEmailPopupData.body || viewEmailPopupData.snippet || 'No content available')
+                                            .split('\n\n')
+                                            .filter(para => para.trim())
+                                            .map((paragraph, idx) => (
+                                                <p key={idx}>{paragraph.trim()}</p>
+                                            ))}
                                     </div>
                                 </div>
                             </div>
@@ -16256,6 +16376,46 @@ onDrop={(e) => {
                                         boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
                                     }}>
                                         Save as Draft
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Connection Confirmation Popup */}
+                    {showConnectionConfirmPopup && confirmConnectionProvider && (
+                        <div className="connection-confirm-overlay" onClick={(e) => {
+                            if (e.target === e.currentTarget) {
+                                setShowConnectionConfirmPopup(false);
+                                setConfirmConnectionProvider(null);
+                            }
+                        }}>
+                            <div className="connection-confirm-dialog" onClick={(e) => e.stopPropagation()}>
+                                <div className="connection-confirm-icon">
+                                    {confirmConnectionProvider === 'gmail' ? '📧' : '📮'}
+                                </div>
+                                <div className="connection-confirm-title">
+                                    Connect {confirmConnectionProvider === 'gmail' ? 'Gmail' : 'Outlook'}?
+                                </div>
+                                <div className="connection-confirm-message">
+                                    You're about to connect your {confirmConnectionProvider === 'gmail' ? 'Gmail' : 'Outlook'} account to InkMind.
+                                    This will allow you to read and send emails directly from the app.
+                                </div>
+                                <div className="connection-confirm-buttons">
+                                    <button
+                                        className="connection-confirm-btn cancel"
+                                        onClick={() => {
+                                            setShowConnectionConfirmPopup(false);
+                                            setConfirmConnectionProvider(null);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="connection-confirm-btn confirm"
+                                        onClick={handleConfirmConnection}
+                                    >
+                                        Confirm Connection
                                     </button>
                                 </div>
                             </div>
