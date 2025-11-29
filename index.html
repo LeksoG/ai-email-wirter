@@ -9356,8 +9356,14 @@ if (tokensParam) {
         setShowLanguageInHome(savedShowLanguageInHome === 'true');
     }
 
-    if (savedConnection === 'true' && savedTokens) {
+    // FIX: Check for tokens to restore connection state (even if emailConnected flag isn't set)
+    if (savedTokens) {
+        // Set connection state if tokens exist
         setEmailConnected(true);
+        // Ensure localStorage flag is set for future loads
+        if (savedConnection !== 'true') {
+            localStorage.setItem('emailConnected', 'true');
+        }
 
         // Fetch emails with saved tokens
         try {
@@ -9379,9 +9385,15 @@ if (tokensParam) {
 const savedOutlookConnection = localStorage.getItem('outlookConnected');
 const savedOutlookTokens = localStorage.getItem('outlookTokens');
 
-if (savedOutlookConnection === 'true' && savedOutlookTokens) {
+// FIX: Check for tokens to restore connection state (even if outlookConnected flag isn't set)
+if (savedOutlookTokens) {
+    // Set connection state if tokens exist
     setOutlookConnected(true);
-    
+    // Ensure localStorage flag is set for future loads
+    if (savedOutlookConnection !== 'true') {
+        localStorage.setItem('outlookConnected', 'true');
+    }
+
     try {
         const tokens = JSON.parse(savedOutlookTokens);  // Parse ONCE
         console.log('📮 Loading saved Outlook tokens');
@@ -9460,7 +9472,9 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
 
             // Helper function to send desktop notification
             const sendDesktopNotification = (title, body) => {
-                if (!pushNotificationsEnabled || isTabVisible) return;
+                // FIX: Send notifications when enabled, regardless of tab visibility
+                // This allows Windows desktop notifications to show even when tab is visible
+                if (!pushNotificationsEnabled) return;
 
                 if ('Notification' in window && Notification.permission === 'granted') {
                     new Notification(title, {
