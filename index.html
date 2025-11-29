@@ -12435,37 +12435,6 @@ const generateAiDraft = async (email) => {
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Settings Options - Only show when logged in */}
-                            {isLoggedIn ? (
-                            <div className="space-y-6">
-
-                                {/* Show Suggestions Toggle */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                        💡 Show Suggestions
-                                    </label>
-                                    <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
-                                        <span className="text-sm text-gray-700">Show AI tone suggestions while typing</span>
-                                        <button
-                                            onClick={() => {
-                                                const newValue = !showSuggestionsEnabled;
-                                                setShowSuggestionsEnabled(newValue);
-                                                localStorage.setItem('showSuggestions', newValue.toString());
-                                            }}
-                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                showSuggestionsEnabled ? 'bg-indigo-600' : 'bg-gray-300'
-                                            }`}
-                                        >
-                                            <span
-                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                    showSuggestionsEnabled ? 'translate-x-6' : 'translate-x-1'
-                                                }`}
-                                            />
-                                        </button>
-                                    </div>
-                                </div>
 
                                 {/* Push Notifications Toggle */}
                                 <div>
@@ -12498,6 +12467,37 @@ const generateAiDraft = async (email) => {
                                             <span
                                                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                                                     pushNotificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                }`}
+                                            />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Settings Options - Only show when logged in */}
+                            {isLoggedIn ? (
+                            <div className="space-y-6">
+
+                                {/* Show Suggestions Toggle */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                        💡 Show Suggestions
+                                    </label>
+                                    <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                        <span className="text-sm text-gray-700">Show AI tone suggestions while typing</span>
+                                        <button
+                                            onClick={() => {
+                                                const newValue = !showSuggestionsEnabled;
+                                                setShowSuggestionsEnabled(newValue);
+                                                localStorage.setItem('showSuggestions', newValue.toString());
+                                            }}
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                showSuggestionsEnabled ? 'bg-indigo-600' : 'bg-gray-300'
+                                            }`}
+                                        >
+                                            <span
+                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                    showSuggestionsEnabled ? 'translate-x-6' : 'translate-x-1'
                                                 }`}
                                             />
                                         </button>
