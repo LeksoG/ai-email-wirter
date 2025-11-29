@@ -7319,6 +7319,24 @@ body.dark-mode .ai-writer-centered-mode {
     background: transparent;
 }
 
+/* Hide email content when centered writer is showing */
+.email-content-area.generating-centered > *:not(.ai-writer-centered-mode) {
+    display: none !important;
+}
+
+/* Make centered writer take full width and position properly */
+.desktop-inbox-layout.generating-mode .ai-writer-centered-mode {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
 @keyframes fade-in-content {
     0% {
         opacity: 0;
@@ -9269,6 +9287,19 @@ if (savedOutlookConnection === 'true' && savedOutlookTokens) {
                     localStorage.setItem('darkMode', 'false');
                 }
             }, [darkMode]);
+
+            // Auto-show connection confirmation popup when OAuth completes
+            useEffect(() => {
+                if (pendingConnection && currentPage === 'settings') {
+                    // Small delay to ensure the settings page is rendered
+                    const timer = setTimeout(() => {
+                        console.log(`📧 Auto-showing ${pendingConnection} connection confirmation popup...`);
+                        setConfirmConnectionProvider(pendingConnection);
+                        setShowConnectionConfirmPopup(true);
+                    }, 500);
+                    return () => clearTimeout(timer);
+                }
+            }, [pendingConnection, currentPage]);
 
             // Play connection sound on user interaction
             useEffect(() => {
