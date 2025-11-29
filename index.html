@@ -12413,10 +12413,8 @@ const generateAiDraft = async (email) => {
                                 </div>
                             )}
 
-                            {/* Settings Options - Only show when logged in */}
-                            {isLoggedIn ? (
-                            <div className="space-y-6">
-                                {/* Dark Mode Toggle */}
+                            {/* Dark Mode Toggle - Available for everyone */}
+                            <div className="space-y-6 mb-6">
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         🌙 Dark Mode
@@ -12437,6 +12435,11 @@ const generateAiDraft = async (email) => {
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Settings Options - Only show when logged in */}
+                            {isLoggedIn ? (
+                            <div className="space-y-6">
 
                                 {/* Show Suggestions Toggle */}
                                 <div>
