@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inkmind-v4';
+const CACHE_NAME = 'inkmind-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -44,8 +44,9 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
-  if (event.request.method !== 'GET') {
+  // Only handle GET requests from http/https
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || !url.protocol.startsWith('http')) {
     return;
   }
 
@@ -69,10 +70,13 @@ self.addEventListener('fetch', (event) => {
           // Clone the response
           const responseToCache = response.clone();
 
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
+          // Only cache GET requests from http/https
+          if (event.request.method === 'GET' && url.protocol.startsWith('http')) {
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+          }
 
           return response;
         });
