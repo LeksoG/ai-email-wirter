@@ -1,8 +1,16 @@
-const CACHE_NAME = 'inkmind-v1';
+const CACHE_NAME = 'inkmind-v2';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon-72x72.png',
+  '/icon-96x96.png',
+  '/icon-128x128.png',
+  '/icon-144x144.png',
+  '/icon-152x152.png',
+  '/icon-192x192.png',
+  '/icon-384x384.png',
+  '/icon-512x512.png'
 ];
 
 // Install event - cache resources
@@ -63,6 +71,43 @@ self.addEventListener('fetch', (event) => {
 
           return response;
         });
+      })
+  );
+});
+
+// Push notification event
+self.addEventListener('push', (event) => {
+  const options = {
+    body: event.data ? event.data.text() : 'Your email is ready!',
+    icon: '/icon-192x192.png',
+    badge: '/icon-96x96.png',
+    vibrate: [200, 100, 200],
+    tag: 'inkmind-notification',
+    requireInteraction: false
+  };
+
+  event.waitUntil(
+    self.registration.showNotification('Inkmind - AI Email Writer', options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // If a window is already open, focus it
+        for (let client of clientList) {
+          if (client.url === '/' && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // Otherwise, open a new window
+        if (clients.openWindow) {
+          return clients.openWindow('/');
+        }
       })
   );
 });
