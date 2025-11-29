@@ -9022,7 +9022,9 @@ body.dark-mode .custom-language-select option:hover {
             const [newEmailCount, setNewEmailCount] = useState(0);
             const [unreadEmails, setUnreadEmails] = useState(new Set());
             const [lastEmailCheck, setLastEmailCheck] = useState(Date.now());
-            const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false);
+            const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(() => {
+                return localStorage.getItem('pushNotificationsEnabled') === 'true';
+            });
             const [isTabVisible, setIsTabVisible] = useState(true);
             const [showInboxExpand, setShowInboxExpand] = useState(false);
             const [userName, setUserName] = useState('');
@@ -9425,12 +9427,6 @@ if (savedOutlookTokens) {
     if (savedDarkMode === 'true') {
         setDarkMode(true);
         document.body.classList.add('dark-mode');
-    }
-
-    // Load push notifications preference
-    const savedPushNotifications = localStorage.getItem('pushNotificationsEnabled');
-    if (savedPushNotifications === 'true') {
-        setPushNotificationsEnabled(true);
     }
 }, []);
 
