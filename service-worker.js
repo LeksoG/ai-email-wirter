@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inkmind-v3';
+const CACHE_NAME = 'inkmind-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -44,6 +44,11 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
