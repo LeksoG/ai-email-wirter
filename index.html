@@ -5107,8 +5107,8 @@ body.dark-mode .inbox-search-suggestion-item:hover {
         /* Replace the hamburger-btn styles with this */
 .mobile-inbox-button {
     position: fixed;
-    top: 60px;
-    right: 24px;
+    top: 20px;
+    right: 20px;
     padding: 12px 24px;
     border-radius: 50px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
@@ -5962,9 +5962,24 @@ body.dark-mode .ai-generation-status {
 }
 
 .ai-followup-container {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(99, 102, 241, 0.2);
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    max-width: 600px;
+    width: 90%;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 251, 0.95) 100%);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
+body.dark-mode .ai-followup-container {
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.98) 0%, rgba(25, 25, 30, 0.95) 100%);
+    border-color: rgba(99, 102, 241, 0.3);
 }
 
 .ai-suggestion-chips {
@@ -13163,20 +13178,26 @@ const generateAiDraft = async (email) => {
                                         Retry
                                     </button>
                                 </div>
-                                <div className="glass-dark rounded-2xl p-8" style={{minHeight: '200px'}}>
+                                <div className="glass-dark rounded-2xl p-8" id="result-text-container" style={{minHeight: '200px', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto'}}>
                                     <pre id="result-text" className="text-gray-800 whitespace-pre-wrap font-sans leading-loose text-left text-base" style={{fontSize: '16px', lineHeight: '1.8'}}></pre>
                                 </div>
-                                {/* View Email Button */}
-                                <button
-                                    onClick={() => {
-                                        setFullscreenEmailText(result);
-                                        setShowFullscreenEmail(true);
-                                    }}
-                                    className="view-email-btn"
-                                >
-                                    <span>👁️</span>
-                                    <span>View Email</span>
-                                </button>
+                                {/* View Email Button - Only show when content overflows */}
+                                {(() => {
+                                    const container = document.getElementById('result-text-container');
+                                    const shouldShowButton = container && container.scrollHeight > container.clientHeight;
+                                    return shouldShowButton ? (
+                                        <button
+                                            onClick={() => {
+                                                setFullscreenEmailText(result);
+                                                setShowFullscreenEmail(true);
+                                            }}
+                                            className="view-email-btn"
+                                        >
+                                            <span>👁️</span>
+                                            <span>View Email</span>
+                                        </button>
+                                    ) : null;
+                                })()}
                             </div>
                         </div>
                     );
@@ -13917,32 +13938,6 @@ const generateAiDraft = async (email) => {
                                                             </div>
                                                         </>
                                                     )}
-                                                </div>
-                                            )}
-
-                                            {/* Prioritizing Glow Notification - Smaller */}
-                                            {isPrioritizing && inboxViewMode !== 'tabs' && !showCenteredWriter && !isCenteredGenerating && (
-                                                <div style={{marginBottom: '12px', animation: 'fadeInScale 0.3s ease-out'}}>
-                                                    <div style={{
-                                                        padding: '8px 16px',
-                                                        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.3) 50%, rgba(167, 139, 250, 0.2) 100%)',
-                                                        backgroundSize: '200% 200%',
-                                                        animation: 'prioritize-glow 2s ease-in-out infinite',
-                                                        borderRadius: '50px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        gap: '8px',
-                                                        fontSize: '0.85rem',
-                                                        fontWeight: 600,
-                                                        color: '#6366f1',
-                                                        backdropFilter: 'blur(10px)',
-                                                        border: '2px solid rgba(99, 102, 241, 0.3)',
-                                                        boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)'
-                                                    }}>
-                                                        <span style={{animation: 'pulse-icon 1.5s ease-in-out infinite'}}>⚡</span>
-                                                        <span>Analyzing...</span>
-                                                    </div>
                                                 </div>
                                             )}
 
@@ -16180,7 +16175,7 @@ onDrop={(e) => {
                                         <div style={{
                                             padding: '20px 0',
                                             marginBottom: '20px',
-                                            maxHeight: '350px',
+                                            maxHeight: 'calc(100vh - 400px)',
                                             overflowY: 'auto',
                                             fontSize: '15px',
                                             lineHeight: '1.8',
