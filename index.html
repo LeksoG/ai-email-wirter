@@ -12436,42 +12436,44 @@ const generateAiDraft = async (email) => {
                                     </div>
                                 </div>
 
-                                {/* Push Notifications Toggle */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                        🔔 Push Notifications
-                                    </label>
-                                    <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
-                                        <span className="text-sm text-gray-700">Notify when email generation is complete</span>
-                                        <button
-                                            onClick={() => {
-                                                const newValue = !pushNotificationsEnabled;
-                                                setPushNotificationsEnabled(newValue);
-                                                localStorage.setItem('pushNotificationsEnabled', newValue.toString());
-                                                if (newValue && 'Notification' in window) {
-                                                    Notification.requestPermission().then(permission => {
-                                                        if (permission === 'granted') {
-                                                            showNotification('🔔 Push notifications enabled!');
-                                                        } else {
-                                                            setPushNotificationsEnabled(false);
-                                                            localStorage.setItem('pushNotificationsEnabled', 'false');
-                                                            showNotification('⚠️ Please allow notifications in your browser settings');
-                                                        }
-                                                    });
-                                                }
-                                            }}
-                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                pushNotificationsEnabled ? 'bg-indigo-600' : 'bg-gray-300'
-                                            }`}
-                                        >
-                                            <span
-                                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                    pushNotificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                                {/* Push Notifications Toggle - Only show when at least one email is connected */}
+                                {(emailConnected || outlookConnected) && (
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                            🔔 Push Notifications
+                                        </label>
+                                        <div className="flex items-center justify-between glass-dark px-4 py-3 rounded-xl">
+                                            <span className="text-sm text-gray-700">Notify when email generation is complete</span>
+                                            <button
+                                                onClick={() => {
+                                                    const newValue = !pushNotificationsEnabled;
+                                                    setPushNotificationsEnabled(newValue);
+                                                    localStorage.setItem('pushNotificationsEnabled', newValue.toString());
+                                                    if (newValue && 'Notification' in window) {
+                                                        Notification.requestPermission().then(permission => {
+                                                            if (permission === 'granted') {
+                                                                showNotification('🔔 Push notifications enabled!');
+                                                            } else {
+                                                                setPushNotificationsEnabled(false);
+                                                                localStorage.setItem('pushNotificationsEnabled', 'false');
+                                                                showNotification('⚠️ Please allow notifications in your browser settings');
+                                                            }
+                                                        });
+                                                    }
+                                                }}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    pushNotificationsEnabled ? 'bg-indigo-600' : 'bg-gray-300'
                                                 }`}
-                                            />
-                                        </button>
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        pushNotificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
                             {/* Settings Options - Only show when logged in */}
