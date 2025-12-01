@@ -9566,6 +9566,323 @@ body.dark-mode .custom-language-select {
         transform: scale(1.1);
     }
 } 
+
+        /* ===== FORCED GLASSY MODERN AI STYLE OVERRIDES ===== */
+
+/* Override Glass Effect */
+.glass-effect {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(251, 253, 255, 0.6) 50%,
+        rgba(240, 244, 255, 0.65) 100%
+    ) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08),
+                0 4px 16px rgba(139, 92, 246, 0.06),
+                inset 0 1px 1px rgba(255, 255, 255, 0.9),
+                inset 0 -1px 1px rgba(148, 163, 184, 0.05) !important;
+}
+
+body.dark-mode .glass-effect {
+    background: linear-gradient(135deg,
+        rgba(30, 35, 45, 0.7) 0%,
+        rgba(20, 25, 35, 0.6) 50%,
+        rgba(25, 30, 40, 0.65) 100%
+    ) !important;
+    border: 1px solid rgba(148, 163, 184, 0.15) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.3),
+                inset 0 1px 1px rgba(148, 163, 184, 0.1) !important;
+}
+
+/* Override Glass Dark */
+.glass-dark {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(150%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .glass-dark {
+    background: rgba(40, 45, 55, 0.75) !important;
+    border: 1.5px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* Override Oval Buttons */
+.oval-button, .unified-button, .action-btn {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(249, 250, 251, 0.9) 100%
+    ) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.95) !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.12),
+                0 2px 8px rgba(139, 92, 246, 0.08),
+                inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .oval-button,
+body.dark-mode .unified-button,
+body.dark-mode .action-btn {
+    background: linear-gradient(135deg,
+        rgba(40, 45, 55, 0.95) 0%,
+        rgba(35, 40, 50, 0.9) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
+                inset 0 1px 2px rgba(148, 163, 184, 0.1) !important;
+}
+
+/* Override Text Areas and Inputs */
+.custom-textarea {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.85) 0%,
+        rgba(249, 250, 251, 0.8) 100%
+    ) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.08),
+                inset 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+.custom-textarea:focus {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(249, 250, 251, 0.9) 100%
+    ) !important;
+    border: 2px solid rgba(99, 102, 241, 0.5) !important;
+    box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.08),
+                0 8px 24px rgba(99, 102, 241, 0.15),
+                inset 0 2px 4px rgba(99, 102, 241, 0.05) !important;
+}
+
+body.dark-mode .custom-textarea {
+    background: linear-gradient(135deg,
+        rgba(35, 40, 50, 0.85) 0%,
+        rgba(30, 35, 45, 0.8) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Override Email Items */
+.modern-email-item, .email-item, .sidebar-email-item {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(251, 253, 255, 0.65) 100%
+    ) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08),
+                0 2px 6px rgba(99, 102, 241, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .modern-email-item,
+body.dark-mode .email-item,
+body.dark-mode .sidebar-email-item {
+    background: linear-gradient(135deg,
+        rgba(40, 45, 55, 0.7) 0%,
+        rgba(35, 40, 50, 0.65) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Override Navigation Container */
+.nav-container {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.75) 0%,
+        rgba(249, 250, 251, 0.7) 100%
+    ) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 50px !important;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .nav-container {
+    background: linear-gradient(135deg,
+        rgba(25, 30, 40, 0.75) 0%,
+        rgba(20, 25, 35, 0.7) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Override Nav Tabs */
+.nav-tab {
+    border-radius: 50px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Override Cards */
+.tool-card, .stat-card, .priority-item, .showcase-card {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(249, 250, 251, 0.6) 50%,
+        rgba(240, 244, 255, 0.65) 100%
+    ) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.08),
+                0 4px 12px rgba(139, 92, 246, 0.05),
+                inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .tool-card,
+body.dark-mode .stat-card,
+body.dark-mode .priority-item,
+body.dark-mode .showcase-card {
+    background: linear-gradient(135deg,
+        rgba(30, 35, 45, 0.7) 0%,
+        rgba(25, 30, 40, 0.6) 50%,
+        rgba(28, 33, 43, 0.65) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Override Dropdowns */
+.custom-language-select, .filter-dropdown, select {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(249, 250, 251, 0.85) 100%
+    ) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1),
+                inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+body.dark-mode .custom-language-select,
+body.dark-mode .filter-dropdown,
+body.dark-mode select {
+    background: linear-gradient(135deg,
+        rgba(35, 40, 50, 0.9) 0%,
+        rgba(30, 35, 45, 0.85) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Override Popups and Modals */
+.auth-popup-container, .profile-popup, .version-modal-container,
+.ai-generation-container, .connection-confirm-dialog {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(249, 250, 251, 0.95) 100%
+    ) !important;
+    backdrop-filter: blur(40px) !important;
+    -webkit-backdrop-filter: blur(40px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.9) !important;
+    border-radius: 40px !important;
+    box-shadow: 0 25px 80px rgba(99, 102, 241, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.8) inset !important;
+}
+
+body.dark-mode .auth-popup-container,
+body.dark-mode .profile-popup,
+body.dark-mode .version-modal-container,
+body.dark-mode .ai-generation-container,
+body.dark-mode .connection-confirm-dialog {
+    background: linear-gradient(135deg,
+        rgba(20, 25, 35, 0.98) 0%,
+        rgba(15, 20, 30, 0.95) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* Override Inbox Sidebar */
+.inbox-sidebar {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.75) 0%,
+        rgba(251, 253, 255, 0.7) 100%
+    ) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.1),
+                0 4px 12px rgba(99, 102, 241, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+body.dark-mode .inbox-sidebar {
+    background: linear-gradient(135deg,
+        rgba(25, 30, 40, 0.75) 0%,
+        rgba(20, 25, 35, 0.7) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Override Email Content Area */
+.email-content-area {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.75) 0%,
+        rgba(251, 253, 255, 0.7) 100%
+    ) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.1),
+                0 4px 12px rgba(99, 102, 241, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+body.dark-mode .email-content-area {
+    background: linear-gradient(135deg,
+        rgba(25, 30, 40, 0.75) 0%,
+        rgba(20, 25, 35, 0.7) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Override AI Prompt Containers */
+.ai-prompt-container, .ai-prompt-input, .fullscreen-prompt-container {
+    border-radius: 50px !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* Override Settings Sections */
+.account-details-section-unified, .stats-section {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.75) 0%,
+        rgba(251, 253, 255, 0.7) 100%
+    ) !important;
+    backdrop-filter: blur(40px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    border-radius: 36px !important;
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15),
+                0 4px 12px rgba(99, 102, 241, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+body.dark-mode .account-details-section-unified,
+body.dark-mode .stats-section {
+    background: linear-gradient(135deg,
+        rgba(30, 35, 45, 0.75) 0%,
+        rgba(25, 30, 40, 0.7) 100%
+    ) !important;
+    border: 2px solid rgba(148, 163, 184, 0.15) !important;
+}
     </style>
 </head>
 <body>
