@@ -44,9 +44,12 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests from http/https
   const url = new URL(event.request.url);
-  if (event.request.method !== 'GET' || !url.protocol.startsWith('http')) {
+
+  // Only handle GET requests from http/https
+  // Skip chrome-extension, data, blob, and other non-http(s) schemes
+  if (event.request.method !== 'GET' ||
+      (url.protocol !== 'http:' && url.protocol !== 'https:')) {
     return;
   }
 
@@ -70,11 +73,20 @@ self.addEventListener('fetch', (event) => {
           // Clone the response
           const responseToCache = response.clone();
 
-          // Only cache GET requests from http/https
-          if (event.request.method === 'GET' && url.protocol.startsWith('http')) {
+          // Only cache GET requests from http/https with additional safety checks
+          if (event.request.method === 'GET' &&
+              (url.protocol === 'http:' || url.protocol === 'https:')) {
             caches.open(CACHE_NAME)
               .then((cache) => {
-                cache.put(event.request, responseToCache);
+                // Wrap in try-catch to prevent unhandled promise rejections
+                try {
+                  cache.put(event.request, responseToCache);
+                } catch (error) {
+                  console.warn('Failed to cache request:', event.request.url, error);
+                }
+              })
+              .catch((error) => {
+                console.warn('Failed to open cache:', error);
               });
           }
 
