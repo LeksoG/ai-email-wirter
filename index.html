@@ -5,20 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InkMind - AI Email Writer</title>
 
-    <!-- PWA Meta Tags -->
     <meta name="description" content="AI-powered email writing assistant with Gmail and Outlook integration">
     <meta name="theme-color" content="#6366f1">
-    <link rel="manifest" href="/manifest.json">
-
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Inkmind">
-
-    <!-- MS Tile -->
-    <meta name="msapplication-TileImage" content="/icon-144x144.png">
-    <meta name="msapplication-TileColor" content="#6366f1">
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -10145,30 +10133,6 @@ const extractSenderName = (fromField) => {
     return 'there';
 };
 
-           // Capture PWA install prompt
-useEffect(() => {
-    let deferredPrompt;
-
-    const handleBeforeInstallPrompt = (e) => {
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later
-        window.deferredPrompt = e;
-        deferredPrompt = e;
-
-        // Show the install button
-        const installButton = document.getElementById('pwa-install-button');
-        if (installButton) {
-            installButton.style.display = 'flex';
-        }
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-}, []);
 
            // Initialize app
 useEffect(() => {
@@ -13618,65 +13582,6 @@ const generateAiDraft = async (email) => {
                                                 </div>
                                             </div>
                                         )}
-                                    </div>
-
-                                    {/* Download Inkmind as PWA */}
-                                    <div className="mb-4 mt-8">
-                                        <div className="text-sm font-medium mb-3" style={{color: darkMode ? '#fff' : '#1f2937'}}>
-                                            📱 Progressive Web App
-                                        </div>
-                                        <button
-                                            id="pwa-install-button"
-                                            onClick={() => {
-                                                const installEvent = window.deferredPrompt;
-                                                if (installEvent) {
-                                                    installEvent.prompt();
-                                                    installEvent.userChoice.then((choiceResult) => {
-                                                        if (choiceResult.outcome === 'accepted') {
-                                                            console.log('User accepted the install prompt');
-                                                            playNotificationSound();
-                                                        }
-                                                        window.deferredPrompt = null;
-                                                        document.getElementById('pwa-install-button').style.display = 'none';
-                                                    });
-                                                } else {
-                                                    alert('To install Inkmind as an app:\n\n• Chrome/Edge: Click the ⊕ icon in the address bar\n• Safari iOS: Tap Share → Add to Home Screen\n• Firefox: Look for "Install" in the menu');
-                                                }
-                                            }}
-                                            style={{
-                                                width: '100%',
-                                                padding: '14px 20px',
-                                                background: darkMode
-                                                    ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)'
-                                                    : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '12px',
-                                                fontSize: '14px',
-                                                fontWeight: '600',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease',
-                                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '8px'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(99, 102, 241, 0.4)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)';
-                                            }}
-                                        >
-                                            <span style={{fontSize: '18px'}}>📥</span>
-                                            <span>Download Inkmind</span>
-                                        </button>
-                                        <div className="text-xs mt-2" style={{color: darkMode ? '#aaa' : '#666'}}>
-                                            Install Inkmind as a standalone app on your device
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -17692,19 +17597,6 @@ onDrop={(e) => {
         };
 
         ReactDOM.render(<App />, document.getElementById('root'));
-
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then((registration) => {
-                        console.log('ServiceWorker registered: ', registration);
-                    })
-                    .catch((error) => {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
-            });
-        }
     </script>
 </body>
 </html>
