@@ -9871,6 +9871,281 @@ body.dark-mode .stats-section {
     ) !important;
     border: 2px solid rgba(148, 163, 184, 0.15) !important;
 }
+
+/* ========================================
+   DESKTOP OPTIMIZATIONS FOR LARGER SCREENS
+   ======================================== */
+
+/* Large Desktop Screens (1440px+) */
+@media (min-width: 1440px) {
+    body {
+        padding-top: 120px;
+    }
+
+    .page-container {
+        max-width: 1400px !important;
+        padding: 48px 64px !important;
+    }
+
+    .glass-effect {
+        padding: 40px !important;
+        border-radius: 32px !important;
+    }
+
+    .custom-textarea {
+        font-size: 16px !important;
+        line-height: 1.8 !important;
+        padding: 24px !important;
+    }
+
+    /* Better spacing for cards */
+    .account-details-section-unified,
+    .stats-section {
+        padding: 36px 48px !important;
+        margin-bottom: 32px !important;
+    }
+
+    /* Improved button sizes */
+    .action-btn {
+        padding: 16px 32px !important;
+        font-size: 15px !important;
+    }
+
+    /* Better email list spacing */
+    .inbox-sidebar {
+        width: 380px !important;
+    }
+
+    /* Improved header */
+    .sticky-header {
+        padding: 20px 48px !important;
+    }
+}
+
+/* Standard Desktop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    body {
+        padding-top: 110px;
+    }
+
+    .page-container {
+        max-width: 1200px !important;
+        padding: 36px 48px !important;
+    }
+
+    .glass-effect {
+        padding: 32px !important;
+        border-radius: 28px !important;
+    }
+
+    .custom-textarea {
+        font-size: 15px !important;
+        line-height: 1.7 !important;
+        padding: 20px !important;
+    }
+
+    .account-details-section-unified,
+    .stats-section {
+        padding: 32px 40px !important;
+        margin-bottom: 28px !important;
+    }
+
+    .sticky-header {
+        padding: 18px 40px !important;
+    }
+}
+
+/* Tablet Landscape & Small Desktop (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .page-container {
+        max-width: 900px !important;
+        padding: 28px 36px !important;
+    }
+
+    .glass-effect {
+        padding: 28px !important;
+        border-radius: 24px !important;
+    }
+}
+
+/* General Desktop Improvements (1024px+) */
+@media (min-width: 1024px) {
+    /* Cleaner spacing between sections */
+    .mb-4 {
+        margin-bottom: 24px !important;
+    }
+
+    .mb-6 {
+        margin-bottom: 32px !important;
+    }
+
+    .mb-8 {
+        margin-bottom: 40px !important;
+    }
+
+    /* Better form controls */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        font-size: 15px !important;
+        padding: 14px 18px !important;
+    }
+
+    /* Improved card hover effects */
+    .glass-effect:hover {
+        transform: translateY(-2px) !important;
+    }
+
+    /* Better grid layouts for settings */
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 28px;
+    }
+
+    /* Cleaner navigation */
+    .nav-container {
+        padding: 12px 24px !important;
+    }
+
+    /* Improved email view */
+    .email-content-area {
+        padding: 32px !important;
+        border-radius: 24px !important;
+    }
+
+    /* Better prompt container */
+    .ai-prompt-container {
+        max-width: 900px !important;
+        margin: 0 auto !important;
+        padding: 28px !important;
+    }
+
+    /* Improved result display */
+    .result-container {
+        max-width: 900px !important;
+        margin: 0 auto !important;
+        padding: 32px !important;
+        line-height: 1.8 !important;
+        font-size: 15px !important;
+    }
+
+    /* Better modal sizing */
+    .auth-popup-container {
+        max-width: 520px !important;
+        padding: 40px !important;
+    }
+
+    /* Cleaner button groups */
+    .button-group {
+        gap: 16px !important;
+    }
+
+    /* Better whitespace for readability */
+    p {
+        margin-bottom: 16px;
+    }
+
+    h1 {
+        font-size: 36px !important;
+        margin-bottom: 24px !important;
+    }
+
+    h2 {
+        font-size: 28px !important;
+        margin-bottom: 20px !important;
+    }
+
+    h3 {
+        font-size: 22px !important;
+        margin-bottom: 16px !important;
+    }
+
+    /* Improved email list */
+    .email-item {
+        padding: 20px !important;
+        margin-bottom: 12px !important;
+        border-radius: 16px !important;
+    }
+
+    .email-item:hover {
+        transform: translateX(4px) !important;
+    }
+
+    /* Better stats cards */
+    .stat-card {
+        padding: 24px !important;
+        border-radius: 20px !important;
+    }
+
+    /* Cleaner badges and pills */
+    .badge, .pill {
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Improved shadows for depth */
+    .elevated-card {
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12),
+                    0 2px 8px rgba(99, 102, 241, 0.08) !important;
+    }
+
+    /* Better focus states */
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    /* Cleaner scrollbar for desktop */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.3);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.5);
+    }
+
+    body.dark-mode ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    body.dark-mode ::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.4);
+    }
+
+    body.dark-mode ::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.6);
+    }
+}
+
+/* Ultra-wide Screens (1920px+) */
+@media (min-width: 1920px) {
+    .page-container {
+        max-width: 1600px !important;
+    }
+
+    .glass-effect {
+        padding: 48px !important;
+    }
+
+    body {
+        font-size: 16px;
+    }
+}
     </style>
 </head>
 <body>
